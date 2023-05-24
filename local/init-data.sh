@@ -1,5 +1,4 @@
 #!/bin/bash
-
 function create_order() {
   request_body=$1
   curl -d "$(cat "$request_body")" -H "Content-Type: application/json" -X POST http://localhost:8081/orders

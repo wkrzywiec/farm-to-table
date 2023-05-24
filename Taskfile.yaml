@@ -16,12 +16,6 @@ tasks:
       - java --version
       - gradlew --help
 
-  infra:
-    desc: Spin up dockerized infrastructure (postgres db)
-    cmds:
-      - docker compose up -d redis
-      - docker run --rm -it --network food-delivery-app_default redis redis-cli -h redis FT.CREATE food-idx ON JSON PREFIX 1 "food:" SCHEMA $.name AS name TEXT
-
   run:
     desc: Run all services in Docker
     cmds:
@@ -29,18 +23,26 @@ tasks:
       - docker compose up -d bff ordering delivery food ui
 
   init:
-    desc: Run all services in Docker for the 1st time
+    desc: Run all services in Docker & add initial data
+    dir: local
     cmds:
       - task: run
       - bash init-data.sh
 
-  local:
+  dev:backend:
     desc: Run backend apps with gradle
     cmds:
       - task: infra
       - echo "Starting food-delivery app..."
       - gradlew clean assemble --info
       - gradlew --parallel startBootStack --info
+
+  infra:
+    desc: Spin up dockerized infrastructure
+    cmds:
+      - docker compose up -d redis
+      - docker run --rm -it --network food-delivery-app_default redis redis-cli -h redis FT.CREATE food-idx ON JSON PREFIX 1 "food:" SCHEMA $.name AS name TEXT
+
 
   infra-down:
     desc: Stop infrastructure
