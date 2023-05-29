@@ -20,6 +20,7 @@ public class FoodItemRepository {
 
     private final StatefulRediSearchConnection<String, String> searchConnection;
     private final ObjectMapper objectMapper;
+
     public List<JsonNode> findByQuery(String query) {
         RediSearchCommands<String, String> commands = searchConnection.sync();
         SearchResults<String, String> results = commands.search("food-idx", query);

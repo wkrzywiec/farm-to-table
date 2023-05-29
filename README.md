@@ -59,43 +59,23 @@ The Food Delivery app is designed as a microservice system, aiming to replicate 
 
 As this project serves as my sandbox for experimenting with new concepts and technologies, it will continue to evolve over time. Initially, it primarily functions as an event-driven system, with services communicating with each other based on events.
 
-### C4 model
+### C4 diagrams
 
+#### C4 container diagram
 ```mermaid
 C4Container
     title Container diagram for Food Delivery
     
-    System_Ext(email_system, "E-Mail System", "The internal Microsoft Exchange system", $tags="v1.0")
-    Person(customer, Customer, "A customer of the bank, with personal bank accounts", $tags="v1.0")
-    
-    Container_Boundary(c1, "Internet Banking") {
-        Container(spa, "Single-Page App", "JavaScript, Angular", "Provides all the Internet banking functionality to cutomers via their web browser")
-        Container_Ext(mobile_app, "Mobile App", "C#, Xamarin", "Provides a limited subset of the Internet banking functionality to customers via their mobile device")
-        Container(web_app, "Web Application", "Java, Spring MVC", "Delivers the static content and the Internet banking SPA")
-        ContainerDb(database, "Database", "SQL Database", "Stores user registration information, hashed auth credentials, access logs, etc.")
-        ContainerDb_Ext(backend_api, "API Application", "Java, Docker Container", "Provides Internet banking functionality via API")
-    
+    Person(user, User, "A user of a food deliver application (currently a restaurant manager, customer and delivery man are the same person)")
+
+    Container_Boundary(c1, "Food deliver") {
+        Container(ui, "UI", "JavaScript, React", "User interface for all activities")
+        Container(bff, "BFF", "Java, Spring Boot", "Provides API that is used by user interface")
+        ContainerDb(database, "Database", "Redis Database", "Acts as a database & queue. Stores all information about food, delivery, etc.")
     }
-    
-    System_Ext(banking_system, "Mainframe Banking System", "Stores all of the core banking information about customers, accounts, transactions, etc.")
-    
-    Rel(customer, web_app, "Uses", "HTTPS")
-    UpdateRelStyle(customer, web_app, $offsetY="60", $offsetX="90")
-    Rel(customer, spa, "Uses", "HTTPS")
-    UpdateRelStyle(customer, spa, $offsetY="-40")
-    Rel(customer, mobile_app, "Uses")
-    UpdateRelStyle(customer, mobile_app, $offsetY="-30")
-    
-    Rel(web_app, spa, "Delivers")
-    UpdateRelStyle(web_app, spa, $offsetX="130")
-    Rel(spa, backend_api, "Uses", "async, JSON/HTTPS")
-    Rel(mobile_app, backend_api, "Uses", "async, JSON/HTTPS")
-    Rel_Back(database, backend_api, "Reads from and writes to", "sync, JDBC")
-    
-    Rel(email_system, customer, "Sends e-mails to")
-    UpdateRelStyle(email_system, customer, $offsetX="-45")
-    Rel(backend_api, email_system, "Sends e-mails using", "sync, SMTP")
-    UpdateRelStyle(backend_api, email_system, $offsetY="-60")
-    Rel(backend_api, banking_system, "Uses", "sync/async, XML/HTTPS")
-    UpdateRelStyle(backend_api, banking_system, $offsetY="-50", $offsetX="-140")
+
+    Rel(user, ui, "Uses", "HTTP")
+    Rel(ui, bff, "Uses", "JSON/HTTP")
+    Rel(bff, database, "Manage orders and deliveries", "async, Redis Queue")
+    Rel(bff, database, "Search food", "sync, full-text-search")
 ```
