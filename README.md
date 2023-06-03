@@ -62,20 +62,5 @@ As this project serves as my sandbox for experimenting with new concepts and tec
 ### C4 diagrams
 
 #### C4 container diagram
-```mermaid
-C4Container
-    title Container diagram for Food Delivery
-    
-    Person(user, User, "A user of a food deliver application (currently a restaurant manager, customer and delivery man are the same person)")
 
-    Container_Boundary(c1, "Food deliver") {
-        Container(ui, "UI", "JavaScript, React", "User interface for all activities")
-        Container(bff, "BFF", "Java, Spring Boot", "Provides API that is used by user interface")
-        ContainerDb(database, "Database", "Redis Database", "Acts as a database & queue. Stores all information about food, delivery, etc.")
-    }
-
-    Rel(user, ui, "Uses", "HTTP")
-    Rel(ui, bff, "Uses", "JSON/HTTP")
-    Rel(bff, database, "Manage orders and deliveries", "async, Redis Queue")
-    Rel(bff, database, "Search food", "sync, full-text-search")
-```
+![c4-container](/docs/c4-model-Containers.png)
