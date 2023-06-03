@@ -10,3 +10,4 @@ jobs:
     uses: wkrzywiec/gh-workflows/.github/workflows/java-gradle-branch.yaml@main
     with:
       app-name: food-delivery
+      path: services

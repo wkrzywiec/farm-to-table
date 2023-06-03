@@ -31,6 +31,7 @@ tasks:
 
   dev:backend:
     desc: Run backend apps with gradle
+    dir: services
     cmds:
       - task: infra
       - echo "Starting food-delivery app..."
