@@ -1,6 +1,7 @@
 package io.wkrzywiec.fooddelivery.food.controller;
 
-import io.wkrzywiec.fooddelivery.food.FoodItemRepository;
+import io.wkrzywiec.fooddelivery.food.repository.FoodItemRepository;
+import io.wkrzywiec.fooddelivery.food.repository.RedisFoodItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -1,19 +1,15 @@
-package io.wkrzywiec.fooddelivery.food;
+package io.wkrzywiec.fooddelivery.food.repository;
 
 import com.redislabs.modules.rejson.JReJSON;
 import io.wkrzywiec.fooddelivery.food.controller.FoodItemDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Component
-@Profile("redis")
-public class FoodItemRepository {
+public class RedisFoodItemRepository implements FoodItemRepository {
 
     private final JReJSON redisJson;
     public List<FoodItemDTO> saveAll(List<FoodItemDTO> foodItemDTOs) {
