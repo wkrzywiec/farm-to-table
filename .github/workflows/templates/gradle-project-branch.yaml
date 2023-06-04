@@ -20,7 +20,7 @@ on:
 
 jobs:
   qa:
-    name: ${{ inputs.app-name }} - Build & test
+    name: Build & test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
@@ -49,7 +49,7 @@ jobs:
         if: success() || failure()
         with:
           name: JUnit Tests
-          path: ./services/build/test-results/test/TEST-*.xml
+          path: ./services/${{ inputs.app-name }}/build/test-results/test/TEST-*.xml
           reporter: java-junit
 
       - name: Test coverage report
