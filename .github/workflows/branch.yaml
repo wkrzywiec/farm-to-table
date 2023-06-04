@@ -10,3 +10,8 @@ jobs:
     uses: ./.github/workflows/template-gradle-project-qa-branch.yaml
     with:
       app-name: bff
+      
+  delivery:
+    uses: ./.github/workflows/template-gradle-project-qa-branch.yaml
+    with:
+      app-name: delivery
