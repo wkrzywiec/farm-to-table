@@ -17,6 +17,10 @@ Exemplary output:
 ```
 * check:        Verify local tools
 * dev:backend:  Run backend apps with gradle
+* dev:bff:      Run 'bff' service
+* dev:delivery: Run 'delivery' service
+* dev:food:     Run 'food' service
+* dev:ordering: Run 'ordering' service
 * infra:        Spin up dockerized infrastructure
 * infra:clean:  Stop and clean all persisted data
 * infra:down:   Stop infrastructure

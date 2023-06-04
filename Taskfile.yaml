@@ -37,13 +37,35 @@ tasks:
       - echo "Starting food-delivery app..."
       - gradlew clean assemble --info
       - gradlew --parallel startBootStack --info
-  
+
+  dev:bff:
+    desc: Run 'bff' service
+    dir: services
+    cmds:
+      - task: infra
+      - gradlew bff:bootRun --info
+
+  dev:delivery:
+    desc: Run 'delivery' service
+    dir: services
+    cmds:
+      - task: infra
+      - gradlew delivery:bootRun --info
+
   dev:food:
     desc: Run 'food' service
     dir: services
     cmds:
       - task: infra
       - gradlew food:bootRun --info
+      -
+
+  dev:ordering:
+    desc: Run 'ordering' service
+    dir: services
+    cmds:
+      - task: infra
+      - gradlew ordering:bootRun --info
 
   infra:
     desc: Spin up dockerized infrastructure
