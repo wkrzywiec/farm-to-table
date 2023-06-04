@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit
 
 import static io.wkrzywiec.fooddelivery.delivery.DeliveryTestData.aDelivery
 import static io.wkrzywiec.fooddelivery.delivery.ItemTestData.anItem
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await
 
 @ActiveProfiles("redis")
 @Subject(RedisOrdersChannelConsumer)
@@ -43,7 +42,7 @@ class RedisOrdersChannelConsumerIT extends IntegrationTest {
         redisStreamsClient.publishMessage(message)
 
         then:
-        await().atMost(5, TimeUnit.SECONDS)
+        org.testcontainers.shaded.org.awaitility.Awaitility.await().atMost(5, TimeUnit.SECONDS)
                 .until {
                     def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
 

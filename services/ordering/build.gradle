@@ -19,9 +19,6 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-
-	integrationTestImplementation.extendsFrom testImplementation
-	integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -52,8 +49,8 @@ dependencies {
 	testImplementation 'org.codehaus.groovy:groovy-all:3.0.11'
 	testImplementation 'io.rest-assured:spring-mock-mvc:4.4.0'
 
-	integrationTestImplementation "org.testcontainers:spock:${testcontainersVersion}"
-	integrationTestImplementation 'org.awaitility:awaitility:4.2.0'
+	testImplementation "org.testcontainers:spock:${testcontainersVersion}"
+	testImplementation 'org.awaitility:awaitility:4.2.0'
 }
 
 bootRun {
@@ -64,31 +61,12 @@ test {
 	useJUnitPlatform()
 }
 
-sourceSets {
-	integrationTest {
-		groovy.srcDir "$projectDir/src/integration-test/groovy"
-		resources.srcDir "$projectDir/src/integration-test/resources"
-		compileClasspath += main.output + test.output
-		runtimeClasspath += main.output + test.output
-	}
-}
-
-task integrationTest(type: Test) {
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
-
-	useJUnitPlatform()
-}
-
-check.dependsOn integrationTest
-
 jacocoTestReport {
 	reports {
 		xml.required = true
 	}
 	dependsOn = [
-	        'test',
-			'integrationTest'
+	        'test'
 	]
 }
 
