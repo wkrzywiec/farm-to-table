@@ -7,11 +7,11 @@ on:
 
 jobs:
   bff:
-    uses: ./.github/workflows/templates/gradle-project-branch.yaml
+    uses: ./.github/workflows/template-gradle-project-branch.yaml
     with:
       app-name: bff
       
   delivery:
-    uses: ./.github/workflows/templates/gradle-project-branch.yaml
+    uses: ./.github/workflows/template-gradle-project-branch.yaml
     with:
       app-name: delivery
