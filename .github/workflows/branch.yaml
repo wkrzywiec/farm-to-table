@@ -1,0 +1,12 @@
+name: Test - feature branch
+on:
+  push:
+    branches-ignore:
+      - 'main'
+  workflow_dispatch:
+
+jobs:
+  bff:
+    uses: ./.github/workflows/template-gradle-project-qa-branch.yaml
+    with:
+      app-name: bff
