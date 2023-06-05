@@ -1,6 +1,8 @@
 package io.wkrzywiec.fooddelivery.delivery;
 
-import io.wkrzywiec.fooddelivery.delivery.outgoing.DeliveryCreated;
+import io.wkrzywiec.fooddelivery.delivery.domain.Delivery;
+import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryStatus;
+import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated;
 import lombok.Getter;
 import org.apache.commons.lang3.reflect.FieldUtils;
 

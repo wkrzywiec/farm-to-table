@@ -1,5 +1,6 @@
 package io.wkrzywiec.fooddelivery.delivery;
 
+import io.wkrzywiec.fooddelivery.delivery.domain.Item;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -21,8 +22,8 @@ class ItemTestData {
                 .build();
     }
 
-    io.wkrzywiec.fooddelivery.delivery.incoming.Item dto() {
-        return new io.wkrzywiec.fooddelivery.delivery.incoming.Item(name, amount, pricePerItem);
+    io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item dto() {
+        return new io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item(name, amount, pricePerItem);
     }
 
     public static ItemTestData anItem() {

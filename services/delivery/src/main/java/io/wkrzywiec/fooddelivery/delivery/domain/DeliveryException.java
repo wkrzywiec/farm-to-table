@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.delivery;
+package io.wkrzywiec.fooddelivery.delivery.domain;
 
 class DeliveryException extends RuntimeException {
 

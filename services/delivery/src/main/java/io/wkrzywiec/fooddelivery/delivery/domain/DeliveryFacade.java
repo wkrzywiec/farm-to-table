@@ -1,12 +1,12 @@
-package io.wkrzywiec.fooddelivery.delivery;
+package io.wkrzywiec.fooddelivery.delivery.domain;
 
 import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 import io.wkrzywiec.fooddelivery.commons.incoming.*;
 import io.wkrzywiec.fooddelivery.commons.infra.repository.EventStore;
-import io.wkrzywiec.fooddelivery.delivery.incoming.*;
-import io.wkrzywiec.fooddelivery.delivery.outgoing.*;
+import io.wkrzywiec.fooddelivery.delivery.domain.incoming.*;
+import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
@@ -38,7 +38,7 @@ public class DeliveryFacade {
                 newDelivery.getCustomerId(),
                 newDelivery.getRestaurantId(),
                 newDelivery.getAddress(),
-                newDelivery.getItems().stream().map(i -> new io.wkrzywiec.fooddelivery.delivery.incoming.Item(i.getName(), i.getAmount(), i.getPricePerItem())).toList(),
+                newDelivery.getItems().stream().map(i -> new io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item(i.getName(), i.getAmount(), i.getPricePerItem())).toList(),
                 newDelivery.getDeliveryCharge(),
                 newDelivery.getTotal());
 

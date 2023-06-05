@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.delivery.outgoing;
+package io.wkrzywiec.fooddelivery.delivery.domain.outgoing;
 
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 

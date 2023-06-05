@@ -1,7 +1,7 @@
-package io.wkrzywiec.fooddelivery.delivery.outgoing;
+package io.wkrzywiec.fooddelivery.delivery.domain.outgoing;
 
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.delivery.incoming.Item;
+import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item;
 
 import java.math.BigDecimal;
 import java.util.List;

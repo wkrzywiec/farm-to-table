@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.delivery;
+package io.wkrzywiec.fooddelivery.delivery.domain;
 
 import lombok.*;
 
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode
 @ToString
 @Builder
-class Item {
+public class Item {
     private String name;
     private int amount;
     private BigDecimal pricePerItem;

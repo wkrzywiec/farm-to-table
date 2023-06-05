@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.delivery.incoming;
+package io.wkrzywiec.fooddelivery.delivery.domain.incoming;
 
 import java.math.BigDecimal;
 

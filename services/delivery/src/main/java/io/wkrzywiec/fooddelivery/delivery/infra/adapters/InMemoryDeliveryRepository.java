@@ -1,5 +1,7 @@
-package io.wkrzywiec.fooddelivery.delivery;
+package io.wkrzywiec.fooddelivery.delivery.infra.adapters;
 
+import io.wkrzywiec.fooddelivery.delivery.domain.Delivery;
+import io.wkrzywiec.fooddelivery.delivery.domain.ports.DeliveryRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

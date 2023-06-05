@@ -6,17 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.commons.incoming.*;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
-import io.wkrzywiec.fooddelivery.delivery.DeliveryFacade;
-import io.wkrzywiec.fooddelivery.delivery.incoming.*;
+import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade;
+import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCanceled;
+import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated;
+import io.wkrzywiec.fooddelivery.delivery.domain.incoming.TipAddedToOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
-@Profile("redis")
 @RequiredArgsConstructor
 public class RedisOrdersChannelConsumer implements RedisStreamListener {
 

@@ -1,8 +1,8 @@
-package io.wkrzywiec.fooddelivery.delivery;
+package io.wkrzywiec.fooddelivery.delivery.domain;
 
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
-import io.wkrzywiec.fooddelivery.delivery.incoming.OrderCreated;
-import io.wkrzywiec.fooddelivery.delivery.outgoing.*;
+import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated;
+import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,7 +17,7 @@ import static java.lang.String.format;
 @Getter
 @EqualsAndHashCode
 @ToString
-class Delivery {
+public class Delivery {
     private String orderId;
     private String customerId;
     private String restaurantId;
@@ -64,7 +64,7 @@ class Delivery {
         );
     }
 
-    private static List<Item> mapItems(List<io.wkrzywiec.fooddelivery.delivery.incoming.Item> items) {
+    private static List<Item> mapItems(List<io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item> items) {
         return items.stream().map(dto -> Item.builder()
                 .name(dto.name())
                 .amount(dto.amount())

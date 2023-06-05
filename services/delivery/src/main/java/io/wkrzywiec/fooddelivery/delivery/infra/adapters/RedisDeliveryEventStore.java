@@ -1,10 +1,10 @@
-package io.wkrzywiec.fooddelivery.delivery;
+package io.wkrzywiec.fooddelivery.delivery.infra.adapters;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 import io.wkrzywiec.fooddelivery.commons.infra.repository.RedisEventStore;
-import io.wkrzywiec.fooddelivery.delivery.outgoing.*;
+import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
