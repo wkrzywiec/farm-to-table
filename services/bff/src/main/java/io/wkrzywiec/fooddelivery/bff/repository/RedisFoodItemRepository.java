@@ -7,15 +7,11 @@ import com.redislabs.lettusearch.RediSearchCommands;
 import com.redislabs.lettusearch.SearchResults;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @RequiredArgsConstructor
-@Repository
-@Profile("redis")
-public class FoodItemRepository {
+public class RedisFoodItemRepository {
 
     private final StatefulRediSearchConnection<String, String> searchConnection;
     private final ObjectMapper objectMapper;

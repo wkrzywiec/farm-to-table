@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.bff.view.DeliveryView;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -17,8 +15,6 @@ import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Slf4j
-@Component
-@Profile("redis")
 public class RedisDeliveryViewRepository implements DeliveryViewRepository {
 
     private final RedisTemplate<String, String> redisTemplate;

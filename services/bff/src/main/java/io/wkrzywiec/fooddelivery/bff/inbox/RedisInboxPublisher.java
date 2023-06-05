@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
-@Profile("redis")
 @Slf4j
 public class RedisInboxPublisher implements InboxPublisher {
 

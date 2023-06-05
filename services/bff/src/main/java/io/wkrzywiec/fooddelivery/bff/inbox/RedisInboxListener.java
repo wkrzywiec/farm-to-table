@@ -16,9 +16,7 @@ import java.time.Clock;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Component
 @Slf4j
-@Profile("redis")
 public class RedisInboxListener {
 
     private static final String ORDERS_CHANNEL = "orders";

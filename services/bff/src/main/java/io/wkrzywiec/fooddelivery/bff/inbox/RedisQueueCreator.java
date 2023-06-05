@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Component
 @Slf4j
 public class RedisQueueCreator implements ApplicationListener<ContextRefreshedEvent> {
 

@@ -26,7 +26,7 @@ public class RedisConfiguration extends RedisMessageConsumerConfig {
     }
 
     @Bean
-    public RedisOrdersChannelConsumer redisOrdersChannelConsumer(OrderingFacade facade, ObjectMapper objectMapper) {
+    public RedisStreamListener redisOrdersChannelConsumer(OrderingFacade facade, ObjectMapper objectMapper) {
         return new RedisOrdersChannelConsumer(facade, objectMapper);
     }
 }
