@@ -1,11 +1,11 @@
-package io.wkrzywiec.fooddelivery.ordering
+package io.wkrzywiec.fooddelivery.ordering.infra.adapters
 
 import io.wkrzywiec.fooddelivery.commons.IntegrationTest
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.repository.RedisEventStore
-import io.wkrzywiec.fooddelivery.ordering.outgoing.OrderCompleted
-import io.wkrzywiec.fooddelivery.ordering.outgoing.OrderInProgress
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCompleted
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderInProgress
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Subject

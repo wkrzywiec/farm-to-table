@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.ordering;
+package io.wkrzywiec.fooddelivery.ordering.domain;
 
 import io.vavr.control.Try;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
@@ -9,8 +9,9 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
 import io.wkrzywiec.fooddelivery.commons.infra.repository.EventStore;
-import io.wkrzywiec.fooddelivery.ordering.incoming.*;
-import io.wkrzywiec.fooddelivery.ordering.outgoing.*;
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered;
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation;
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

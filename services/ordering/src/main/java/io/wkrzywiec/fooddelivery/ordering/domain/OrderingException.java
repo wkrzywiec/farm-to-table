@@ -1,6 +1,6 @@
-package io.wkrzywiec.fooddelivery.ordering;
+package io.wkrzywiec.fooddelivery.ordering.domain;
 
-class OrderingException extends RuntimeException {
+public class OrderingException extends RuntimeException {
 
     OrderingException(String message) {
         super(message);

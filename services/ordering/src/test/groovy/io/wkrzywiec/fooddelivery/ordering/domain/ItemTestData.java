@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.ordering;
+package io.wkrzywiec.fooddelivery.ordering.domain;
 
 import lombok.Getter;
 

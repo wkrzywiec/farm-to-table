@@ -10,8 +10,8 @@ import spock.lang.Subject
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-import static io.wkrzywiec.fooddelivery.ordering.ItemTestData.anItem
-import static io.wkrzywiec.fooddelivery.ordering.OrderTestData.anOrder
+import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
+import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await
 
 @ActiveProfiles("redis")

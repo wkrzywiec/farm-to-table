@@ -8,17 +8,14 @@ import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder;
 import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
-import io.wkrzywiec.fooddelivery.ordering.OrderingFacade;
-import io.wkrzywiec.fooddelivery.ordering.incoming.*;
+import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade;
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered;
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
-@Profile("redis")
 @RequiredArgsConstructor
 public class RedisOrdersChannelConsumer implements RedisStreamListener {
 

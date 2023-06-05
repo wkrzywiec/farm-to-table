@@ -1,5 +1,7 @@
-package io.wkrzywiec.fooddelivery.ordering;
+package io.wkrzywiec.fooddelivery.ordering.infra.adapters;
 
+import io.wkrzywiec.fooddelivery.ordering.domain.Order;
+import io.wkrzywiec.fooddelivery.ordering.domain.ports.OrderingRepository;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.stereotype.Component;
 

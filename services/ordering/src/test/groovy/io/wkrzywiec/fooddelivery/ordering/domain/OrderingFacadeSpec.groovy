@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.ordering
+package io.wkrzywiec.fooddelivery.ordering.domain
 
 
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.FakeMessagePublisher
@@ -6,13 +6,13 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.incoming.AddTip
 import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder
 import io.wkrzywiec.fooddelivery.commons.infra.repository.InMemoryEventStore
-import io.wkrzywiec.fooddelivery.ordering.incoming.FoodDelivered
-import io.wkrzywiec.fooddelivery.ordering.incoming.FoodInPreparation
-import io.wkrzywiec.fooddelivery.ordering.outgoing.OrderCanceled
-import io.wkrzywiec.fooddelivery.ordering.outgoing.OrderCompleted
-import io.wkrzywiec.fooddelivery.ordering.outgoing.OrderCreated
-import io.wkrzywiec.fooddelivery.ordering.outgoing.OrderInProgress
-import io.wkrzywiec.fooddelivery.ordering.outgoing.TipAddedToOrder
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCanceled
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCompleted
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderInProgress
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.TipAddedToOrder
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Title
@@ -20,9 +20,9 @@ import spock.lang.Title
 import java.time.Clock
 import java.time.Instant
 
-import static ItemTestData.anItem
-import static OrderTestData.anOrder
 import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.message
+import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
+import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 
 @Subject(OrderingFacade)
 @Title("Specification for ordering process")

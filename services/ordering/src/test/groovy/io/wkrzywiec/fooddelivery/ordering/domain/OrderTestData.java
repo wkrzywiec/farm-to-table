@@ -1,14 +1,14 @@
-package io.wkrzywiec.fooddelivery.ordering;
+package io.wkrzywiec.fooddelivery.ordering.domain;
 
 import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
-import io.wkrzywiec.fooddelivery.ordering.outgoing.OrderCreated;
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated;
 import lombok.Getter;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import static io.wkrzywiec.fooddelivery.ordering.OrderStatus.CREATED;
+import static io.wkrzywiec.fooddelivery.ordering.domain.OrderStatus.CREATED;
 import static java.lang.String.format;
 
 @Getter

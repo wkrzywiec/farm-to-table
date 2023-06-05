@@ -1,8 +1,8 @@
-package io.wkrzywiec.fooddelivery.ordering;
+package io.wkrzywiec.fooddelivery.ordering.domain;
 
 import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
-import io.wkrzywiec.fooddelivery.ordering.outgoing.*;
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -10,13 +10,13 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static io.wkrzywiec.fooddelivery.ordering.OrderStatus.*;
+import static io.wkrzywiec.fooddelivery.ordering.domain.OrderStatus.*;
 import static java.lang.String.format;
 
 @Getter
 @EqualsAndHashCode
 @ToString
-class Order {
+public class Order {
 
     private String id;
     private String customerId;
