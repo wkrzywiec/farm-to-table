@@ -17,11 +17,6 @@ on:
         description: Project name
         required: true
         type: string
-      path:
-        description: Path to the root folder of a Gradle project
-        default: '.'
-        required: false
-        type: string
     secrets:
       sonarToken:
         required: false
@@ -32,7 +27,7 @@ on:
 
 jobs:
   qa:
-    name: ${{ inputs.app-name }} - Build & test
+    name: Build & test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
@@ -58,59 +53,23 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Build 🏗️ & unit test app 🧪
+        working-directory: services
         run: |
           chmod +x ${{ inputs.path }}/gradlew
-          ${{ inputs.path }}/gradlew clean check --info
+          ./gradlew clean ${{ inputs.app-name }}:check --info
 
       - name: Test report
         uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
-          name: JUnit Tests
-          path: ${{ inputs.path }}/build/test-results/test/TEST-*.xml
+          name: ${{ inputs.app-name }} - Test report
+          path: ./services/${{ inputs.app-name }}/build/test-results/test/TEST-*.xml
           reporter: java-junit
 
       - name: Generate test coverage report 🔎
+        working-directory: services
         run: |
-          ${{ inputs.path }}/gradlew jacocoTestReport --info
-
-      - name: Sonar Cloud 🌟
-        run: |
-          ${{ inputs.path }}/gradlew sonarqube -Dsonar.host.url=https://sonarcloud.io -Dsonar.verbose=true --info
-        env:
-          GITHUB_TOKEN: ${{ secrets.githubToken }}
-          SONAR_TOKEN: ${{ secrets.sonarToken }}
-
-
-  security:
-    name: ${{ inputs.app-name }} - Security scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
-
-      - name: Gradlew permissions
-        run: |
-          chmod +x ${{ inputs.path }}/gradlew
-
-      - name: Run Snyk & upload to results to the cloud
-        uses: snyk/actions/gradle-jdk17@master
-        env:
-          SNYK_TOKEN: ${{ secrets.snykToken }}
-        with:
-          command: monitor
-
-      - name: Run Snyk to check for vulnerabilities 👮‍♀️
-        uses: snyk/actions/gradle-jdk17@master
-        continue-on-error: true # To make sure that SARIF upload gets called
-        env:
-          SNYK_TOKEN: ${{ secrets.snykToken }}
-        with:
-          args: --severity-threshold=high --sarif-file-output=snyk.sarif
-
-      - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: snyk.sarif
-
+          ./gradlew ${{ inputs.app-name }}:jacocoTestReport --info
+          
+#upload artifact
 

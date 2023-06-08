@@ -7,11 +7,67 @@ on:
   workflow_dispatch:
 
 jobs:
-  qa:
-    uses: wkrzywiec/gh-workflows/.github/workflows/java-gradle.yaml@main
+  bff:
+    uses: ./.github/workflows/template-gradle-project-branch.yaml
     with:
-      app-name: food-delivery
-      path: services
-    secrets:
-      sonarToken: ${{ secrets.SONAR_TOKEN }}
-      githubToken: ${{ secrets.GITHUB_TOKEN }}
+      app-name: bff
+  
+  delivery:
+    uses: ./.github/workflows/template-gradle-project-branch.yaml
+    with:
+      app-name: delivery
+  
+  food:
+    uses: ./.github/workflows/template-gradle-project-branch.yaml
+    with:
+      app-name: food
+  
+  ordering:
+    uses: ./.github/workflows/template-gradle-project-branch.yaml
+    with:
+      app-name: ordering
+
+#  sonar:
+#    runs-on: ubuntu-latest
+#    needs: [bff, delivery, food, ordering]
+#    steps:
+#      #download artifacts & upload them to sonar cloud
+#      - name: Sonar Cloud 🌟
+#        working-directory: services
+#        run: |
+#          ./gradlew sonarqube -Dsonar.host.url=https://sonarcloud.io -Dsonar.verbose=true --info
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.githubToken }}
+#          SONAR_TOKEN: ${{ secrets.sonarToken }}
+
+  security:
+    name: Security scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Gradlew permissions
+        working-directory: services
+        run: |
+          chmod +x ./gradlew
+
+      - name: Run Snyk & upload to results to the cloud
+        uses: snyk/actions/gradle-jdk17@master
+        env:
+          SNYK_TOKEN: ${{ secrets.snykToken }}
+        with:
+          command: monitor --file ./services/build.gradle
+
+      - name: Run Snyk to check for vulnerabilities 👮‍♀️
+        uses: snyk/actions/gradle-jdk17@master
+        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.snykToken }}
+        with:
+          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file ./services/build.gradle
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif
