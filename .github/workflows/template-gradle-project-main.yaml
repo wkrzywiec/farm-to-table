@@ -72,6 +72,7 @@ jobs:
           ./gradlew ${{ inputs.app-name }}:jacocoTestReport --info
           
       - uses: actions/upload-artifact@v3
+        name: Upload code coverage
         with:
           name: ${{ inputs.app-name }}-code-coverage
           path: ./services/${{ inputs.app-name }}/build/reports/jacoco/test/jacocoTestReport.xml
