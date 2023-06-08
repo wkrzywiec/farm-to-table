@@ -57,7 +57,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.snykToken }}
         with:
-          command: monitor --file ./services/build.gradle
+          command: monitor --file services/build.gradle
 
       - name: Run Snyk to check for vulnerabilities 👮‍♀️
         uses: snyk/actions/gradle-jdk17@master
@@ -65,7 +65,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.snykToken }}
         with:
-          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file ./services/build.gradle
+          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file services/build.gradle
 
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
