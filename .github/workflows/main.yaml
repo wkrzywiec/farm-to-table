@@ -54,6 +54,11 @@ jobs:
           name: ordering-code-coverage
           path: ./services/ordering/build/reports/jacoco/test/jacocoTestReport.xml
 
+      - name: Set permissions for gradlew
+        working-directory: services
+        run: |
+          chmod +x ./gradlew
+
       - name: Sonar Cloud 🌟
         working-directory: services
         run: |
