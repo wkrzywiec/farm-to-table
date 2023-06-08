@@ -55,7 +55,7 @@ jobs:
       - name: Build 🏗️ & unit test app 🧪
         working-directory: services
         run: |
-          chmod +x ${{ inputs.path }}/gradlew
+          chmod +x ./gradlew
           ./gradlew clean ${{ inputs.app-name }}:check --info
 
       - name: Test report
