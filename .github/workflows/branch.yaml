@@ -1,8 +1,5 @@
 name: Test - feature branch
 on:
-  push:
-    branches-ignore:
-      - 'main'
   workflow_dispatch:
 
 jobs:
