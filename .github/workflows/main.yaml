@@ -44,7 +44,7 @@ jobs:
       - name: Run Snyk & upload to results to the cloud
         uses: snyk/actions/gradle-jdk17@master
         env:
-          SNYK_TOKEN: ${{ secrets.snykToken }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor --file=services/build.gradle
 
@@ -52,7 +52,7 @@ jobs:
         uses: snyk/actions/gradle-jdk17@master
         continue-on-error: true # To make sure that SARIF upload gets called
         env:
-          SNYK_TOKEN: ${{ secrets.snykToken }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high --sarif-file-output=snyk.sarif --file=services/build.gradle
 
