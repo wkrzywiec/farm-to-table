@@ -7,31 +7,31 @@ on:
   workflow_dispatch:
 
 jobs:
-#  bff:
-#    uses: ./.github/workflows/template-gradle-project-main.yaml
-#    with:
-#      app-name: bff
-#  
-#  delivery:
-#    uses: ./.github/workflows/template-gradle-project-main.yaml
-#    with:
-#      app-name: delivery
-#  
-#  food:
-#    uses: ./.github/workflows/template-gradle-project-main.yaml
-#    with:
-#      app-name: food
-#  
-#  ordering:
-#    uses: ./.github/workflows/template-gradle-project-main.yaml
-#    with:
-#      app-name: ordering
+  bff:
+    uses: ./.github/workflows/template-gradle-project-main.yaml
+    with:
+      app-name: bff
+
+  delivery:
+    uses: ./.github/workflows/template-gradle-project-main.yaml
+    with:
+      app-name: delivery
+
+  food:
+    uses: ./.github/workflows/template-gradle-project-main.yaml
+    with:
+      app-name: food
+
+  ordering:
+    uses: ./.github/workflows/template-gradle-project-main.yaml
+    with:
+      app-name: ordering
 
 
   security:
     name: Security scan
     runs-on: ubuntu-latest
-#    needs: [bff, delivery, food, ordering]
+    needs: [bff, delivery, food, ordering]
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
