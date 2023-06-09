@@ -15,29 +15,29 @@ jobs:
     uses: ./.github/workflows/template-gradle-project-main.yaml
     with:
       app-name: bff
-      java-version: $java_version
-      jdk-distribution: $jdk_distribution
+      java-version: ${{ vars..java_version }}
+      jdk-distribution: ${{ vars..jdk_distribution }}
 
   delivery:
     uses: ./.github/workflows/template-gradle-project-main.yaml
     with:
       app-name: delivery
-      java-version: $java_version
-      jdk-distribution: $jdk_distribution
+      java-version: ${{ vars..java_version }}
+      jdk-distribution: ${{ vars..jdk_distribution }}
 
   food:
     uses: ./.github/workflows/template-gradle-project-main.yaml
     with:
       app-name: food
-      java-version: $java_version
-      jdk-distribution: $jdk_distribution
+      java-version: ${{ vars..java_version }}
+      jdk-distribution: ${{ vars..jdk_distribution }}
 
   ordering:
     uses: ./.github/workflows/template-gradle-project-main.yaml
     with:
       app-name: ordering
-      java-version: $java_version
-      jdk-distribution: $jdk_distribution
+      java-version: ${{ vars..java_version }}
+      jdk-distribution: ${{ vars..jdk_distribution }}
 
 
   snyk:
@@ -81,8 +81,8 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: $jdk_distribution
-          java-version: $java_version
+          distribution: ${{ vars..jdk_distribution }}
+          java-version: ${{ vars..java_version }}
 
       - name: Set permissions for gradlew
         working-directory: services
