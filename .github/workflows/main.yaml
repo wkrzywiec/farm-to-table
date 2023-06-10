@@ -68,6 +68,15 @@ jobs:
         working-directory: services/ui
         run: npm run build
 
+      - name: Sonar Cloud 🌟
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: services/ui
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.UI_SONAR_TOKEN }}
+
+# todo add snyk & sonar
 
   snyk:
     runs-on: ubuntu-latest
