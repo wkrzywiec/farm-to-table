@@ -76,8 +76,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.UI_SONAR_TOKEN }}
 
-# todo add snyk & sonar
-
   snyk:
     runs-on: ubuntu-latest
     needs: [bff, delivery, food, ordering]
