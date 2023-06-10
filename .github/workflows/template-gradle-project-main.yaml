@@ -39,14 +39,14 @@ jobs:
           java-version: ${{ inputs.java-version }}
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache Gradle packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -70,3 +70,11 @@ jobs:
         working-directory: services
         run: |
           ./gradlew ${{ inputs.app-name }}:jacocoTestReport --info
+
+      - name: Sonar Cloud 🌟
+        working-directory: services
+        run: |
+          ./gradlew ${{ inputs.app-name }}:sonarqube -Dsonar.host.url=https://sonarcloud.io -Dsonar.verbose=true --info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.sonarToken }}
