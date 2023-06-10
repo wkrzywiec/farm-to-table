@@ -95,19 +95,6 @@ jobs:
         with:
           command: monitor --file=services/build.gradle --all-sub-projects
 
-#      - name: Gradle - Run Snyk to check for vulnerabilities 👮‍♀️
-#        uses: snyk/actions/gradle-jdk17@master
-#        continue-on-error: true # To make sure that SARIF upload gets called
-#        env:
-#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-#        with:
-#          args: --severity-threshold=high --sarif-file-output=snyk.sarif --file=services/build.gradle --all-sub-projects
-
-#      - name: Gradle - Upload result to GitHub Code Scanning
-#        uses: github/codeql-action/upload-sarif@v2
-#        with:
-#          sarif_file: snyk.sarif
-
       - name: Set up NodeJS environment
         uses: actions/setup-node@v3
         with:
