@@ -6,6 +6,7 @@ plugins {
 	id 'groovy'
 	id 'jacoco'
 	id "org.barfuin.gradle.jacocolog" version "3.0.0-RC2"
+	id 'org.sonarqube' version "4.2.0.3129"
 }
 
 group = 'io.wkrzywiec'
@@ -76,5 +77,14 @@ jacocoTestCoverageVerification {
 				minimum = 0.1
 			}
 		}
+	}
+}
+
+sonarqube {
+	properties {
+		property 'sonar.projectName', 'delivery - Farm-to-Table app'
+		property "sonar.projectKey", "farm-to-table-app_delivery"
+		property "sonar.organization", "farm-to-table-app"
+		property "sonar.host.url", "https://sonarcloud.io"
 	}
 }

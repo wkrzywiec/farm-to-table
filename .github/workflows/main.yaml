@@ -18,16 +18,22 @@ jobs:
     uses: ./.github/workflows/template-gradle-project-main.yaml
     with:
       app-name: delivery
+    secrets:
+      sonarToken: ${{ secrets.DELIVERY_SONAR_TOKEN }}
 
   food:
     uses: ./.github/workflows/template-gradle-project-main.yaml
     with:
       app-name: food
+    secrets:
+      sonarToken: ${{ secrets.FOOD_SONAR_TOKEN }}
 
   ordering:
     uses: ./.github/workflows/template-gradle-project-main.yaml
     with:
       app-name: ordering
+    secrets:
+      sonarToken: ${{ secrets.ORDERING_SONAR_TOKEN }}
 
 
   snyk:
