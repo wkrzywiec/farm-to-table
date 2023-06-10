@@ -108,6 +108,15 @@ jobs:
 #        with:
 #          sarif_file: snyk.sarif
 
+      - name: Set up NodeJS environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install package dependencies
+        working-directory: services/ui
+        run: npm install
+
       - name: Node - Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
         continue-on-error: true # To make sure that SARIF upload gets called
