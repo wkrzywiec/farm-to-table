@@ -71,6 +71,8 @@ The entire system is made of 5 microservices (1 React, 4 Java/Spring):
 * *ordering* - core service for managing orders,
 * *delivery* - core service for managing deliveries.
 
+TODO - add badges for each service
+
 ### C4 diagrams
 
 #### C4 container diagram
