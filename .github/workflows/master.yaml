@@ -1,8 +1,10 @@
-name: Build
+name: Master
 on:
   push:
     branches:
       - 'master'
+    paths:
+      - 'services/**'
   pull_request:
   workflow_dispatch:
 
