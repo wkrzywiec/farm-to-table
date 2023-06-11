@@ -88,7 +88,7 @@ jacocoTestCoverageVerification {
 
 sonarqube {
     properties {
-        property 'sonar.projectName', 'BFF - Farm-to-Table app'
+        property 'sonar.projectName', 'bff'
         property "sonar.projectKey", "farm-to-table-app_bff"
         property "sonar.organization", "farm-to-table-app"
         property "sonar.host.url", "https://sonarcloud.io"
