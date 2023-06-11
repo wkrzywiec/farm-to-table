@@ -1,4 +1,4 @@
-name: Java Gradle - build an app
+name: Java Gradle - build, test & publish artifacts
 
 on:
   workflow_call:
