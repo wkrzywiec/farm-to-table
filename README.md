@@ -1,5 +1,5 @@
 # Food Delivery
-[![Build](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/build.yaml) ![GitHub](https://img.shields.io/github/license/wkrzywiec/food-delivery-app) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=wkrzywiec_food-delivery-app&metric=coverage)](https://sonarcloud.io/summary/new_code?id=wkrzywiec_food-delivery-app) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=wkrzywiec_food-delivery-app&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=wkrzywiec_food-delivery-app) ![GitHub issues](https://img.shields.io/github/issues/wkrzywiec/food-delivery-app)
+[![Build](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/main.yaml/badge.svg?branch=main)](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/main.yaml) ![GitHub](https://img.shields.io/github/license/wkrzywiec/food-delivery-app) ![GitHub issues](https://img.shields.io/github/issues/wkrzywiec/food-delivery-app)
 
 This application is a simplified food delivery platform, similar to Uber Eats or Glovo. It serves as a sandbox environment for experimenting with novel concepts and technologies.
 

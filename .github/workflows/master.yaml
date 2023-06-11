@@ -2,34 +2,34 @@ name: Build
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
   pull_request:
   workflow_dispatch:
 
 jobs:
   bff:
-    uses: ./.github/workflows/template-gradle-main.yaml
+    uses: ./.github/workflows/template-gradle-master.yaml
     with:
       app-name: bff
     secrets:
       sonarToken: ${{ secrets.BFF_SONAR_TOKEN }}
 
   delivery:
-    uses: ./.github/workflows/template-gradle-main.yaml
+    uses: ./.github/workflows/template-gradle-master.yaml
     with:
       app-name: delivery
     secrets:
       sonarToken: ${{ secrets.DELIVERY_SONAR_TOKEN }}
 
   food:
-    uses: ./.github/workflows/template-gradle-main.yaml
+    uses: ./.github/workflows/template-gradle-master.yaml
     with:
       app-name: food
     secrets:
       sonarToken: ${{ secrets.FOOD_SONAR_TOKEN }}
 
   ordering:
-    uses: ./.github/workflows/template-gradle-main.yaml
+    uses: ./.github/workflows/template-gradle-master.yaml
     with:
       app-name: ordering
     secrets:
