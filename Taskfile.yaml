@@ -12,15 +12,9 @@ tasks:
   check:
     desc: Verify local tools
     cmds:
-      - docker --info
+      - docker version
       - java --version
-      - gradlew --help
-
-  infra:
-    desc: Spin up dockerized infrastructure (postgres db)
-    cmds:
-      - docker compose up -d redis
-      - docker run --rm -it --network food-delivery-app_default redis redis-cli -h redis FT.CREATE food-idx ON JSON PREFIX 1 "food:" SCHEMA $.name AS name TEXT
+      - services/gradlew --help
 
   run:
     desc: Run all services in Docker
@@ -29,28 +23,65 @@ tasks:
       - docker compose up -d bff ordering delivery food ui
 
   init:
-    desc: Run all services in Docker for the 1st time
+    desc: Run all services in Docker & add initial data
+    dir: local
     cmds:
       - task: run
       - bash init-data.sh
 
-  local:
+  dev:backend:
     desc: Run backend apps with gradle
+    dir: services
     cmds:
       - task: infra
       - echo "Starting food-delivery app..."
       - gradlew clean assemble --info
       - gradlew --parallel startBootStack --info
 
-  infra-down:
+  dev:bff:
+    desc: Run 'bff' service
+    dir: services
+    cmds:
+      - task: infra
+      - gradlew bff:bootRun --info
+
+  dev:delivery:
+    desc: Run 'delivery' service
+    dir: services
+    cmds:
+      - task: infra
+      - gradlew delivery:bootRun --info
+
+  dev:food:
+    desc: Run 'food' service
+    dir: services
+    cmds:
+      - task: infra
+      - gradlew food:bootRun --info
+      -
+
+  dev:ordering:
+    desc: Run 'ordering' service
+    dir: services
+    cmds:
+      - task: infra
+      - gradlew ordering:bootRun --info
+
+  infra:
+    desc: Spin up dockerized infrastructure
+    cmds:
+      - docker compose up -d redis
+      - docker run --rm -it --network food-delivery-app_default redis redis-cli -h redis FT.CREATE food-idx ON JSON PREFIX 1 "food:" SCHEMA $.name AS name TEXT
+
+  infra:down:
     desc: Stop infrastructure
     cmds:
       - docker compose down
       - echo "All infra apps stopped."
 
-  infra-clean:
+  infra:clean:
     desc: Stop and clean all persisted data
     cmds:
-      - task: infra-down
+      - task: infra:down
       - docker volume rm food-delivery-app_redis-data
       - echo "Docker volumes cleaned."

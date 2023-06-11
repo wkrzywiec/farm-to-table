@@ -1,0 +1,24 @@
+name: Test - feature branch
+on:
+  workflow_dispatch:
+
+jobs:
+  bff:
+    uses: ./.github/workflows/template-gradle-branch.yaml
+    with:
+      app-name: bff
+      
+  delivery:
+    uses: ./.github/workflows/template-gradle-branch.yaml
+    with:
+      app-name: delivery
+      
+  food:
+    uses: ./.github/workflows/template-gradle-branch.yaml
+    with:
+      app-name: food
+      
+  ordering:
+    uses: ./.github/workflows/template-gradle-branch.yaml
+    with:
+      app-name: ordering
