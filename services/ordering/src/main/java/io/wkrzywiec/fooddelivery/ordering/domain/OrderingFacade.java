@@ -38,7 +38,7 @@ public class OrderingFacade {
         OrderCreated orderCreated = new OrderCreated(
                 newOrder.getId(),
                 newOrder.getCustomerId(),
-                newOrder.getRestaurantId(),
+                newOrder.getFarmId(),
                 newOrder.getAddress(),
                 createOrder.items(),
                 newOrder.getDeliveryCharge(),

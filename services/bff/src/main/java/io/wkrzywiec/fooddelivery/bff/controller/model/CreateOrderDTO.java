@@ -14,7 +14,7 @@ public class CreateOrderDTO {
 
     private String id;
     private String customerId;
-    private String restaurantId;
+    private String farmId;
     private List<ItemDTO> items;
     private String address;
     private BigDecimal deliveryCharge;

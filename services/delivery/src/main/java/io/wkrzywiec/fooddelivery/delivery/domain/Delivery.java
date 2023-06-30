@@ -20,7 +20,7 @@ import static java.lang.String.format;
 public class Delivery {
     private String orderId;
     private String customerId;
-    private String restaurantId;
+    private String farmId;
     private String deliveryManId;
     private DeliveryStatus status;
     private String address;
@@ -32,15 +32,15 @@ public class Delivery {
 
     private Delivery() {};
 
-    private Delivery(String orderId, String customerId, String restaurantId, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal total, Instant creationTimestamp) {
-        this(orderId, customerId, restaurantId, null, DeliveryStatus.CREATED, address, items, deliveryCharge, BigDecimal.ZERO, total, new HashMap<>());
+    private Delivery(String orderId, String customerId, String farmId, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal total, Instant creationTimestamp) {
+        this(orderId, customerId, farmId, null, DeliveryStatus.CREATED, address, items, deliveryCharge, BigDecimal.ZERO, total, new HashMap<>());
         this.metadata.put("creationTimestamp", creationTimestamp.toString());
     }
 
-    private Delivery(String orderId, String customerId, String restaurantId, String deliveryManId, DeliveryStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip, BigDecimal total, Map<String, String> metadata) {
+    private Delivery(String orderId, String customerId, String farmId, String deliveryManId, DeliveryStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip, BigDecimal total, Map<String, String> metadata) {
         this.orderId = orderId;
         this.customerId = customerId;
-        this.restaurantId = restaurantId;
+        this.farmId = farmId;
         this.deliveryManId = deliveryManId;
         this.status = status;
         this.address = address;
@@ -55,7 +55,7 @@ public class Delivery {
         return new Delivery(
                 orderCreated.orderId(),
                 orderCreated.customerId(),
-                orderCreated.restaurantId(),
+                orderCreated.farmId(),
                 orderCreated.address(),
                 mapItems(orderCreated.items()),
                 orderCreated.deliveryCharge(),
@@ -80,7 +80,7 @@ public class Delivery {
                 metadata.put("creationTimestamp", event.header().createdAt().toString());
                 delivery = new Delivery(
                         created.orderId(), created.customerId(),
-                        created.restaurantId(), null, DeliveryStatus.CREATED,
+                        created.farmId(), null, DeliveryStatus.CREATED,
                         created.address(), mapItems(created.items()),
                         created.deliveryCharge(), BigDecimal.ZERO,
                         created.total(), metadata
@@ -90,7 +90,7 @@ public class Delivery {
             if (event.body() instanceof TipAddedToDelivery tipAddedToDelivery) {
                 delivery = new Delivery(
                         delivery.getOrderId(), delivery.getCustomerId(),
-                        delivery.getRestaurantId(), delivery.getDeliveryManId(),
+                        delivery.getFarmId(), delivery.getDeliveryManId(),
                         delivery.getStatus(), delivery.getAddress(),
                         delivery.getItems(), delivery.getDeliveryCharge(),
                         tipAddedToDelivery.tip(), tipAddedToDelivery.total(), delivery.getMetadata()
@@ -104,7 +104,7 @@ public class Delivery {
 
                 delivery = new Delivery(
                         delivery.getOrderId(), delivery.getCustomerId(),
-                        delivery.getRestaurantId(), delivery.getDeliveryManId(),
+                        delivery.getFarmId(), delivery.getDeliveryManId(),
                         DeliveryStatus.CANCELED, delivery.getAddress(),
                         delivery.getItems(), delivery.getDeliveryCharge(),
                         delivery.getTip(), delivery.getTotal(), metadata
@@ -117,7 +117,7 @@ public class Delivery {
 
                 delivery = new Delivery(
                         delivery.getOrderId(), delivery.getCustomerId(),
-                        delivery.getRestaurantId(), delivery.getDeliveryManId(),
+                        delivery.getFarmId(), delivery.getDeliveryManId(),
                         DeliveryStatus.FOOD_IN_PREPARATION, delivery.getAddress(),
                         delivery.getItems(), delivery.getDeliveryCharge(),
                         delivery.getTip(), delivery.getTotal(), metadata
@@ -127,7 +127,7 @@ public class Delivery {
             if (event.body() instanceof DeliveryManAssigned deliveryManAssigned) {
                 delivery = new Delivery(
                         delivery.getOrderId(), delivery.getCustomerId(),
-                        delivery.getRestaurantId(), deliveryManAssigned.deliveryManId(),
+                        delivery.getFarmId(), deliveryManAssigned.deliveryManId(),
                         delivery.getStatus(), delivery.getAddress(),
                         delivery.getItems(), delivery.getDeliveryCharge(),
                         delivery.getTip(), delivery.getTotal(), delivery.getMetadata()
@@ -137,7 +137,7 @@ public class Delivery {
             if (event.body() instanceof DeliveryManUnAssigned deliveryManUnAssigned) {
                 delivery = new Delivery(
                         delivery.getOrderId(), delivery.getCustomerId(),
-                        delivery.getRestaurantId(), null,
+                        delivery.getFarmId(), null,
                         delivery.getStatus(), delivery.getAddress(),
                         delivery.getItems(), delivery.getDeliveryCharge(),
                         delivery.getTip(), delivery.getTotal(), delivery.getMetadata()
@@ -150,7 +150,7 @@ public class Delivery {
 
                 delivery = new Delivery(
                         delivery.getOrderId(), delivery.getCustomerId(),
-                        delivery.getRestaurantId(), delivery.getDeliveryManId(),
+                        delivery.getFarmId(), delivery.getDeliveryManId(),
                         DeliveryStatus.FOOD_READY, delivery.getAddress(),
                         delivery.getItems(), delivery.getDeliveryCharge(),
                         delivery.getTip(), delivery.getTotal(), metadata
@@ -163,7 +163,7 @@ public class Delivery {
 
                 delivery = new Delivery(
                         delivery.getOrderId(), delivery.getCustomerId(),
-                        delivery.getRestaurantId(), delivery.getDeliveryManId(),
+                        delivery.getFarmId(), delivery.getDeliveryManId(),
                         DeliveryStatus.FOOD_PICKED, delivery.getAddress(),
                         delivery.getItems(), delivery.getDeliveryCharge(),
                         delivery.getTip(), delivery.getTotal(), metadata
@@ -176,7 +176,7 @@ public class Delivery {
 
                 delivery = new Delivery(
                         delivery.getOrderId(), delivery.getCustomerId(),
-                        delivery.getRestaurantId(), delivery.getDeliveryManId(),
+                        delivery.getFarmId(), delivery.getDeliveryManId(),
                         DeliveryStatus.FOOD_DELIVERED, delivery.getAddress(),
                         delivery.getItems(), delivery.getDeliveryCharge(),
                         delivery.getTip(), delivery.getTotal(), metadata

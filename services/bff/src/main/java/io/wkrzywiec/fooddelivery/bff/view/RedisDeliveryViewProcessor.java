@@ -60,7 +60,7 @@ public class RedisDeliveryViewProcessor {
         if (event instanceof DeliveryCreated created) {
             deliveryView = new DeliveryView(
                     created.orderId(), created.customerId(),
-                    created.restaurantId(), null, DeliveryStatus.CREATED,
+                    created.farmId(), null, DeliveryStatus.CREATED,
                     created.address(),created.items(),
                     created.deliveryCharge(), BigDecimal.ZERO,
                     created.total()
@@ -70,7 +70,7 @@ public class RedisDeliveryViewProcessor {
         if (event instanceof TipAddedToDelivery tipAddedToDelivery) {
             deliveryView = new DeliveryView(
                     deliveryView.getOrderId(), deliveryView.getCustomerId(),
-                    deliveryView.getRestaurantId(), deliveryView.getDeliveryManId(),
+                    deliveryView.getFarmId(), deliveryView.getDeliveryManId(),
                     deliveryView.getStatus(), deliveryView.getAddress(),
                     deliveryView.getItems(), deliveryView.getDeliveryCharge(),
                     tipAddedToDelivery.tip(), tipAddedToDelivery.total()
@@ -80,7 +80,7 @@ public class RedisDeliveryViewProcessor {
         if (event instanceof DeliveryCanceled canceled) {
             deliveryView = new DeliveryView(
                     deliveryView.getOrderId(), deliveryView.getCustomerId(),
-                    deliveryView.getRestaurantId(), deliveryView.getDeliveryManId(),
+                    deliveryView.getFarmId(), deliveryView.getDeliveryManId(),
                     DeliveryStatus.CANCELED, deliveryView.getAddress(),
                     deliveryView.getItems(), deliveryView.getDeliveryCharge(),
                     deliveryView.getTip(), deliveryView.getTotal()
@@ -91,7 +91,7 @@ public class RedisDeliveryViewProcessor {
 
             deliveryView = new DeliveryView(
                     deliveryView.getOrderId(), deliveryView.getCustomerId(),
-                    deliveryView.getRestaurantId(), deliveryView.getDeliveryManId(),
+                    deliveryView.getFarmId(), deliveryView.getDeliveryManId(),
                     DeliveryStatus.FOOD_IN_PREPARATION, deliveryView.getAddress(),
                     deliveryView.getItems(), deliveryView.getDeliveryCharge(),
                     deliveryView.getTip(), deliveryView.getTotal()
@@ -101,7 +101,7 @@ public class RedisDeliveryViewProcessor {
         if (event instanceof DeliveryManAssigned deliveryManAssigned) {
             deliveryView = new DeliveryView(
                     deliveryView.getOrderId(), deliveryView.getCustomerId(),
-                    deliveryView.getRestaurantId(), deliveryManAssigned.deliveryManId(),
+                    deliveryView.getFarmId(), deliveryManAssigned.deliveryManId(),
                     deliveryView.getStatus(), deliveryView.getAddress(),
                     deliveryView.getItems(), deliveryView.getDeliveryCharge(),
                     deliveryView.getTip(), deliveryView.getTotal()
@@ -111,7 +111,7 @@ public class RedisDeliveryViewProcessor {
         if (event instanceof DeliveryManUnAssigned deliveryManUnAssigned) {
             deliveryView = new DeliveryView(
                     deliveryView.getOrderId(), deliveryView.getCustomerId(),
-                    deliveryView.getRestaurantId(), null,
+                    deliveryView.getFarmId(), null,
                     deliveryView.getStatus(), deliveryView.getAddress(),
                     deliveryView.getItems(), deliveryView.getDeliveryCharge(),
                     deliveryView.getTip(), deliveryView.getTotal()
@@ -121,7 +121,7 @@ public class RedisDeliveryViewProcessor {
         if (event instanceof FoodIsReady) {
             deliveryView = new DeliveryView(
                     deliveryView.getOrderId(), deliveryView.getCustomerId(),
-                    deliveryView.getRestaurantId(), deliveryView.getDeliveryManId(),
+                    deliveryView.getFarmId(), deliveryView.getDeliveryManId(),
                     DeliveryStatus.FOOD_READY, deliveryView.getAddress(),
                     deliveryView.getItems(), deliveryView.getDeliveryCharge(),
                     deliveryView.getTip(), deliveryView.getTotal()
@@ -131,7 +131,7 @@ public class RedisDeliveryViewProcessor {
         if (event instanceof FoodWasPickedUp) {
             deliveryView = new DeliveryView(
                     deliveryView.getOrderId(), deliveryView.getCustomerId(),
-                    deliveryView.getRestaurantId(), deliveryView.getDeliveryManId(),
+                    deliveryView.getFarmId(), deliveryView.getDeliveryManId(),
                     DeliveryStatus.FOOD_PICKED, deliveryView.getAddress(),
                     deliveryView.getItems(), deliveryView.getDeliveryCharge(),
                     deliveryView.getTip(), deliveryView.getTotal()
@@ -141,7 +141,7 @@ public class RedisDeliveryViewProcessor {
         if (event instanceof FoodDelivered) {
             deliveryView = new DeliveryView(
                     deliveryView.getOrderId(), deliveryView.getCustomerId(),
-                    deliveryView.getRestaurantId(), deliveryView.getDeliveryManId(),
+                    deliveryView.getFarmId(), deliveryView.getDeliveryManId(),
                     DeliveryStatus.FOOD_DELIVERED, deliveryView.getAddress(),
                     deliveryView.getItems(), deliveryView.getDeliveryCharge(),
                     deliveryView.getTip(), deliveryView.getTotal()

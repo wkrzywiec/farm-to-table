@@ -155,7 +155,7 @@ There are several Redis modules that are used to store data:
 {
    "orderId":"order-2",
    "customerId":"Pam Beesly",
-   "restaurantId":"Ristorante Da Aldo",
+   "farmId":"Garden's Finest",
    "deliveryManId":"nicest-guy",
    "status":"FOOD_DELIVERED",
    "address":"Cottage Avenue 11",

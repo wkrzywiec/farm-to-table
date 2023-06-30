@@ -1,7 +1,7 @@
 {
   "id": "order-1",
   "customerId": "Jim Halpert",
-  "restaurantId": "Pizza Hut",
+  "farmId": "Sustainable Farming",
   "items": [
     {
       "name": "Cheesy Pizza",
