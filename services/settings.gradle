@@ -1,4 +1,4 @@
-rootProject.name = 'food-delivery'
+rootProject.name = 'farm-to-table'
 
 include 'commons'
 include 'ordering'
