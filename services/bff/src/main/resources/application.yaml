@@ -3,7 +3,7 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   application:
-    name: 'food-delivery_bff'
+    name: 'farm-to-table_bff'
 
 management:
   endpoints:
