@@ -71,7 +71,7 @@ tasks:
     desc: Spin up dockerized infrastructure
     dir: services
     cmds:
-      - docker compose up -d redis
+      - docker compose up -d redis pgadmin
       - docker run --rm -it --network services_default redis redis-cli -h redis FT.CREATE food-idx ON JSON PREFIX 1 "food:" SCHEMA $.name AS name TEXT
 
   infra:down:
@@ -85,7 +85,7 @@ tasks:
     desc: Stop and clean all persisted data
     cmds:
       - task: infra:down
-      - docker volume rm services_redis-data
+      - docker volume rm services_redis-data services_postgres
       - echo "Docker volumes cleaned."
 
   clean-docker:
