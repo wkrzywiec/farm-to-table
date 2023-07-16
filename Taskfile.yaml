@@ -85,5 +85,14 @@ tasks:
     desc: Stop and clean all persisted data
     cmds:
       - task: infra:down
-      - docker volume rm food-delivery-app_redis-data
+      - docker volume rm services_redis-data
       - echo "Docker volumes cleaned."
+
+  clean-docker:
+    desc: Remove all build docker images
+    dir: services
+    cmds:
+      - task: infra:clean
+      - docker compose rm
+      - docker image rm $(docker image ls -q --filter "reference=services_*")
+
