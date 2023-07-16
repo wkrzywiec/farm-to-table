@@ -96,6 +96,23 @@ Currently, there is only one available profile called `redis`. However, there ar
 
 ### Default configuration (`SOON`)
 
+#### How to access data
+
+##### postgres
+
+In order to check the content of postgres db use the pgAdmin4 bundled in docker-compose.yaml. 
+
+Link: http://localhost:5050
+
+Credentials:
+* username: admin@admin.com
+* password: admin
+
+During first login you may also be asked to provide a password to `postgres` server. It is plain and simple - `postgres`.
+
+After logging all available databases will be listed.
+
+
 ### `redis` configuration
 
 All of the infrastructure components are utilizing Redis. This profile serves as a showcase to demonstrate the versatility of Redis and its ability to support various functionalities across the application.
