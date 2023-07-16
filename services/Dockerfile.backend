@@ -1,7 +1,7 @@
-FROM openjdk:17-slim as build
+FROM gradle:7.6.2-jdk17 as build
 WORKDIR /app
 COPY ./ ./
-RUN ./gradlew clean assemble --info
+RUN gradle clean assemble --info
 
 
 FROM openjdk:17-alpine as main

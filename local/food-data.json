@@ -1,134 +1,134 @@
 [
   {
-    "name": "Pizza Margherita",
-    "pricePerItem": 10.99
+    "name": "Apple",
+    "pricePerItem": 3.99
   },
   {
-    "name": "Pizza Pepperoni",
-    "pricePerItem": 12.99
+    "name": "Orange",
+    "pricePerItem": 6.99
   },
   {
-    "name": "Pizza Classica",
-    "pricePerItem": 12.99
+    "name": "Strawberry",
+    "pricePerItem": 12.50
   },
   {
-    "name": "Pizza Americana",
-    "pricePerItem": 12.99
+    "name": "Raspberry",
+    "pricePerItem": 15.00
   },
   {
-    "name": "Cottage Pizza",
-    "pricePerItem": 14.99
+    "name": "Plum",
+    "pricePerItem": 4.30
   },
   {
-    "name": "Cheesy Pizza",
-    "pricePerItem": 14.99
-  },
-  {
-    "name": "Hawaiian Pizza",
-    "pricePerItem": 14.99
-  },
-  {
-    "name": "Greek Pizza",
-    "pricePerItem": 14.99
-  },
-  {
-    "name": "Hot Pepperoni Pizza",
-    "pricePerItem": 14.99
-  },
-  {
-    "name": "Farmer Pizza",
-    "pricePerItem": 15.99
-  },
-  {
-    "name": "Carbonara Pizza",
-    "pricePerItem": 15.49
-  },
-  {
-    "name": "Prosciutto Pizza",
-    "pricePerItem": 14.99
-  },
-  {
-    "name": "Spaghetti Bolognese",
-    "pricePerItem": 11
-  },
-  {
-    "name": "Spaghetti Carbonara",
-    "pricePerItem": 12
-  },
-  {
-    "name": "Tagliatelle Carbonara",
-    "pricePerItem": 9.99
-  },
-  {
-    "name": "Tagliatelle con pollo",
-    "pricePerItem": 10.30
-  },
-  {
-    "name": "Tagliatelle con pesto verde",
-    "pricePerItem": 10.30
-  },
-  {
-    "name": "Lasagne Bolognese",
-    "pricePerItem": 20.99
-  },
-  {
-    "name": "Garlic Chicken Penne",
+    "name": "Peach",
     "pricePerItem": 8.99
   },
   {
-    "name": "Roasted Red Pepper Pesto Penne",
+    "name": "Watermelon",
+    "pricePerItem": 7.99
+  },
+  {
+    "name": "Cherry",
+    "pricePerItem": 21.99
+  },
+  {
+    "name": "Blackberry",
+    "pricePerItem": 11.99
+  },
+  {
+    "name": "Melon",
+    "pricePerItem": 7.49
+  },
+  {
+    "name": "Pear",
+    "pricePerItem": 4.49
+  },
+  {
+    "name": "Grape",
+    "pricePerItem": 7.49
+  },
+  {
+    "name": "Kiwi",
+    "pricePerItem": 2.99
+  },
+  {
+    "name": "Tomato",
+    "pricePerItem": 6.35
+  },
+  {
+    "name": "Carrot",
+    "pricePerItem": 15.49
+  },
+  {
+    "name": "Lettuce",
+    "pricePerItem": 3.99
+  },
+  {
+    "name": "Onion",
+    "pricePerItem": 3.00
+  },
+  {
+    "name": "Radish",
+    "pricePerItem": 5
+  },
+  {
+    "name": "Zucchini",
+    "pricePerItem": 6.99
+  },
+  {
+    "name": "Eggplant",
+    "pricePerItem": 8.99
+  },
+  {
+    "name": "Broccoli",
+    "pricePerItem": 10.30
+  },
+  {
+    "name": "Cauliflower",
+    "pricePerItem": 11
+  },
+  {
+    "name": "Leek",
+    "pricePerItem": 4
+  },
+  {
+    "name": "Spinach",
+    "pricePerItem": 6.78
+  },
+  {
+    "name": "Celery",
+    "pricePerItem": 5.50
+  },
+  {
+    "name": "Pumpkin",
     "pricePerItem": 9.49
   },
   {
-    "name": "Spinach Pesto Penne with Shrimp and Peas",
-    "pricePerItem": 9.49
-  },
-  {
-    "name": "Lemony Asparagus Penne",
-    "pricePerItem": 9.49
-  },
-  {
-    "name": "Tiramisu",
+    "name": "Potato",
     "pricePerItem": 4.49
   },
   {
-    "name": "Lemon cake",
+    "name": "Corn",
     "pricePerItem": 4.49
   },
   {
-    "name": "Cannoli",
-    "pricePerItem": 4.49
+    "name": "Cheese",
+    "pricePerItem": 45.00
   },
   {
-    "name": "Panna cotta with cherry",
-    "pricePerItem": 4.49
+    "name": "Honey",
+    "pricePerItem": 25.99
   },
   {
-    "name": "Water",
-    "pricePerItem": 1.49
+    "name": "Milk",
+    "pricePerItem": 4.99
   },
   {
-    "name": "Orange juice",
-    "pricePerItem": 1.99
+    "name": "Egg",
+    "pricePerItem": 10.99
   },
   {
-    "name": "Apple juice",
-    "pricePerItem": 1.99
-  },
-  {
-    "name": "Tea",
-    "pricePerItem": 1.99
-  },
-  {
-    "name": "Coffee",
-    "pricePerItem": 1.99
-  },
-  {
-    "name": "Red Wine",
-    "pricePerItem": 3.49
-  },
-  {
-    "name": "White Wine",
-    "pricePerItem": 3.49
+    "name": "Mushroom",
+    "pricePerItem": 9.99
   }
 ]

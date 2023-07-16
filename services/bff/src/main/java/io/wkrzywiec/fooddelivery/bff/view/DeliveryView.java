@@ -16,7 +16,7 @@ public class DeliveryView {
 
     private String orderId;
     private String customerId;
-    private String restaurantId;
+    private String farmId;
     private String deliveryManId;
     private DeliveryStatus status;
     private String address;

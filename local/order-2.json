@@ -1,17 +1,17 @@
 {
   "id": "order-2",
   "customerId": "Pam Beesly",
-  "restaurantId": "Ristorante Da Aldo",
+  "farmId": "Heritage Farm",
   "items": [
     {
-      "name": "Lemony Asparagus Penne",
-      "amount": 1,
-      "pricePerItem": 9.49
+      "name": "Tomato",
+      "amount": 3,
+      "pricePerItem": 6.35
     },
     {
-      "name": "Tea",
-      "amount": 1,
-      "pricePerItem": 1.99
+      "name": "Potato",
+      "amount": 10,
+      "pricePerItem": 4.49
     }
   ],
   "address": "Cottage Avenue 11",

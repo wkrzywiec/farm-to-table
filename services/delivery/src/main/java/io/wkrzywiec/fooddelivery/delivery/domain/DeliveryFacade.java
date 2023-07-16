@@ -36,7 +36,7 @@ public class DeliveryFacade {
         var deliveryCreated = new DeliveryCreated(
                 newDelivery.getOrderId(),
                 newDelivery.getCustomerId(),
-                newDelivery.getRestaurantId(),
+                newDelivery.getFarmId(),
                 newDelivery.getAddress(),
                 newDelivery.getItems().stream().map(i -> new io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item(i.getName(), i.getAmount(), i.getPricePerItem())).toList(),
                 newDelivery.getDeliveryCharge(),

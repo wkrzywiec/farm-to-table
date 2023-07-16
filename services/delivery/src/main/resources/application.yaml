@@ -1,6 +1,6 @@
 spring:
   application:
-    name: 'food-delivery_delivery'
+    name: 'farm-to-table_delivery'
 
 management:
   endpoints:

@@ -15,11 +15,11 @@ import static java.lang.String.format;
  class DeliveryTestData {
 
     private String orderId = UUID.randomUUID().toString();
-    private String customerId = "default-customer-orderId";
-    private String restaurantId = "default-restaurant-orderId";
+    private String customerId = "default-customerId";
+    private String farmId = "default-farmId";
     private String deliveryManId = null;
     private DeliveryStatus status = DeliveryStatus.CREATED;
-    private String address = "Pizza street, Naples, Italy";
+    private String address = "Farm street, Naples, Italy";
     private List<ItemTestData> items = List.of(ItemTestData.anItem());
     private BigDecimal deliveryCharge = new BigDecimal(5);
     private BigDecimal tip = new BigDecimal(0);
@@ -36,7 +36,7 @@ import static java.lang.String.format;
         Delivery delivery = createAnEmptyDelivery();
         setValue(delivery, "orderId", orderId);
         setValue(delivery, "customerId", customerId);
-        setValue(delivery, "restaurantId", restaurantId);
+        setValue(delivery, "farmId", farmId);
         setValue(delivery, "deliveryManId", deliveryManId);
         setValue(delivery, "status", status);
         setValue(delivery, "address", address);
@@ -50,7 +50,7 @@ import static java.lang.String.format;
     }
 
     public DeliveryCreated deliveryCreated() {
-        return new DeliveryCreated(orderId, customerId, restaurantId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, total);
+        return new DeliveryCreated(orderId, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, total);
     }
 
     DeliveryTestData withOrderId(String orderId) {
@@ -63,8 +63,8 @@ import static java.lang.String.format;
         return this;
     }
 
-     DeliveryTestData withRestaurantId(String restaurantId) {
-        this.restaurantId = restaurantId;
+     DeliveryTestData withFarmId(String farmId) {
+        this.farmId = farmId;
         return this;
     }
 

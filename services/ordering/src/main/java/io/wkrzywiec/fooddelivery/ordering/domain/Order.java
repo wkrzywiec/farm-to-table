@@ -20,7 +20,7 @@ public class Order {
 
     private String id;
     private String customerId;
-    private String restaurantId;
+    private String farmId;
     private OrderStatus status;
     private String address;
     private List<Item> items;
@@ -31,18 +31,18 @@ public class Order {
 
     private Order() {}
 
-    private Order(String id, String customerId, String restaurantId, List<Item> items, String address, BigDecimal deliveryCharge) {
-        this(id, customerId, restaurantId, CREATED, address, items, deliveryCharge, BigDecimal.ZERO, new HashMap<>());
+    private Order(String id, String customerId, String farmId, List<Item> items, String address, BigDecimal deliveryCharge) {
+        this(id, customerId, farmId, CREATED, address, items, deliveryCharge, BigDecimal.ZERO, new HashMap<>());
     }
 
-    private Order(String id, String customerId, String restaurantId, OrderStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip, Map<String, String> metadata) {
+    private Order(String id, String customerId, String farmId, OrderStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip, Map<String, String> metadata) {
         if (id == null) {
             this.id = UUID.randomUUID().toString();
         } else {
             this.id = id;
         }
         this.customerId = customerId;
-        this.restaurantId = restaurantId;
+        this.farmId = farmId;
         this.status = status;
         this.address = address;
         this.items = items;
@@ -56,7 +56,7 @@ public class Order {
         var order = new Order(
                 createOrder.orderId(),
                 createOrder.customerId(),
-                createOrder.restaurantId(),
+                createOrder.farmId(),
                 mapItems(createOrder.items()),
                 createOrder.address(),
                 createOrder.deliveryCharge());
@@ -78,7 +78,7 @@ public class Order {
             if (event.body() instanceof OrderCreated created) {
                 order = new Order(
                         created.orderId(), created.customerId(),
-                        created.restaurantId(), mapItems(created.items()),
+                        created.farmId(), mapItems(created.items()),
                         created.address(), created.deliveryCharge()
                 );
             }
@@ -88,7 +88,7 @@ public class Order {
                 meta.put("cancellationReason", canceled.reason());
                 order = new Order(
                         order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), CANCELED,
+                        order.getFarmId(), CANCELED,
                         order.getAddress(), order.getItems(),
                         order.getDeliveryCharge(), order.getTip(),
                         meta
@@ -98,7 +98,7 @@ public class Order {
             if (event.body() instanceof OrderInProgress) {
                 order = new Order(
                         order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), IN_PROGRESS,
+                        order.getFarmId(), IN_PROGRESS,
                         order.getAddress(), order.getItems(),
                         order.getDeliveryCharge(), order.getTip(),
                         order.getMetadata()
@@ -108,7 +108,7 @@ public class Order {
             if (event.body() instanceof TipAddedToOrder tipAdded) {
                 order = new Order(
                         order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), order.getStatus(),
+                        order.getFarmId(), order.getStatus(),
                         order.getAddress(), order.getItems(),
                         order.getDeliveryCharge(), tipAdded.tip(),
                         order.getMetadata()
@@ -118,7 +118,7 @@ public class Order {
             if (event.body() instanceof OrderCompleted) {
                 order = new Order(
                         order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), COMPLETED,
+                        order.getFarmId(), COMPLETED,
                         order.getAddress(), order.getItems(),
                         order.getDeliveryCharge(), order.getTip(),
                         order.getMetadata()

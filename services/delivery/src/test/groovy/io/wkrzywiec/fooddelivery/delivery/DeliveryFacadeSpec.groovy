@@ -66,7 +66,7 @@ class DeliveryFacadeSpec extends Specification {
 
         var orderCreated = new OrderCreated(
                 delivery.getOrderId(), delivery.getCustomerId(),
-                delivery.getRestaurantId(), delivery.getAddress(),
+                delivery.getFarmId(), delivery.getAddress(),
                 delivery.getItems().stream().map(i -> new Item(i.name, i.amount, i.pricePerItem)).toList(),
                 delivery.getDeliveryCharge(), delivery.getTotal())
 

@@ -10,7 +10,7 @@ plugins {
 
 group = 'io.wkrzywiec'
 version = '0.0.1-SNAPSHOT'
-description = 'food-delivery common libraries'
+description = 'farm-to-table common libraries'
 sourceCompatibility = '17'
 
 bootJar {

@@ -9,8 +9,6 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.util.UUID;
@@ -28,7 +26,7 @@ public class RedisInboxListener {
         log.info("Received a command to create an order: {}", createOrderDTO);
         var command = command(createOrderDTO.getId(),
                 new CreateOrder(
-                        createOrderDTO.getId(), createOrderDTO.getCustomerId(), createOrderDTO.getRestaurantId(),
+                        createOrderDTO.getId(), createOrderDTO.getCustomerId(), createOrderDTO.getFarmId(),
                         createOrderDTO.getItems().stream().map(i -> new Item(i.name(), i.amount(), i.pricePerItem())).toList(),
                         createOrderDTO.getAddress(), createOrderDTO.getDeliveryCharge()));
 

@@ -16,7 +16,7 @@ import static java.lang.String.format;
 
     private String id = UUID.randomUUID().toString();
     private String customerId = "default-customer-id";
-    private String restaurantId = "default-restaurant-id";
+    private String farmId = "default-farm-id";
     private OrderStatus status = CREATED;
     private String address = "Pizza street, Naples, Italy";
     private List<ItemTestData> items = List.of(ItemTestData.anItem());
@@ -34,7 +34,7 @@ import static java.lang.String.format;
         Order order = createAnEmptyOrder();
         setValue(order, "id", id);
         setValue(order, "customerId", customerId);
-        setValue(order, "restaurantId", restaurantId);
+        setValue(order, "farmId", farmId);
         setValue(order, "status", status);
         setValue(order, "address", address);
         setValue(order, "items", items.stream().map(ItemTestData::entity).toList());
@@ -47,12 +47,12 @@ import static java.lang.String.format;
     }
 
      public CreateOrder createOrder() {
-        return new CreateOrder(id, customerId, restaurantId, items.stream().map(ItemTestData::dto).toList(), address, deliveryCharge);
+        return new CreateOrder(id, customerId, farmId, items.stream().map(ItemTestData::dto).toList(), address, deliveryCharge);
     }
 
     public OrderCreated orderCreated() {
          var entity = entity();
-         return new OrderCreated(id, customerId, restaurantId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, entity.getTotal());
+         return new OrderCreated(id, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, entity.getTotal());
     }
 
      public OrderTestData withId(String id) {
@@ -65,8 +65,8 @@ import static java.lang.String.format;
         return this;
     }
 
-     public OrderTestData withRestaurantId(String restaurantId) {
-        this.restaurantId = restaurantId;
+     public OrderTestData withFarmId(String farmId) {
+        this.farmId = farmId;
         return this;
     }
 

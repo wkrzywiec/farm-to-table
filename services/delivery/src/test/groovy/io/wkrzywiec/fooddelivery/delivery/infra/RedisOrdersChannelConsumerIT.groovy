@@ -31,7 +31,7 @@ class RedisOrdersChannelConsumerIT extends IntegrationTest {
                 .withAddress(faker.address().fullAddress())
 
         def body = new OrderCreated(
-                delivery.getOrderId(), delivery.getCustomerId(), delivery.getRestaurantId(), delivery.getAddress(),
+                delivery.getOrderId(), delivery.getCustomerId(), delivery.getFarmId(), delivery.getAddress(),
                 delivery.getItems().stream().map(i -> new Item(i.getName(), i.getAmount(), i.getPricePerItem())).toList(),
                 delivery.getDeliveryCharge(), delivery.getTotal())
 

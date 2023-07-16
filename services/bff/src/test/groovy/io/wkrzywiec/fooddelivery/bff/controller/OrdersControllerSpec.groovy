@@ -10,7 +10,6 @@ import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
@@ -42,7 +41,7 @@ class OrdersControllerSpec extends Specification {
         def requestBody = """
             {
               "customerId": "any-customer",
-              "restaurantId": "good-restaurant",
+              "farmId": "good-farm",
               "items": [
                 {
                   "name": "pizza",
@@ -71,7 +70,7 @@ class OrdersControllerSpec extends Specification {
         def inbox = inboxPublisher.inboxes.get("ordering-inbox:create")
         with(inbox.peek() as CreateOrderDTO) { it ->
             it.customerId == "any-customer"
-            it.restaurantId == "good-restaurant"
+            it.farmId == "good-farm"
             it.address == "main road"
             it.deliveryCharge == 5.25
             it.items == [ new ItemDTO("pizza", 2, 7.99)]
@@ -85,7 +84,7 @@ class OrdersControllerSpec extends Specification {
             {
               "id": "$id",
               "customerId": "any-customer",
-              "restaurantId": "good-restaurant",
+              "farmId": "good-farm",
               "items": [
                 {
                   "name": "pizza",
