@@ -4,6 +4,9 @@ spring:
       matching-strategy: ant_path_matcher
   application:
     name: 'farm-to-table_bff'
+  liquibase:
+    enabled: false
+    change-log: db/changelog/changelog-master.xml
 
 management:
   endpoints:
@@ -17,7 +20,19 @@ server:
 
 spring:
   profiles: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bff
+    username: bff
+    password: bff
+  liquibase:
+    enabled: true
 
 ---
 spring:
   profiles: prod
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:bff}
+    username: ${POSTGRES_USERNAME:bff}
+    password: ${POSTGRES_PASSWORD:password}
+  liquibase:
+    enabled: true

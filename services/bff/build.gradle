@@ -2,7 +2,6 @@ plugins {
     id 'idea'
     id 'org.springframework.boot' version '2.7.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'org.liquibase.gradle' version '2.1.1'
     id 'java'
     id 'groovy'
     id 'jacoco'
@@ -15,7 +14,7 @@ version = '0.0.1-SNAPSHOT'
 description = 'farm-to-table backend for frontend'
 sourceCompatibility = '17'
 
-def activeDevProfiles = 'dev,redis'
+def activeDevProfiles = 'dev,redis,redis-inbox'
 
 configurations {
     compileOnly {
@@ -37,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'com.github.sonus21:rqueue-spring-boot-starter:2.10.2-RELEASE'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
     implementation 'io.vavr:vavr:0.10.4'
@@ -44,6 +44,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'com.redislabs:lettusearch:3.1.2'
     implementation 'com.redislabs:spring-redisearch:3.1.2'
+    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'org.liquibase:liquibase-core:4.23.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation "org.spockframework:spock-core:${spockVersion}"
