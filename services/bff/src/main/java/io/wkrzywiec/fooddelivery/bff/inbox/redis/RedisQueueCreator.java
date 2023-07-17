@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.bff.inbox;
+package io.wkrzywiec.fooddelivery.bff.inbox.redis;
 
 import com.github.sonus21.rqueue.core.RqueueEndpointManager;
 import lombok.RequiredArgsConstructor;

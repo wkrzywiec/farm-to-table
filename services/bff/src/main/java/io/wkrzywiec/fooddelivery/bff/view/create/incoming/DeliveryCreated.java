@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.bff.view.outgoing;
+package io.wkrzywiec.fooddelivery.bff.view.create.incoming;
 
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 import io.wkrzywiec.fooddelivery.commons.incoming.Item;

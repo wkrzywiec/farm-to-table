@@ -1,18 +1,14 @@
 package io.wkrzywiec.fooddelivery.bff.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.sonus21.rqueue.core.RqueueEndpointManager;
-import com.github.sonus21.rqueue.core.RqueueMessageEnqueuer;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
-import io.wkrzywiec.fooddelivery.bff.inbox.*;
-import io.wkrzywiec.fooddelivery.bff.repository.DeliveryViewRepository;
-import io.wkrzywiec.fooddelivery.bff.repository.RedisDeliveryViewRepository;
-import io.wkrzywiec.fooddelivery.bff.repository.RedisFoodItemRepository;
-import io.wkrzywiec.fooddelivery.bff.view.RedisDeliveryViewProcessor;
-import io.wkrzywiec.fooddelivery.bff.view.RedisOrdersChannelConsumer;
+import io.wkrzywiec.fooddelivery.bff.view.read.DeliveryViewRepository;
+import io.wkrzywiec.fooddelivery.bff.view.read.RedisDeliveryViewRepository;
+import io.wkrzywiec.fooddelivery.bff.view.read.RedisFoodItemRepository;
+import io.wkrzywiec.fooddelivery.bff.view.create.RedisDeliveryViewProcessor;
+import io.wkrzywiec.fooddelivery.bff.view.create.RedisOrdersChannelConsumer;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisMessageConsumerConfig;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -20,7 +16,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.Subscription;
 
-@Slf4j
 @Configuration
 @Profile("redis")
 public class RedisConfiguration extends RedisMessageConsumerConfig {
@@ -35,21 +30,6 @@ public class RedisConfiguration extends RedisMessageConsumerConfig {
     @Bean
     public RedisStreamListener redisOrdersChannelConsumer(RedisDeliveryViewProcessor processor, ObjectMapper objectMapper) {
         return new RedisOrdersChannelConsumer(processor, objectMapper);
-    }
-
-    @Bean
-    public InboxPublisher redisInboxPublisher(RqueueMessageEnqueuer redisQueue) {
-        return new RedisInboxPublisher(redisQueue);
-    }
-
-    @Bean
-    public RedisInboxListener redisInboxListener(InboxMessageProcessor inboxMessageProcessor) {
-        return new RedisInboxListener(inboxMessageProcessor);
-    }
-
-    @Bean
-    public RedisQueueCreator redisQueueCreator(RqueueEndpointManager rqueueEndpointManager) {
-        return new RedisQueueCreator(rqueueEndpointManager);
     }
 
     @Bean

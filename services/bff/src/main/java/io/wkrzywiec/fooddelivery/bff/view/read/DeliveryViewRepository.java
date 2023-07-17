@@ -1,6 +1,6 @@
-package io.wkrzywiec.fooddelivery.bff.repository;
+package io.wkrzywiec.fooddelivery.bff.view.read;
 
-import io.wkrzywiec.fooddelivery.bff.view.DeliveryView;
+import io.wkrzywiec.fooddelivery.bff.view.create.DeliveryView;
 
 import java.util.List;
 import java.util.Optional;

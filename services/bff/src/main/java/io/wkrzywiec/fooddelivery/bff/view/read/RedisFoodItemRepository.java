@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.bff.repository;
+package io.wkrzywiec.fooddelivery.bff.view.read;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

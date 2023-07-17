@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.bff.view;
+package io.wkrzywiec.fooddelivery.bff.view.create;
 
 import io.wkrzywiec.fooddelivery.commons.incoming.Item;
 import lombok.*;

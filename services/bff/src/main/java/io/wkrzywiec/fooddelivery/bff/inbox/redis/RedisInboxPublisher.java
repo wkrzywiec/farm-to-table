@@ -1,6 +1,7 @@
-package io.wkrzywiec.fooddelivery.bff.inbox;
+package io.wkrzywiec.fooddelivery.bff.inbox.redis;
 
 import com.github.sonus21.rqueue.core.RqueueMessageEnqueuer;
+import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;

@@ -1,23 +1,17 @@
 package io.wkrzywiec.fooddelivery.bff.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher;
 import io.wkrzywiec.fooddelivery.bff.controller.model.ChangeDeliveryManDTO;
 import io.wkrzywiec.fooddelivery.bff.controller.model.ResponseDTO;
 import io.wkrzywiec.fooddelivery.bff.controller.model.UpdateDeliveryDTO;
-import io.wkrzywiec.fooddelivery.bff.repository.DeliveryViewRepository;
-import io.wkrzywiec.fooddelivery.bff.view.DeliveryView;
-import io.wkrzywiec.fooddelivery.bff.view.outgoing.DeliveryCreated;
+import io.wkrzywiec.fooddelivery.bff.view.read.DeliveryViewRepository;
+import io.wkrzywiec.fooddelivery.bff.view.create.DeliveryView;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-
-import static java.util.Optional.ofNullable;
 
 @Slf4j
 @RestController

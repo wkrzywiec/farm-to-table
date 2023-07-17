@@ -1,8 +1,8 @@
-package io.wkrzywiec.fooddelivery.bff.view;
+package io.wkrzywiec.fooddelivery.bff.view.create;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.bff.view.outgoing.*;
+import io.wkrzywiec.fooddelivery.bff.view.create.incoming.*;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

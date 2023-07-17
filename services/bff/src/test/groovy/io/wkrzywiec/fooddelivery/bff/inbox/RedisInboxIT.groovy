@@ -1,6 +1,8 @@
 package io.wkrzywiec.fooddelivery.bff.inbox
 
 import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO
+import io.wkrzywiec.fooddelivery.bff.inbox.redis.RedisInboxListener
+import io.wkrzywiec.fooddelivery.bff.inbox.redis.RedisInboxPublisher
 import io.wkrzywiec.fooddelivery.commons.IntegrationTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
