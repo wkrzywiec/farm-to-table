@@ -1,7 +1,8 @@
-package io.wkrzywiec.fooddelivery.commons.infra.messaging.redis;
+package io.wkrzywiec.fooddelivery.bff.stream.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -10,7 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@Profile("redis")
+@Profile("redis-stream")
 public class RedisMessagePublisherConfig {
 
     @Bean

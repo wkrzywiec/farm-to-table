@@ -4,7 +4,8 @@
 -- comment create inbox table
 CREATE TABLE inbox
 (
-    message             JSONB NOT NULL,
+    id                  VARCHAR(256) NOT NULL,
     channel             VARCHAR(256) NOT NULL,
-    publish_timestamp   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    message             JSONB NOT NULL,
+    publish_timestamp   TIMESTAMP WITH TIME ZONE NOT NULL
 )

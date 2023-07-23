@@ -14,7 +14,7 @@ version = '0.0.1-SNAPSHOT'
 description = 'farm-to-table backend for frontend'
 sourceCompatibility = '17'
 
-def activeDevProfiles = 'dev,redis,redis-inbox'
+def activeDevProfiles = 'dev'
 
 configurations {
     compileOnly {

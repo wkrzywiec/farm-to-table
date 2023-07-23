@@ -1,4 +1,18 @@
 spring:
+  profiles:
+    default: prod
+    group:
+      dev:
+        - postgres-inbox
+        - redis-stream
+        - dev-local
+      prod:
+        - postgres-inbox
+        - redis-stream
+      redis:
+        - redis-inbox
+        - redis-stream
+        - dev-local
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -7,6 +21,9 @@ spring:
   liquibase:
     enabled: false
     change-log: db/changelog/changelog-master.xml
+  autoconfigure:
+    exclude: >
+      org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 management:
   endpoints:
@@ -15,24 +32,23 @@ management:
         include: '*'
 
 ---
-server:
-  port: 8081
 
 spring:
-  profiles: dev
+  profiles: postgres-inbox
   datasource:
-    url: jdbc:postgresql://localhost:5432/bff
-    username: bff
-    password: bff
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:bff}
+    username: ${POSTGRES_USERNAME:bff}
+    password: ${POSTGRES_PASSWORD:bff}
   liquibase:
     enabled: true
 
 ---
+
 spring:
-  profiles: prod
-  datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:bff}
-    username: ${POSTGRES_USERNAME:bff}
-    password: ${POSTGRES_PASSWORD:password}
-  liquibase:
-    enabled: true
+  profiles: dev-local
+
+server:
+  port: 8081
+
+---
+

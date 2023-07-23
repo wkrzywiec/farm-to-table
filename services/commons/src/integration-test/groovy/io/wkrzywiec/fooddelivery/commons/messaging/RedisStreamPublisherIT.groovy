@@ -5,7 +5,7 @@ import io.wkrzywiec.fooddelivery.commons.infra.RedisConfig
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisMessagePublisherConfig
+import RedisMessagePublisherConfig
 import io.wkrzywiec.fooddelivery.commons.infra.RedisStreamTestClient
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory

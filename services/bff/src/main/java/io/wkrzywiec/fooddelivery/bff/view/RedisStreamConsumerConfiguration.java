@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.bff.config;
+package io.wkrzywiec.fooddelivery.bff.view;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
@@ -17,8 +17,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.Subscription;
 
 @Configuration
-@Profile("redis")
-public class RedisConfiguration extends RedisMessageConsumerConfig {
+@Profile("redis-stream")
+public class RedisStreamConsumerConfiguration extends RedisMessageConsumerConfig {
 
     @Bean
     public Subscription ordersChannelSubscription(RedisConnectionFactory factory,
