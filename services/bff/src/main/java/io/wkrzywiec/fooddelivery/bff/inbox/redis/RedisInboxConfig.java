@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Profile;
 public class RedisInboxConfig {
 
     @Bean
-    public InboxPublisher redisInboxPublisher(RqueueMessageEnqueuer redisQueue) {
-        return new RedisInboxPublisher(redisQueue);
+    public Inbox redisInboxPublisher(RqueueMessageEnqueuer redisQueue) {
+        return new RedisInbox(redisQueue);
     }
 
     @Bean

@@ -1,6 +1,6 @@
 package io.wkrzywiec.fooddelivery.bff.controller;
 
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher;
+import io.wkrzywiec.fooddelivery.bff.inbox.Inbox;
 import io.wkrzywiec.fooddelivery.bff.controller.model.ChangeDeliveryManDTO;
 import io.wkrzywiec.fooddelivery.bff.controller.model.ResponseDTO;
 import io.wkrzywiec.fooddelivery.bff.controller.model.UpdateDeliveryDTO;
@@ -19,7 +19,7 @@ import java.util.*;
 public class DeliveryController {
 
     private final DeliveryViewRepository repository;
-    private final InboxPublisher inboxPublisher;
+    private final Inbox inbox;
     private static final String DELIVERY_INBOX = "delivery-inbox";
 
     @GetMapping("/deliveries")
@@ -42,7 +42,7 @@ public class DeliveryController {
     ResponseEntity<ResponseDTO> updateADelivery(@PathVariable String orderId, @RequestBody UpdateDeliveryDTO updateDelivery) {
         log.info("Received request to update a delivery for an '{}' order, update: {}", orderId, updateDelivery);
         updateDelivery.setOrderId(orderId);
-        inboxPublisher.storeMessage(DELIVERY_INBOX + ":update", updateDelivery);
+        inbox.storeMessage(DELIVERY_INBOX + ":update", updateDelivery);
 
         return ResponseEntity.accepted().body(new ResponseDTO(orderId));
     }
@@ -51,7 +51,7 @@ public class DeliveryController {
     ResponseEntity<ResponseDTO> deliveryMan(@PathVariable String orderId, @RequestBody ChangeDeliveryManDTO changeDeliveryMan) {
         log.info("Received request to assign '{}' delivery man to an '{}' order", changeDeliveryMan.getDeliveryManId(), orderId);
         changeDeliveryMan.setOrderId(orderId);
-        inboxPublisher.storeMessage(DELIVERY_INBOX + ":delivery-man", changeDeliveryMan);
+        inbox.storeMessage(DELIVERY_INBOX + ":delivery-man", changeDeliveryMan);
 
         return ResponseEntity.accepted().body(new ResponseDTO(orderId));
     }

@@ -6,8 +6,6 @@ import io.wkrzywiec.fooddelivery.bff.controller.model.*;
 import io.wkrzywiec.fooddelivery.bff.inbox.InboxMessageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -58,7 +56,7 @@ public class PostgresInboxListener {
                 FROM inbox
                 ORDER BY publish_timestamp
                 LIMIT 1
-                """, BeanPropertyRowMapper.newInstance(RawInboxEntry.class));
+                """, (resultSet, i) -> new RawInboxEntry(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
     }
 
     private <T> T mapMessageTo(RawInboxEntry rawInboxEntry, Class<T> requiredType) throws JsonProcessingException {

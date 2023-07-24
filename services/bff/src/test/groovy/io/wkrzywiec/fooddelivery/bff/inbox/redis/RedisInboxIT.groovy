@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 import static org.awaitility.Awaitility.await
 
-@Subject([RedisInboxPublisher, RedisInboxListener])
+@Subject([RedisInbox, RedisInboxListener])
 @ActiveProfiles(["redis-inbox", "redis-stream"])
 @ContextConfiguration(initializers = IntegrationTestContainerInitializer)
 class RedisInboxIT extends IntegrationTest {
@@ -56,9 +56,9 @@ class RedisInboxIT extends IntegrationTest {
     }
 
     @Autowired
-    private RedisInboxPublisher redisInboxPublisher
+    private RedisInbox redisInboxPublisher
 
-    def "Store object in inbox"() {
+    def "Store object in inbox and then published"() {
         given:
         def addTip = new AddTipDTO("any-order-id", BigDecimal.valueOf(10))
 

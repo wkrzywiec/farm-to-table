@@ -1,9 +1,8 @@
 package io.wkrzywiec.fooddelivery.bff.inbox.postgres;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.sonus21.rqueue.core.RqueueMessageEnqueuer;
 import io.wkrzywiec.fooddelivery.bff.inbox.InboxMessageProcessor;
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher;
+import io.wkrzywiec.fooddelivery.bff.inbox.Inbox;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +25,8 @@ public class PostgresInboxConfig {
     }
 
     @Bean
-    public InboxPublisher postgresInboxPublisher(JdbcTemplate jdbcTemplate, Clock clock, ObjectMapper objectMapper) {
-        return new PostgresInboxPublisher(jdbcTemplate, clock, objectMapper);
+    public Inbox postgresInboxPublisher(JdbcTemplate jdbcTemplate, Clock clock, ObjectMapper objectMapper) {
+        return new PostgresInbox(jdbcTemplate, clock, objectMapper);
     }
 
     @Bean

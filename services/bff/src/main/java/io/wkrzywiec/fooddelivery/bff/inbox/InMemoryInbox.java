@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InMemoryInboxPublisher implements InboxPublisher {
+public class InMemoryInbox implements Inbox {
 
     public Map<String, Queue<Object>> inboxes = new ConcurrentHashMap<>();
 

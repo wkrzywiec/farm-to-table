@@ -2,19 +2,18 @@ package io.wkrzywiec.fooddelivery.bff.inbox.postgres;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher;
+import io.wkrzywiec.fooddelivery.bff.inbox.Inbox;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j
-public class PostgresInboxPublisher implements InboxPublisher {
+public class PostgresInbox implements Inbox {
 
     private final JdbcTemplate jdbcTemplate;
     private final Clock clock;
