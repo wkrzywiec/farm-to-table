@@ -21,14 +21,14 @@ public class RedisMessagePublisherConfig {
 
     @Bean
     public RedisTemplate<String, ?> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
-        redisTemplate.setConnectionFactory(connectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
-        redisTemplate.afterPropertiesSet();
+            RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
+            redisTemplate.setConnectionFactory(connectionFactory);
+            redisTemplate.setKeySerializer(new StringRedisSerializer());
+            redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+            redisTemplate.setValueSerializer(new StringRedisSerializer());
+            redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+            redisTemplate.afterPropertiesSet();
 
-        return redisTemplate;
+            return redisTemplate;
     }
 }

@@ -18,3 +18,7 @@ task startBootStack(type: GradleBuild) {
             ':delivery:bootRun'
     ]
 }
+
+task startBff(type: GradleBuild) {
+    tasks = [':bff:bootRun']
+}

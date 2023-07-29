@@ -2,15 +2,11 @@ package io.wkrzywiec.fooddelivery.bff.inbox.postgres
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.wkrzywiec.fooddelivery.bff.IntegrationTest
 import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO
 import io.wkrzywiec.fooddelivery.bff.inbox.InboxMessageProcessor
-import io.wkrzywiec.fooddelivery.commons.IntegrationTest
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
-import org.spockframework.spring.SpringBean
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.test.context.ActiveProfiles
 import spock.lang.Subject
 
 import java.time.Clock
@@ -19,27 +15,21 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 @Subject([PostgresInbox, PostgresInboxListener])
-@ActiveProfiles(["postgres-inbox", "redis-stream"])
 class PostgresInboxIT extends IntegrationTest {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate
     private Clock clock
     private ObjectMapper objectMapper
-    @Autowired
     private InboxMessageProcessor inboxMessageProcessor
-    @SpringBean
     private MessagePublisher messagePublisher = Mock()
-    private PostgresInbox publisher
-    private PostgresInboxListener listener
+    private PostgresInbox inboxPublisher
+    private PostgresInboxListener inboxListener
 
     def setup() {
         clock = Clock.fixed(Instant.parse("2023-07-23T18:15:30.12Z"), ZoneOffset.UTC)
         objectMapper = new ObjectMapper()
-        publisher = new PostgresInbox(jdbcTemplate, clock, objectMapper)
-        listener = new PostgresInboxListener(jdbcTemplate, inboxMessageProcessor, objectMapper)
-
-        jdbcTemplate.execute("TRUNCATE inbox")
+        inboxPublisher = new PostgresInbox(jdbcTemplate, clock, objectMapper)
+        inboxMessageProcessor = new InboxMessageProcessor(messagePublisher, clock)
+        inboxListener = new PostgresInboxListener(jdbcTemplate, inboxMessageProcessor, objectMapper)
     }
 
     def "Message is stored in inbox"() {
@@ -48,7 +38,7 @@ class PostgresInboxIT extends IntegrationTest {
         def addTip = new AddTipDTO("any-order-id", BigDecimal.valueOf(10))
 
         when: "is stored"
-        publisher.storeMessage(channel, addTip)
+        inboxPublisher.storeMessage(channel, addTip)
         def inboxEntryMap = fetchStoredMsgAsMap()
 
         then: "message id is stored"
@@ -71,10 +61,10 @@ class PostgresInboxIT extends IntegrationTest {
         given: "message is in inbox"
         def channel = "ordering-inbox:tip"
         def addTip = new AddTipDTO("any-order-id", BigDecimal.valueOf(10))
-        publisher.storeMessage(channel, addTip)
+        inboxPublisher.storeMessage(channel, addTip)
 
         when: "check if there are outstanding messages in inbox"
-        listener.checkInbox()
+        inboxListener.checkInbox()
 
         then: "message is no longer in inbox"
         def storedMessages = fetchStoredMsgAsMap()
