@@ -6,13 +6,14 @@ spring:
     group:
       dev:
         - redis-stream
+        - redis-event-store
         - dev-local
       prod:
         - redis-stream
+        - redis-event-store
       redis:
-        - redis-inbox
+        - redis-event-store
         - redis-stream
-        - dev-local
 
 management:
   endpoints:

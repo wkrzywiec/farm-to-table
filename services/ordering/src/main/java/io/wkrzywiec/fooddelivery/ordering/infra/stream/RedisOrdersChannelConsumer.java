@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.ordering.application;
+package io.wkrzywiec.fooddelivery.ordering.infra.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

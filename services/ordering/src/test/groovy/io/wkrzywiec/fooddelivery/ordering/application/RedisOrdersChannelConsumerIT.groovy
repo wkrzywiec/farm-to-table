@@ -1,9 +1,10 @@
 package io.wkrzywiec.fooddelivery.ordering.application
 
 import com.github.javafaker.Faker
-import io.wkrzywiec.fooddelivery.commons.IntegrationTest
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.ordering.IntegrationTestWithSpring
+import io.wkrzywiec.fooddelivery.ordering.infra.stream.RedisOrdersChannelConsumer
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Subject
 
@@ -14,9 +15,9 @@ import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await
 
-@ActiveProfiles("redis")
+@ActiveProfiles(["redis-stream", "redis-event-store"])
 @Subject(RedisOrdersChannelConsumer)
-class RedisOrdersChannelConsumerIT extends IntegrationTest {
+class RedisOrdersChannelConsumerIT extends IntegrationTestWithSpring {
 
     def "Message is consumed correctly"() {
         given:

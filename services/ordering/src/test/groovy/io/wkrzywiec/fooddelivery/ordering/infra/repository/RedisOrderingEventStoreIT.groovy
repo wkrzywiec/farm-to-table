@@ -1,20 +1,21 @@
-package io.wkrzywiec.fooddelivery.ordering.infra.adapters
+package io.wkrzywiec.fooddelivery.ordering.infra.repository
 
-import io.wkrzywiec.fooddelivery.commons.IntegrationTest
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.repository.RedisEventStore
+import io.wkrzywiec.fooddelivery.ordering.IntegrationTestWithSpring
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCompleted
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderInProgress
+import io.wkrzywiec.fooddelivery.ordering.infra.store.RedisOrderingEventStore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Subject
 
 import java.time.Instant
 
+@ActiveProfiles(["redis-stream", "redis-event-store"])
 @Subject(RedisOrderingEventStore)
-@ActiveProfiles("redis")
-class RedisOrderingEventStoreIT extends IntegrationTest {
+class RedisOrderingEventStoreIT extends IntegrationTestWithSpring {
 
     @Autowired
     private RedisEventStore eventStore
