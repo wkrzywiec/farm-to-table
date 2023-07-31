@@ -1,8 +1,8 @@
 package io.wkrzywiec.fooddelivery.bff.inbox.postgres;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxMessageProcessor;
 import io.wkrzywiec.fooddelivery.bff.inbox.Inbox;
+import io.wkrzywiec.fooddelivery.bff.inbox.InboxMessageProcessor;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +18,6 @@ import java.time.Clock;
 @EnableScheduling
 @Import({DataSourceAutoConfiguration.class})
 public class PostgresInboxConfig {
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
-    }
 
     @Bean
     public Inbox postgresInboxPublisher(JdbcTemplate jdbcTemplate, Clock clock, ObjectMapper objectMapper) {

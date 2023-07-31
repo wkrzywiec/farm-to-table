@@ -120,11 +120,6 @@ abstract class IntegrationTest extends Specification {
         RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration()
         redisConfiguration.setHostName(REDIS_HOST)
         redisConfiguration.setPort(REDIS_PORT)
-//        redisConfiguration.setDatabase(Integer.parseInt(redisDb));
-//        redisConfiguration.setPassword(RedisPassword.of(password));
-
-//        String registrationTokenDb = getProperty(redisProperties, RedisDb.REGISTRATION_TOKEN_DB)
-//        setRedisProperties(redisConfiguration, registrationTokenDb);
 
         def redisConnectionFactory = new LettuceConnectionFactory(redisConfiguration)
         redisConnectionFactory.afterPropertiesSet()

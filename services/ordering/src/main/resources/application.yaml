@@ -1,6 +1,18 @@
 spring:
   application:
     name: 'farm-to-table_ordering'
+  profiles:
+    default: prod
+    group:
+      dev:
+        - redis-stream
+        - dev-local
+      prod:
+        - redis-stream
+      redis:
+        - redis-inbox
+        - redis-stream
+        - dev-local
 
 management:
   endpoints:

@@ -1,14 +1,16 @@
 package io.wkrzywiec.fooddelivery.commons.messaging
 
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
-import io.wkrzywiec.fooddelivery.commons.infra.RedisConfig
+import io.wkrzywiec.fooddelivery.commons.infra.ObjectMapperConfig
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
-import RedisMessagePublisherConfig
 import io.wkrzywiec.fooddelivery.commons.infra.RedisStreamTestClient
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamPublisher
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.serializer.StringRedisSerializer
 
 import java.time.Instant
 
@@ -20,12 +22,9 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
     private RedisStreamTestClient redis
 
     def setup() {
-        def config = new RedisMessagePublisherConfig()
-        def redisStandaloneConfig = new RedisStandaloneConfiguration(REDIS_HOST, REDIS_PORT)
-        def connectionFactory = new LettuceConnectionFactory(redisStandaloneConfig)
-        connectionFactory.afterPropertiesSet()
-        def redisTemplate = config.redisTemplate(connectionFactory)
-        messagePublisher = config.messagePublisher(redisTemplate, new RedisConfig().objectMapper())
+        def config = new ObjectMapperConfig()
+        def redisTemplate = configRedisTemplate()
+        messagePublisher = new RedisStreamPublisher(redisTemplate, config.objectMapper())
 
         redis = new RedisStreamTestClient(redisTemplate)
 
@@ -54,6 +53,22 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
         publishedMessage.get("header").get("itemId").asText() == itemId
         publishedMessage.get("header").get("type").asText() == "MessageTestBody"
         publishedMessage.get("body").get("orderId").asText() == itemId
+    }
+
+    private RedisTemplate configRedisTemplate() {
+        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration(REDIS_HOST, REDIS_PORT)
+        def redisConnectionFactory = new LettuceConnectionFactory(redisConfiguration)
+        redisConnectionFactory.afterPropertiesSet()
+
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<String, String>()
+        redisTemplate.setConnectionFactory(redisConnectionFactory)
+        redisTemplate.setKeySerializer(new StringRedisSerializer())
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer())
+        redisTemplate.setValueSerializer(new StringRedisSerializer())
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer())
+        redisTemplate.afterPropertiesSet()
+
+        return redisTemplate
     }
 
     private Message event(String itemId, DomainMessageBody eventBody) {

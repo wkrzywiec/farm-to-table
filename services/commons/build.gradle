@@ -56,31 +56,12 @@ test {
     useJUnitPlatform()
 }
 
-sourceSets {
-    integrationTest {
-        groovy.srcDir "$projectDir/src/integration-test/groovy"
-        resources.srcDir "$projectDir/src/integration-test/resources"
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-    }
-}
-
-task integrationTest(type: Test) {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-
-    useJUnitPlatform()
-}
-
-check.dependsOn integrationTest
-
 jacocoTestReport {
     reports {
         xml.required = true
     }
     dependsOn = [
-            'test',
-            'integrationTest'
+            'test'
     ]
 }
 
