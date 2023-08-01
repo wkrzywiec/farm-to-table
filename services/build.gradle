@@ -10,15 +10,29 @@ allprojects {
     }
 }
 
-task startBootStack(type: GradleBuild) {
-    tasks = [
-            ':bff:bootRun',
+task runAllApps {
+    doFirst {
+        println "Running all Gradle apps..."
+    }
+
+    dependsOn ':bff:bootRun',
             ':food:bootRun',
             ':ordering:bootRun',
             ':delivery:bootRun'
-    ]
 }
 
-task startBff(type: GradleBuild) {
-    tasks = [':bff:bootRun']
+task runBff {
+    dependsOn ':bff:bootRun'
+}
+
+task runFood {
+    dependsOn ':food:bootRun'
+}
+
+task runOrdering {
+    dependsOn ':ordering:bootRun'
+}
+
+task runDelivery {
+    dependsOn ':delivery:bootRun'
 }

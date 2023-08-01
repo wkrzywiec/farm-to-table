@@ -1,7 +1,5 @@
-package io.wkrzywiec.fooddelivery.delivery;
+package io.wkrzywiec.fooddelivery.delivery.domain;
 
-import io.wkrzywiec.fooddelivery.delivery.domain.Delivery;
-import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryStatus;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated;
 import lombok.Getter;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -12,7 +10,7 @@ import java.util.*;
 import static java.lang.String.format;
 
 @Getter
- class DeliveryTestData {
+ public class DeliveryTestData {
 
     private String orderId = UUID.randomUUID().toString();
     private String customerId = "default-customerId";
@@ -32,7 +30,7 @@ import static java.lang.String.format;
         return new DeliveryTestData();
     }
 
-     Delivery entity() {
+     public Delivery entity() {
         Delivery delivery = createAnEmptyDelivery();
         setValue(delivery, "orderId", orderId);
         setValue(delivery, "customerId", customerId);
@@ -53,27 +51,27 @@ import static java.lang.String.format;
         return new DeliveryCreated(orderId, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, total);
     }
 
-    DeliveryTestData withOrderId(String orderId) {
+    public DeliveryTestData withOrderId(String orderId) {
         this.orderId = orderId;
         return this;
     }
 
-     DeliveryTestData withCustomerId(String customerId) {
+     public DeliveryTestData withCustomerId(String customerId) {
         this.customerId = customerId;
         return this;
     }
 
-     DeliveryTestData withFarmId(String farmId) {
+     public DeliveryTestData withFarmId(String farmId) {
         this.farmId = farmId;
         return this;
     }
 
-     DeliveryTestData withDeliveryManId(String deliveryManId) {
+     public DeliveryTestData withDeliveryManId(String deliveryManId) {
         this.deliveryManId = deliveryManId;
         return this;
     }
 
-     DeliveryTestData withStatus(DeliveryStatus status) {
+     public DeliveryTestData withStatus(DeliveryStatus status) {
         this.status = status;
         return this;
     }
@@ -88,22 +86,22 @@ import static java.lang.String.format;
         return this;
     }
 
-     DeliveryTestData withDeliveryCharge(double deliveryCharge) {
+     public DeliveryTestData withDeliveryCharge(double deliveryCharge) {
         this.deliveryCharge = new BigDecimal(deliveryCharge);
         return this;
     }
 
-     DeliveryTestData withTip(BigDecimal tip) {
+     public DeliveryTestData withTip(BigDecimal tip) {
         this.tip = tip;
         return this;
     }
 
-    DeliveryTestData withTotal(BigDecimal total) {
+    public DeliveryTestData withTotal(BigDecimal total) {
         this.total = total;
         return this;
     }
 
-     DeliveryTestData withMetadata(Map<String, String> metadata) {
+     public DeliveryTestData withMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
         return this;
     }

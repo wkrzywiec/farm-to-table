@@ -1,11 +1,8 @@
-package io.wkrzywiec.fooddelivery.delivery
+package io.wkrzywiec.fooddelivery.delivery.domain
 
 
 import io.wkrzywiec.fooddelivery.commons.incoming.AssignDeliveryMan
 import io.wkrzywiec.fooddelivery.commons.infra.repository.InMemoryEventStore
-import io.wkrzywiec.fooddelivery.delivery.domain.Delivery
-import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade
-import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryStatus
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
 import io.wkrzywiec.fooddelivery.commons.incoming.DeliverFood
 import io.wkrzywiec.fooddelivery.commons.incoming.FoodReady
@@ -33,8 +30,6 @@ import spock.lang.Title
 import java.time.Clock
 import java.time.Instant
 
-import static DeliveryTestData.aDelivery
-import static ItemTestData.anItem
 import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.message
 
 @Subject(DeliveryFacade)
@@ -58,10 +53,10 @@ class DeliveryFacadeSpec extends Specification {
 
     def "Create a delivery"() {
         given:
-        var delivery = aDelivery()
+        var delivery = DeliveryTestData.aDelivery()
                 .withItems(
-                        anItem().withName("Pizza").withPricePerItem(2.5),
-                        anItem().withName("Spaghetti").withPricePerItem(3.0)
+                        ItemTestData.anItem().withName("Pizza").withPricePerItem(2.5),
+                        ItemTestData.anItem().withName("Spaghetti").withPricePerItem(3.0)
                 )
 
         var orderCreated = new OrderCreated(
@@ -94,7 +89,7 @@ class DeliveryFacadeSpec extends Specification {
 
     def "Add tip to delivery"() {
         given:
-        var delivery = aDelivery()
+        var delivery = DeliveryTestData.aDelivery()
         eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
 
         and:
@@ -121,7 +116,7 @@ class DeliveryFacadeSpec extends Specification {
 
     def "Cancel a delivery"() {
         given:
-        var delivery = aDelivery()
+        var delivery = DeliveryTestData.aDelivery()
         eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
 
         and:
@@ -152,7 +147,7 @@ class DeliveryFacadeSpec extends Specification {
 
     def "Food in preparation"() {
         given:
-        var delivery = aDelivery()
+        var delivery = DeliveryTestData.aDelivery()
         eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
 
         and:
@@ -182,7 +177,7 @@ class DeliveryFacadeSpec extends Specification {
 
     def "Assign delivery man to delivery"() {
         given:
-        var delivery = aDelivery().withDeliveryManId(null)
+        var delivery = DeliveryTestData.aDelivery().withDeliveryManId(null)
         eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
 
         and:
@@ -211,7 +206,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Un assign delivery man from delivery"() {
         given:
         var deliveryManId = "any-delivery-man-orderId"
-        var delivery = aDelivery()
+        var delivery = DeliveryTestData.aDelivery()
         eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
         eventStore.store(message("orders", testClock, new DeliveryManAssigned(delivery.getOrderId(), deliveryManId)))
 
@@ -240,7 +235,7 @@ class DeliveryFacadeSpec extends Specification {
 
     def "Food is ready"() {
         given:
-        var delivery = aDelivery()
+        var delivery = DeliveryTestData.aDelivery()
         eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
         eventStore.store(message("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
 
@@ -268,7 +263,7 @@ class DeliveryFacadeSpec extends Specification {
 
     def "Food is picked up"() {
         given:
-        var delivery = aDelivery()
+        var delivery = DeliveryTestData.aDelivery()
         eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
         eventStore.store(message("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
         eventStore.store(message("orders", testClock, new FoodIsReady(delivery.getOrderId())))
@@ -297,7 +292,7 @@ class DeliveryFacadeSpec extends Specification {
 
     def "Food is delivered"() {
         given:
-        var delivery = aDelivery()
+        var delivery = DeliveryTestData.aDelivery()
                 .withStatus(DeliveryStatus.FOOD_PICKED)
         eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
         eventStore.store(message("orders", testClock, new FoodInPreparation(delivery.getOrderId())))

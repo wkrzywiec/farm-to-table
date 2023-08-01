@@ -1,6 +1,19 @@
 spring:
   application:
     name: 'farm-to-table_delivery'
+  profiles:
+    default: prod
+    group:
+      dev:
+        - redis-stream
+        - redis-event-store
+        - dev-local
+      prod:
+        - redis-stream
+        - redis-event-store
+      redis:
+        - redis-event-store
+        - redis-stream
 
 management:
   endpoints:

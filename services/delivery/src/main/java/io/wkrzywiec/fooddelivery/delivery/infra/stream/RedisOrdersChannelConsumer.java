@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.delivery.application;
+package io.wkrzywiec.fooddelivery.delivery.infra.stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,10 +12,12 @@ import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated;
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.TipAddedToOrder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.stream.MapRecord;
 
 @Slf4j
 @RequiredArgsConstructor
+@Profile("redis-stream")
 public class RedisOrdersChannelConsumer implements RedisStreamListener {
 
     private final DeliveryFacade facade;

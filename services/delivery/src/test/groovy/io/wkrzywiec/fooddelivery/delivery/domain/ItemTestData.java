@@ -1,12 +1,11 @@
-package io.wkrzywiec.fooddelivery.delivery;
+package io.wkrzywiec.fooddelivery.delivery.domain;
 
-import io.wkrzywiec.fooddelivery.delivery.domain.Item;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
-class ItemTestData {
+public class ItemTestData {
 
     private String name = "Pizza Margherita";
     private int amount = 1;

@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.delivery.infra.adapters;
+package io.wkrzywiec.fooddelivery.delivery.infra.repository;
 
 import io.wkrzywiec.fooddelivery.delivery.domain.Delivery;
 import io.wkrzywiec.fooddelivery.delivery.domain.ports.DeliveryRepository;

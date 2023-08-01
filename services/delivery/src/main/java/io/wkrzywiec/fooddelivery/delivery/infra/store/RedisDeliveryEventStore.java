@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.delivery.infra.adapters;
+package io.wkrzywiec.fooddelivery.delivery.infra.store;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Profile("redis")
+@Profile("redis-event-store")
 @Component
 class RedisDeliveryEventStore extends RedisEventStore {
 

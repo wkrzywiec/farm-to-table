@@ -1,24 +1,25 @@
 package io.wkrzywiec.fooddelivery.delivery.infra
 
 import com.github.javafaker.Faker
-import io.wkrzywiec.fooddelivery.commons.IntegrationTest
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
-import io.wkrzywiec.fooddelivery.delivery.application.RedisOrdersChannelConsumer
+import io.wkrzywiec.fooddelivery.delivery.IntegrationTestWithSpring
+import io.wkrzywiec.fooddelivery.delivery.infra.stream.RedisOrdersChannelConsumer
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated
 import org.springframework.test.context.ActiveProfiles
+import org.testcontainers.shaded.org.awaitility.Awaitility
 import spock.lang.Subject
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-import static io.wkrzywiec.fooddelivery.delivery.DeliveryTestData.aDelivery
-import static io.wkrzywiec.fooddelivery.delivery.ItemTestData.anItem
+import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryTestData.aDelivery
+import static io.wkrzywiec.fooddelivery.delivery.domain.ItemTestData.anItem
 
-@ActiveProfiles("redis")
+@ActiveProfiles(["redis-stream", "redis-event-store"])
 @Subject(RedisOrdersChannelConsumer)
-class RedisOrdersChannelConsumerIT extends IntegrationTest {
+class RedisOrdersChannelConsumerIT extends IntegrationTestWithSpring {
 
     def "Message is consumed correctly"() {
         given:
@@ -42,7 +43,7 @@ class RedisOrdersChannelConsumerIT extends IntegrationTest {
         redisStreamsClient.publishMessage(message)
 
         then:
-        org.testcontainers.shaded.org.awaitility.Awaitility.await().atMost(5, TimeUnit.SECONDS)
+        Awaitility.await().atMost(5, TimeUnit.SECONDS)
                 .until {
                     def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
 
