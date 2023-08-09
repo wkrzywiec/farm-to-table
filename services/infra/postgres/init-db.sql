@@ -1,8 +1,14 @@
+-- commons, only for integration tests purposes
+CREATE USER commons WITH ENCRYPTED PASSWORD 'commons';
+CREATE DATABASE commons;
+GRANT ALL PRIVILEGES ON DATABASE commons TO commons;
+ALTER DATABASE commons OWNER TO commons; -- needed since postgres v15
+
 -- ordering
 CREATE USER ordering WITH ENCRYPTED PASSWORD 'ordering';
 CREATE DATABASE ordering;
 GRANT ALL PRIVILEGES ON DATABASE ordering TO ordering;
-ALTER DATABASE ordering OWNER TO ordering; -- needed since postgres v15
+ALTER DATABASE ordering OWNER TO ordering;
 
 -- delivery
 CREATE USER delivery WITH ENCRYPTED PASSWORD 'delivery';

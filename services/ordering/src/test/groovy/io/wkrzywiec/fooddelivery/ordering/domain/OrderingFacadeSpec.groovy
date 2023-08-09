@@ -5,7 +5,7 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.FakeMessagePublisher
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.incoming.AddTip
 import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder
-import io.wkrzywiec.fooddelivery.commons.infra.repository.InMemoryEventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.InMemoryEventStore
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCanceled
@@ -20,7 +20,7 @@ import spock.lang.Title
 import java.time.Clock
 import java.time.Instant
 
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.message
+import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
 import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 
@@ -76,7 +76,7 @@ class OrderingFacadeSpec extends Specification {
     def "Cancel an order"() {
         given:
         var order = anOrder()
-        eventStore.store(message("orders", testClock, order.orderCreated()))
+        eventStore.store(firstMessage("orders", testClock, order.orderCreated()))
 
         and:
         var cancellationReason = "Not hungry anymore"
@@ -106,7 +106,7 @@ class OrderingFacadeSpec extends Specification {
     def "Set order to IN_PROGRESS"() {
         given:
         var order = anOrder()
-        eventStore.store(message("orders", testClock, order.orderCreated()))
+        eventStore.store(firstMessage("orders", testClock, order.orderCreated()))
 
         and:
         var foodInPreparation = new FoodInPreparation(order.id)
@@ -141,7 +141,7 @@ class OrderingFacadeSpec extends Specification {
         var order = anOrder()
                 .withItems(anItem().withPricePerItem(itemCost))
                 .withDeliveryCharge(deliveryCharge)
-        eventStore.store(message("orders", testClock, order.orderCreated()))
+        eventStore.store(firstMessage("orders", testClock, order.orderCreated()))
 
         and:
         double tip = 20
@@ -176,8 +176,8 @@ class OrderingFacadeSpec extends Specification {
     def "Complete an order"() {
         given:
         var order = anOrder()
-        eventStore.store(message("orders", testClock, order.orderCreated()))
-        eventStore.store(message("orders", testClock, new OrderInProgress(order.getId())))
+        eventStore.store(firstMessage("orders", testClock, order.orderCreated()))
+        eventStore.store(firstMessage("orders", testClock, new OrderInProgress(order.getId())))
 
         and:
         var foodDelivered = new FoodDelivered(order.id)
@@ -206,10 +206,10 @@ class OrderingFacadeSpec extends Specification {
 
     private void verifyEventHeader(Message event, String orderId, String eventType) {
         def header = event.header()
-        header.messageId() != null
+        header.id() != null
         header.channel() == ORDERS_CHANNEL
         header.type() == eventType
-        header.itemId() == orderId
+        header.streamId() == orderId
         header.createdAt() == testClock.instant()
     }
 }

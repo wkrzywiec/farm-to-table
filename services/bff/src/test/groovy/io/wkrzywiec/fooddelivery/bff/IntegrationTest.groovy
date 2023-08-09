@@ -104,7 +104,6 @@ abstract class IntegrationTest extends Specification {
         } catch (BadSqlGrammarException exception) {
             System.out.println("!!!! BAD SQL GRAMMAR in cleaning database. Msg: " + exception.message)
         }
-
     }
 
     private JdbcTemplate configJdbcTemplate() {

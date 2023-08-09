@@ -1,6 +1,5 @@
-package io.wkrzywiec.fooddelivery.commons.infra.repository;
+package io.wkrzywiec.fooddelivery.commons.infra.store;
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 
 import java.util.ArrayList;

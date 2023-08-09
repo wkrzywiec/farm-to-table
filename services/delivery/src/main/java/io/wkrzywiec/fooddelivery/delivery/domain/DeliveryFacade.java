@@ -4,7 +4,7 @@ import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 import io.wkrzywiec.fooddelivery.commons.incoming.*;
-import io.wkrzywiec.fooddelivery.commons.infra.repository.EventStore;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.*;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;

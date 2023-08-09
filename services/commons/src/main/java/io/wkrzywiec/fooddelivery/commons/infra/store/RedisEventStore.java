@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.commons.infra.repository;
+package io.wkrzywiec.fooddelivery.commons.infra.store;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,7 +24,7 @@ public abstract class RedisEventStore implements EventStore {
 
     protected abstract String streamPrefix();
 
-    protected  abstract Class<? extends DomainMessageBody> getClassType(String type);
+    protected abstract Class<? extends DomainMessageBody> getClassType(String type);
 
     @Override
     public void store(Message event) {
@@ -85,7 +85,7 @@ public abstract class RedisEventStore implements EventStore {
     private Message mapToDomainEvent(JsonNode eventAsJson) {
         var eventType = eventAsJson.get("header").get("type").asText();
         var eventBody =  eventAsJson.get("body");
-        var classType = getClassType(eventType);
+        Class<? extends DomainMessageBody> classType = getClassType(eventType);
         return new Message(mapEventHeader(eventAsJson), mapEventBody(eventBody, classType));
     }
 

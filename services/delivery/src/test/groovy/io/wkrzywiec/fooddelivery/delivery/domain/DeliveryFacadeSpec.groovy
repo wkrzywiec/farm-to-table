@@ -2,7 +2,7 @@ package io.wkrzywiec.fooddelivery.delivery.domain
 
 
 import io.wkrzywiec.fooddelivery.commons.incoming.AssignDeliveryMan
-import io.wkrzywiec.fooddelivery.commons.infra.repository.InMemoryEventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.InMemoryEventStore
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
 import io.wkrzywiec.fooddelivery.commons.incoming.DeliverFood
 import io.wkrzywiec.fooddelivery.commons.incoming.FoodReady
@@ -30,7 +30,7 @@ import spock.lang.Title
 import java.time.Clock
 import java.time.Instant
 
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.message
+import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
 
 @Subject(DeliveryFacade)
 @Title("Specification for delivery process")
@@ -90,7 +90,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Add tip to delivery"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
 
         and:
         var tipAddedToOrder = new TipAddedToOrder(delivery.orderId, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50))
@@ -117,7 +117,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Cancel a delivery"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
 
         and:
         var cancellationReason = "Not hungry anymore"
@@ -148,7 +148,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Food in preparation"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
 
         and:
         var prepareFood = new PrepareFood(delivery.orderId)
@@ -178,7 +178,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Assign delivery man to delivery"() {
         given:
         var delivery = DeliveryTestData.aDelivery().withDeliveryManId(null)
-        eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
 
         and:
         var deliveryManId = "any-delivery-man-orderId"
@@ -207,8 +207,8 @@ class DeliveryFacadeSpec extends Specification {
         given:
         var deliveryManId = "any-delivery-man-orderId"
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
-        eventStore.store(message("orders", testClock, new DeliveryManAssigned(delivery.getOrderId(), deliveryManId)))
+        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(firstMessage("orders", testClock, new DeliveryManAssigned(delivery.getOrderId(), deliveryManId)))
 
         and:
         var assignDeliveryMan = new UnAssignDeliveryMan(delivery.orderId)
@@ -236,8 +236,8 @@ class DeliveryFacadeSpec extends Specification {
     def "Food is ready"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
-        eventStore.store(message("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
 
         and:
         var foodReady = new FoodReady(delivery.orderId)
@@ -264,9 +264,9 @@ class DeliveryFacadeSpec extends Specification {
     def "Food is picked up"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
-        eventStore.store(message("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
-        eventStore.store(message("orders", testClock, new FoodIsReady(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, new FoodIsReady(delivery.getOrderId())))
 
         and:
         var pickUpFood = new PickUpFood(delivery.orderId)
@@ -294,10 +294,10 @@ class DeliveryFacadeSpec extends Specification {
         given:
         var delivery = DeliveryTestData.aDelivery()
                 .withStatus(DeliveryStatus.FOOD_PICKED)
-        eventStore.store(message("orders", testClock, delivery.deliveryCreated()))
-        eventStore.store(message("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
-        eventStore.store(message("orders", testClock, new FoodIsReady(delivery.getOrderId())))
-        eventStore.store(message("orders", testClock, new FoodWasPickedUp(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, new FoodIsReady(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, new FoodWasPickedUp(delivery.getOrderId())))
 
         and:
         var deliverFood = new DeliverFood(delivery.orderId)
@@ -323,10 +323,10 @@ class DeliveryFacadeSpec extends Specification {
 
     private void verifyEventHeader(Message event, String orderId, String eventType) {
         def header = event.header()
-        header.messageId() != null
+        header.id() != null
         header.channel() == ORDERS_CHANNEL
         header.type() == eventType
-        header.itemId() == orderId
+        header.streamId() == orderId
         header.createdAt() == testClock.instant()
     }
 }

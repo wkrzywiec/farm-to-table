@@ -2,7 +2,7 @@ package io.wkrzywiec.fooddelivery.ordering.infra.repository
 
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
-import io.wkrzywiec.fooddelivery.commons.infra.repository.RedisEventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.RedisEventStore
 import io.wkrzywiec.fooddelivery.ordering.IntegrationTestWithSpring
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCompleted
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderInProgress

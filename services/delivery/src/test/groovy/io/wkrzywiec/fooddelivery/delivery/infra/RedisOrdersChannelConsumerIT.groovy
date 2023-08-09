@@ -47,7 +47,7 @@ class RedisOrdersChannelConsumerIT extends IntegrationTestWithSpring {
                 .until {
                     def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
 
-                    event.get("header").get("itemId").asText() == delivery.orderId
+                    event.get("header").get("streamId").asText() == delivery.orderId
                     event.get("header").get("type").asText() == "DeliveryCreated"
                 }
     }

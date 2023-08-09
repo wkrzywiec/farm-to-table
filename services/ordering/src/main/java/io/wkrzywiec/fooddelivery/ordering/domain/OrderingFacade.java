@@ -8,7 +8,7 @@ import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
-import io.wkrzywiec.fooddelivery.commons.infra.repository.EventStore;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered;
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation;
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;

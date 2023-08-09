@@ -76,7 +76,7 @@ public class InboxMessageProcessor {
     }
 
     private Header commandHeader(String orderId, String type) {
-        return new Header(UUID.randomUUID().toString(), ORDERS_CHANNEL, type, orderId, clock.instant());
+        return new Header(UUID.randomUUID().toString(), 1, ORDERS_CHANNEL, type, orderId, clock.instant());
     }
 
     private DomainMessageBody commandBody(ChangeDeliveryManDTO changeDeliveryManDTO) {

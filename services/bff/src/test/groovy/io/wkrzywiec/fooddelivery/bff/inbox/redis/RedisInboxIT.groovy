@@ -69,10 +69,10 @@ class RedisInboxIT extends IntegrationTest {
         await().atMost(5, TimeUnit.SECONDS)
                 .until {
                     def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
-                    event.get("header").get("messageId").asText() != null
+                    event.get("header").get("id").asText() != null
                     event.get("header").get("channel").asText() == "orders"
                     event.get("header").get("type").asText() == "AddTip"
-                    event.get("header").get("itemId").asText() == "any-order-id"
+                    event.get("header").get("streamId").asText() == "any-order-id"
                     event.get("header").get("createdAt").asText() != null
                     event.get("body").get("orderId").asText() == "any-order-id"
                 }

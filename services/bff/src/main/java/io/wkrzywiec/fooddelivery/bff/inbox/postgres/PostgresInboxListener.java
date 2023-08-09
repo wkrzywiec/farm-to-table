@@ -6,6 +6,7 @@ import io.wkrzywiec.fooddelivery.bff.controller.model.*;
 import io.wkrzywiec.fooddelivery.bff.inbox.InboxMessageProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -51,12 +52,17 @@ public class PostgresInboxListener {
     }
 
     private RawInboxEntry fetchNextMessageFromInbox() {
-        return jdbcTemplate.queryForObject("""
+        try {
+            return jdbcTemplate.queryForObject("""
                 SELECT id, channel, message
                 FROM inbox
                 ORDER BY publish_timestamp
                 LIMIT 1
                 """, (resultSet, i) -> new RawInboxEntry(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
+
     }
 
     private <T> T mapMessageTo(RawInboxEntry rawInboxEntry, Class<T> requiredType) throws JsonProcessingException {

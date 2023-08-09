@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.commons.infra.repository;
+package io.wkrzywiec.fooddelivery.commons.infra.store;
 
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 

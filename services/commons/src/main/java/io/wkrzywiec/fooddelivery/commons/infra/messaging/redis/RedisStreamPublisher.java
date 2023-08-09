@@ -7,7 +7,6 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
@@ -43,7 +42,6 @@ public class RedisStreamPublisher implements MessagePublisher {
         }
     }
 
-    @NotNull
     private static ObjectRecord<String, String> prepareRedisRecord(Message message, String messageJson) {
         return StreamRecords.newRecord()
                 .ofObject(messageJson)

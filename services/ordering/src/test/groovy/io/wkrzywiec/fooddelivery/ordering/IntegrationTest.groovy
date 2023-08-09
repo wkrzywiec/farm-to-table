@@ -73,7 +73,7 @@ abstract class IntegrationTest extends Specification {
 //        jdbcTemplate = configJdbcTemplate()
 
 //        File file = ResourceUtils.getFile(
-//                "classpath:db/changelog/001-create-inbox.sql")
+//                "classpath:db/changelog/001-create-events.sql")
 //        String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8)
 //        jdbcTemplate.execute(content)
     }

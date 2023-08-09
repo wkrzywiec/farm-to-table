@@ -1,12 +1,13 @@
-package io.wkrzywiec.fooddelivery.commons.messaging
+package io.wkrzywiec.fooddelivery.commons.infra.messaging.redis
 
+import io.wkrzywiec.fooddelivery.commons.CommonsIntegrationTest
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
 import io.wkrzywiec.fooddelivery.commons.infra.ObjectMapperConfig
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
 import io.wkrzywiec.fooddelivery.commons.infra.RedisStreamTestClient
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamPublisher
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessageTestBody
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
@@ -50,7 +51,7 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
         then: "Message was published on $testChannel redis stream"
         def publishedMessage = redis.getLatestMessageFromStreamAsJson(testChannel)
 
-        publishedMessage.get("header").get("itemId").asText() == itemId
+        publishedMessage.get("header").get("streamId").asText() == itemId
         publishedMessage.get("header").get("type").asText() == "MessageTestBody"
         publishedMessage.get("body").get("orderId").asText() == itemId
     }

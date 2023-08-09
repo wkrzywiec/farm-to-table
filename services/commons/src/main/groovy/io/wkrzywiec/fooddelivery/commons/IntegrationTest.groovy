@@ -2,7 +2,6 @@ package io.wkrzywiec.fooddelivery.commons
 
 import io.restassured.RestAssured
 import io.restassured.module.mockmvc.RestAssuredMockMvc
-import io.wkrzywiec.fooddelivery.commons.infra.RedisStreamTestClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort

@@ -3,7 +3,7 @@ package io.wkrzywiec.fooddelivery.delivery.infra.store;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.commons.infra.repository.RedisEventStore;
+import io.wkrzywiec.fooddelivery.commons.infra.store.RedisEventStore;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
