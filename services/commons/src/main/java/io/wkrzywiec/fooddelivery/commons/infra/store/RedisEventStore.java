@@ -17,18 +17,16 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-public abstract class RedisEventStore implements EventStore {
+public class RedisEventStore implements EventStore {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
-
-    protected abstract String streamPrefix();
-
-    protected abstract Class<? extends DomainMessageBody> getClassType(String type);
+    private final EventClassTypeProvider eventClassTypeProvider;
+    private final String streamPrefix;
 
     @Override
     public void store(Message event) {
-        log.info("Storing event in a stream '{}', body: '{}'", streamPrefix() + event.body().orderId(), event);
+        log.info("Storing event in a stream '{}', body: '{}'", streamPrefix + event.body().orderId(), event);
 
         String messageJsonAsString;
         try {
@@ -42,19 +40,19 @@ public abstract class RedisEventStore implements EventStore {
 
         ObjectRecord<String, String> record = StreamRecords.newRecord()
                 .ofObject(messageJsonAsString)
-                .withStreamKey(streamPrefix() + event.body().orderId());
+                .withStreamKey(streamPrefix + event.body().orderId());
 
         RecordId recordId = redisTemplate.opsForStream()
                 .add(record);
 
         log.info("Event was stored in stream: '{}', full message: '{}'. Record id: {}",
-                streamPrefix() + event.body().orderId(), messageJsonAsString, recordId.getValue());
+                streamPrefix + event.body().orderId(), messageJsonAsString, recordId.getValue());
     }
 
     @Override
     public List<Message> getEventsForOrder(String orderId) {
-        log.info("Fetching events from '{}{}' Redis stream", streamPrefix(), orderId);
-        return getAllMessagesInStream(streamPrefix() + orderId);
+        log.info("Fetching events from '{}{}' Redis stream", streamPrefix, orderId);
+        return getAllMessagesInStream(streamPrefix + orderId);
     }
 
     private List<Message> getAllMessagesInStream(String stream) {
@@ -85,7 +83,7 @@ public abstract class RedisEventStore implements EventStore {
     private Message mapToDomainEvent(JsonNode eventAsJson) {
         var eventType = eventAsJson.get("header").get("type").asText();
         var eventBody =  eventAsJson.get("body");
-        Class<? extends DomainMessageBody> classType = getClassType(eventType);
+        Class<? extends DomainMessageBody> classType = eventClassTypeProvider.getClassType(eventType);
         return new Message(mapEventHeader(eventAsJson), mapEventBody(eventBody, classType));
     }
 

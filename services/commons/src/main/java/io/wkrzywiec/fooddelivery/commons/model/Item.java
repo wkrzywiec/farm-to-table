@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.commons.incoming;
+package io.wkrzywiec.fooddelivery.commons.model;
 
 import java.math.BigDecimal;
 

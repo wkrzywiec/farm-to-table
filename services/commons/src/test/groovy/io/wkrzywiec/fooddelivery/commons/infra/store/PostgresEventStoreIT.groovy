@@ -3,12 +3,14 @@ package io.wkrzywiec.fooddelivery.commons.infra.store
 import io.wkrzywiec.fooddelivery.commons.CommonsIntegrationTest
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody
 import spock.lang.Subject
 
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
+import static io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody.aSampleEvent
 import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
 
 @Subject(PostgresEventStore)
@@ -25,10 +27,7 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
 
     def "One event is saved in event store"() {
         given:
-        def eventBody = new IntegrationTestEventBody(
-                "some test text", 88.23,
-                BigDecimal.valueOf(1.23), true as boolean,
-                TEST_TIME)
+        def eventBody = aSampleEvent(TEST_TIME)
         def testChannel = "test-channel"
         def event = firstMessage(testChannel, TEST_CLOCK, eventBody)
 
@@ -48,12 +47,5 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
         Class<? extends DomainMessageBody> getClassType(String type) {
             return IntegrationTestEventBody.class
         }
-    }
-}
-
-record IntegrationTestEventBody(String text, double number, BigDecimal money, boolean truth, Instant time) implements DomainMessageBody {
-    @Override
-    String orderId() {
-        return text
     }
 }

@@ -2,9 +2,9 @@ package io.wkrzywiec.fooddelivery.ordering.domain;
 
 import io.vavr.control.Try;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.commons.incoming.AddTip;
-import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder;
-import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
+import io.wkrzywiec.fooddelivery.commons.model.AddTip;
+import io.wkrzywiec.fooddelivery.commons.model.CancelOrder;
+import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
@@ -37,6 +37,7 @@ public class OrderingFacade {
         Order newOrder = Order.from(createOrder);
         OrderCreated orderCreated = new OrderCreated(
                 newOrder.getId(),
+                1,
                 newOrder.getCustomerId(),
                 newOrder.getFarmId(),
                 newOrder.getAddress(),
@@ -64,8 +65,8 @@ public class OrderingFacade {
         var order = Order.from(storedEvents);
 
         Try.run(() -> order.cancelOrder(cancelOrder.reason()))
-                .onSuccess(v -> publishSuccessEvent(order.getId(), new OrderCanceled(cancelOrder.orderId(), cancelOrder.reason())))
-                .onFailure(ex -> publishingFailureEvent(order.getId(), "Failed to cancel an order.", ex))
+                .onSuccess(v -> publishSuccessEvent(order.getId(), new OrderCanceled(cancelOrder.orderId(), incrementVersionAndReturn(cancelOrder), cancelOrder.reason())))
+                .onFailure(ex -> publishingFailureEvent(order.getId(), "Failed to cancel an order.", cancelOrder.version(), ex))
                 .andFinally(() -> log.info("Cancellation of an order '{}' has been completed", order.getId()));
     }
 
@@ -79,8 +80,8 @@ public class OrderingFacade {
         var order = Order.from(storedEvents);
 
         Try.run(order::setInProgress)
-                .onSuccess(v -> publishSuccessEvent(order.getId(), new OrderInProgress(foodInPreparation.orderId())))
-                .onFailure(ex -> publishingFailureEvent(order.getId(), "Failed to set an order to IN_PROGRESS state.", ex))
+                .onSuccess(v -> publishSuccessEvent(order.getId(), new OrderInProgress(foodInPreparation.orderId(), incrementVersionAndReturn(foodInPreparation))))
+                .onFailure(ex -> publishingFailureEvent(order.getId(), "Failed to set an order to IN_PROGRESS state.", foodInPreparation.version(), ex))
                 .andFinally(() -> log.info("Setting an '{}' order to IN_PROGRESS state has been completed", foodInPreparation.orderId()));
     }
 
@@ -94,8 +95,8 @@ public class OrderingFacade {
         var order = Order.from(storedEvents);
 
         Try.run(() -> order.addTip(addTip.tip()))
-                .onSuccess(v -> publishSuccessEvent(order.getId(), new TipAddedToOrder(order.getId(), order.getTip(), order.getTotal())))
-                .onFailure(ex -> publishingFailureEvent(order.getId(), "Failed to add tip to an order.", ex))
+                .onSuccess(v -> publishSuccessEvent(order.getId(), new TipAddedToOrder(order.getId(), incrementVersionAndReturn(addTip), order.getTip(), order.getTotal())))
+                .onFailure(ex -> publishingFailureEvent(order.getId(), "Failed to add tip to an order.", addTip.version(), ex))
                 .andFinally(() -> log.info("Adding a tip to '{}' order has been completed", addTip.orderId()));
     }
 
@@ -109,9 +110,13 @@ public class OrderingFacade {
         var order = Order.from(storedEvents);
 
         Try.run(order::complete)
-                .onSuccess(v -> publishSuccessEvent(order.getId(), new OrderCompleted(foodDelivered.orderId())))
-                .onFailure(ex -> publishingFailureEvent(order.getId(), "Failed to complete an order.", ex))
+                .onSuccess(v -> publishSuccessEvent(order.getId(), new OrderCompleted(foodDelivered.orderId(), incrementVersionAndReturn(foodDelivered))))
+                .onFailure(ex -> publishingFailureEvent(order.getId(), "Failed to complete an order.", foodDelivered.version(), ex))
                 .andFinally(() -> log.info("Setting an '{}' order to COMPLETED state has been completed", foodDelivered.orderId()));
+    }
+
+    private static int incrementVersionAndReturn(DomainMessageBody causeMessage) {
+        return causeMessage.version() + 1;
     }
 
     private void publishSuccessEvent(String orderId, DomainMessageBody eventObject) {
@@ -121,17 +126,17 @@ public class OrderingFacade {
         publisher.send(event);
     }
 
-    private void publishingFailureEvent(String id, String message, Throwable ex) {
+    private void publishingFailureEvent(String id, String message, int version, Throwable ex) {
         log.error(message + " Publishing OrderProcessingError event", ex);
-        Message event = resultingEvent(id, new OrderProcessingError(id, message, ex.getLocalizedMessage()));
+        Message event = resultingEvent(id, new OrderProcessingError(id, version, message, ex.getLocalizedMessage()));
         publisher.send(event);
     }
 
     private Message resultingEvent(String orderId, DomainMessageBody eventBody) {
-        return new Message(eventHeader(orderId, eventBody.getClass().getSimpleName()), eventBody);
+        return new Message(eventHeader(orderId, eventBody.getClass().getSimpleName(), eventBody.version()), eventBody);
     }
 
-    private Header eventHeader(String orderId, String type) {
-        return new Header(UUID.randomUUID().toString(), ORDERS_CHANNEL, type, orderId, clock.instant());
+    private Header eventHeader(String orderId, String type, int version) {
+        return new Header(UUID.randomUUID().toString(), version, ORDERS_CHANNEL, type, orderId, clock.instant());
     }
 }

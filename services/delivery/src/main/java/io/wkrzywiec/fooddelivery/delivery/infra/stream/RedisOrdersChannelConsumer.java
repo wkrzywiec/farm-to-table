@@ -3,7 +3,7 @@ package io.wkrzywiec.fooddelivery.delivery.infra.stream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.commons.incoming.*;
+import io.wkrzywiec.fooddelivery.commons.model.*;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
 import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade;

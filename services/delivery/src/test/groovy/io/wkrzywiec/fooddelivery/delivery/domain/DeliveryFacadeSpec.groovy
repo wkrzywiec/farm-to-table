@@ -1,16 +1,16 @@
 package io.wkrzywiec.fooddelivery.delivery.domain
 
 
-import io.wkrzywiec.fooddelivery.commons.incoming.AssignDeliveryMan
+import io.wkrzywiec.fooddelivery.commons.model.AssignDeliveryMan
 import io.wkrzywiec.fooddelivery.commons.infra.store.InMemoryEventStore
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
-import io.wkrzywiec.fooddelivery.commons.incoming.DeliverFood
-import io.wkrzywiec.fooddelivery.commons.incoming.FoodReady
+import io.wkrzywiec.fooddelivery.commons.model.DeliverFood
+import io.wkrzywiec.fooddelivery.commons.model.FoodReady
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCanceled
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated
-import io.wkrzywiec.fooddelivery.commons.incoming.PickUpFood
-import io.wkrzywiec.fooddelivery.commons.incoming.PrepareFood
-import io.wkrzywiec.fooddelivery.commons.incoming.UnAssignDeliveryMan
+import io.wkrzywiec.fooddelivery.commons.model.PickUpFood
+import io.wkrzywiec.fooddelivery.commons.model.PrepareFood
+import io.wkrzywiec.fooddelivery.commons.model.UnAssignDeliveryMan
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.TipAddedToOrder
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCanceled
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated

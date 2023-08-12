@@ -5,7 +5,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
 
 @ActiveProfiles("dev")
-class OrderingApplicationDevProfileSpec extends IntegrationTestWithSpring {
+class OrderingApplicationDevProfileSpec extends IntegrationTest {
 
     @Autowired
     ApplicationContext context

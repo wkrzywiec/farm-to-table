@@ -1,7 +1,6 @@
 package io.wkrzywiec.fooddelivery.bff.controller.model;
 
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,5 +11,6 @@ import lombok.NoArgsConstructor;
 public class CancelOrderDTO {
 
     private String orderId;
+    private int version;
     private String reason;
 }

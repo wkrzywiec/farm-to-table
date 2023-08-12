@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChangeDeliveryManDTO {
     private String orderId;
+    private int version;
     private String deliveryManId;
 }

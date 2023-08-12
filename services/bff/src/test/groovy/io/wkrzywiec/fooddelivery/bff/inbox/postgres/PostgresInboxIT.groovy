@@ -35,7 +35,7 @@ class PostgresInboxIT extends IntegrationTest {
     def "Message is stored in inbox"() {
         given: "new message"
         def channel = "ordering-inbox:tip"
-        def addTip = new AddTipDTO("any-order-id", BigDecimal.valueOf(10))
+        def addTip = new AddTipDTO("any-order-id", 2, BigDecimal.valueOf(10))
 
         when: "is stored"
         inboxPublisher.storeMessage(channel, addTip)
@@ -60,7 +60,7 @@ class PostgresInboxIT extends IntegrationTest {
     def "A message from inbox is published"() {
         given: "message is in inbox"
         def channel = "ordering-inbox:tip"
-        def addTip = new AddTipDTO("any-order-id", BigDecimal.valueOf(10))
+        def addTip = new AddTipDTO("any-order-id", 2, BigDecimal.valueOf(10))
         inboxPublisher.storeMessage(channel, addTip)
 
         when: "check if there are outstanding messages in inbox"
@@ -87,7 +87,7 @@ class PostgresInboxIT extends IntegrationTest {
                         inboxEntryMap.publish_timestamp = publishTimestampAsOffsetDateTime.toInstant()
                         return inboxEntryMap
                     })
-        } catch (EmptyResultDataAccessException ex) {
+        } catch (EmptyResultDataAccessException ignored) {
             return Map.of()
         }
 

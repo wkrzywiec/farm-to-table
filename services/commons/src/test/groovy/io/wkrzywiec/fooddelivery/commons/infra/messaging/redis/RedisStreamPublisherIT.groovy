@@ -7,13 +7,15 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
 import io.wkrzywiec.fooddelivery.commons.infra.RedisStreamTestClient
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessageTestBody
+
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
 import java.time.Instant
+
+import static io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody.aSampleEvent
 
 class RedisStreamPublisherIT extends CommonsIntegrationTest {
 
@@ -38,11 +40,7 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
         String itemId = UUID.randomUUID()
         Message message = event(
                 itemId,
-                new MessageTestBody(
-                        itemId,
-                        Instant.now(),
-                        BigDecimal.valueOf(2.22)
-                )
+                aSampleEvent(Instant.now())
         )
 
         when: "Publish message"
@@ -52,8 +50,8 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
         def publishedMessage = redis.getLatestMessageFromStreamAsJson(testChannel)
 
         publishedMessage.get("header").get("streamId").asText() == itemId
-        publishedMessage.get("header").get("type").asText() == "MessageTestBody"
-        publishedMessage.get("body").get("orderId").asText() == itemId
+        publishedMessage.get("header").get("type").asText() == "IntegrationTestEventBody"
+        publishedMessage.get("body").get("orderId").asText() == "some test text"
     }
 
     private RedisTemplate configRedisTemplate() {
@@ -77,6 +75,6 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
     }
 
     private Header eventHeader(String itemId, String messageType) {
-        return new Header(UUID.randomUUID().toString(), testChannel, messageType, itemId, Instant.now())
+        return new Header(UUID.randomUUID().toString(), 1, testChannel, messageType, itemId, Instant.now())
     }
 }

@@ -2,7 +2,7 @@ package io.wkrzywiec.fooddelivery.bff.inbox;
 
 import io.wkrzywiec.fooddelivery.bff.controller.model.*;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.commons.incoming.*;
+import io.wkrzywiec.fooddelivery.commons.model.*;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
@@ -26,7 +26,7 @@ public class InboxMessageProcessor {
         log.info("Received a command to create an order: {}", createOrderDTO);
         var command = command(createOrderDTO.getId(),
                 new CreateOrder(
-                        createOrderDTO.getId(), createOrderDTO.getCustomerId(), createOrderDTO.getFarmId(),
+                        createOrderDTO.getId(), 1, createOrderDTO.getCustomerId(), createOrderDTO.getFarmId(),
                         createOrderDTO.getItems().stream().map(i -> new Item(i.name(), i.amount(), i.pricePerItem())).toList(),
                         createOrderDTO.getAddress(), createOrderDTO.getDeliveryCharge()));
 
@@ -35,14 +35,14 @@ public class InboxMessageProcessor {
 
     public void cancelOrder(CancelOrderDTO cancelOrderDTO) {
         log.info("Received a command to update an order: {}", cancelOrderDTO);
-        var command = command(cancelOrderDTO.getOrderId(), new CancelOrder(cancelOrderDTO.getOrderId(), cancelOrderDTO.getReason()));
+        var command = command(cancelOrderDTO.getOrderId(), new CancelOrder(cancelOrderDTO.getOrderId(), cancelOrderDTO.getVersion(), cancelOrderDTO.getReason()));
 
         messagePublisher.send(command);
     }
 
     public void addTip(AddTipDTO addTipDTO) {
         log.info("Received a command to change a tip for an order: {}", addTipDTO);
-        var command = command(addTipDTO.getOrderId(), new AddTip(addTipDTO.getOrderId(), addTipDTO.getTip()));
+        var command = command(addTipDTO.getOrderId(), new AddTip(addTipDTO.getOrderId(), addTipDTO.getVersion(), addTipDTO.getTip()));
 
         messagePublisher.send(command);
     }
@@ -56,10 +56,10 @@ public class InboxMessageProcessor {
 
     private DomainMessageBody commandBody(UpdateDeliveryDTO updateDeliveryDTO) {
         return switch (updateDeliveryDTO.getStatus()) {
-            case "prepareFood" -> new PrepareFood(updateDeliveryDTO.getOrderId());
-            case "foodReady" -> new FoodReady(updateDeliveryDTO.getOrderId());
-            case "pickUpFood" -> new PickUpFood(updateDeliveryDTO.getOrderId());
-            case "deliverFood" -> new DeliverFood(updateDeliveryDTO.getOrderId());
+            case "prepareFood" -> new PrepareFood(updateDeliveryDTO.getOrderId(), updateDeliveryDTO.getVersion());
+            case "foodReady" -> new FoodReady(updateDeliveryDTO.getOrderId(), updateDeliveryDTO.getVersion());
+            case "pickUpFood" -> new PickUpFood(updateDeliveryDTO.getOrderId(), updateDeliveryDTO.getVersion());
+            case "deliverFood" -> new DeliverFood(updateDeliveryDTO.getOrderId(), updateDeliveryDTO.getVersion());
             default -> throw new RuntimeException(updateDeliveryDTO.getStatus() + " delivery status is not supported.");
         };
     }
@@ -81,8 +81,8 @@ public class InboxMessageProcessor {
 
     private DomainMessageBody commandBody(ChangeDeliveryManDTO changeDeliveryManDTO) {
         if (changeDeliveryManDTO.getDeliveryManId() == null) {
-            return new UnAssignDeliveryMan(changeDeliveryManDTO.getOrderId());
+            return new UnAssignDeliveryMan(changeDeliveryManDTO.getOrderId(), changeDeliveryManDTO.getVersion());
         }
-        return new AssignDeliveryMan(changeDeliveryManDTO.getOrderId(), changeDeliveryManDTO.getDeliveryManId());
+        return new AssignDeliveryMan(changeDeliveryManDTO.getOrderId(), changeDeliveryManDTO.getVersion(), changeDeliveryManDTO.getDeliveryManId());
     }
 }

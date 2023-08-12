@@ -34,7 +34,7 @@ abstract class CommonsIntegrationTest extends Specification {
 
     static boolean useLocalInfrastructure() {
         // change it to `true` in order to use it with infra from docker-compose.yaml
-        true
+        false
     }
 
     static {

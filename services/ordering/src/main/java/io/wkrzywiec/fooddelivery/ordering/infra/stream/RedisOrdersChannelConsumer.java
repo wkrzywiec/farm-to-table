@@ -3,9 +3,9 @@ package io.wkrzywiec.fooddelivery.ordering.infra.stream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.commons.incoming.AddTip;
-import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder;
-import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
+import io.wkrzywiec.fooddelivery.commons.model.AddTip;
+import io.wkrzywiec.fooddelivery.commons.model.CancelOrder;
+import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade;
@@ -53,7 +53,7 @@ public class RedisOrdersChannelConsumer implements RedisStreamListener {
                 case "FoodInPreparation" -> facade.handle(mapMessageBody(messageAsJson, FoodInPreparation.class));
                 case "AddTip" -> facade.handle(mapMessageBody(messageAsJson, AddTip.class));
                 case "FoodDelivered" -> facade.handle(mapMessageBody(messageAsJson, FoodDelivered.class));
-                default -> log.info("There is not logic for handling {} message", header.type());
+                default -> log.info("There is no logic for handling {} message", header.type());
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

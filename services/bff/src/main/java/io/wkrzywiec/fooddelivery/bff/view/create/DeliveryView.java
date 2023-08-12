@@ -1,6 +1,6 @@
 package io.wkrzywiec.fooddelivery.bff.view.create;
 
-import io.wkrzywiec.fooddelivery.commons.incoming.Item;
+import io.wkrzywiec.fooddelivery.commons.model.Item;
 import lombok.*;
 
 import java.math.BigDecimal;

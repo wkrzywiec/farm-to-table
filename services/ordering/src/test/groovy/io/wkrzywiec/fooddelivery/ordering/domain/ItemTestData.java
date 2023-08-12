@@ -13,7 +13,7 @@ class ItemTestData {
 
     private ItemTestData() {};
 
-    Item entity() {
+    public Item entity() {
         return Item.builder()
                 .name(name)
                 .amount(amount)
@@ -21,8 +21,8 @@ class ItemTestData {
                 .build();
     }
 
-    io.wkrzywiec.fooddelivery.commons.incoming.Item dto() {
-        return new io.wkrzywiec.fooddelivery.commons.incoming.Item(name, amount, pricePerItem);
+    public io.wkrzywiec.fooddelivery.commons.model.Item dto() {
+        return new io.wkrzywiec.fooddelivery.commons.model.Item(name, amount, pricePerItem);
     }
 
     public static ItemTestData anItem() {

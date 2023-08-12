@@ -60,7 +60,7 @@ class RedisInboxIT extends IntegrationTest {
 
     def "Store object in inbox and then published"() {
         given:
-        def addTip = new AddTipDTO("any-order-id", BigDecimal.valueOf(10))
+        def addTip = new AddTipDTO("any-order-id", 2, BigDecimal.valueOf(10))
 
         when:
         redisInboxPublisher.storeMessage("ordering-inbox:tip", addTip)

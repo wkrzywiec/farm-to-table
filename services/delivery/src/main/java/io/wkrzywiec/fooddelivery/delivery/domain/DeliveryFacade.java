@@ -3,7 +3,7 @@ package io.wkrzywiec.fooddelivery.delivery.domain;
 import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.commons.incoming.*;
+import io.wkrzywiec.fooddelivery.commons.model.*;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.*;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;

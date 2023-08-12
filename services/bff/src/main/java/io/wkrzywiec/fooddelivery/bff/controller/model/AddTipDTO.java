@@ -11,5 +11,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class AddTipDTO {
     private String orderId;
+    private int version;
     private BigDecimal tip;
 }
