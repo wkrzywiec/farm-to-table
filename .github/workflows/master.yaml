@@ -16,6 +16,13 @@ jobs:
     secrets:
       sonarToken: ${{ secrets.BFF_SONAR_TOKEN }}
 
+  commons:
+    uses: ./.github/workflows/template-gradle-master.yaml
+    with:
+      app-name: commons
+    secrets:
+      sonarToken: ${{ secrets.BFF_SONAR_TOKEN }}
+
   delivery:
     uses: ./.github/workflows/template-gradle-master.yaml
     with:
