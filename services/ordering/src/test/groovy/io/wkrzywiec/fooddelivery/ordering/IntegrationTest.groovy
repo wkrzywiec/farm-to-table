@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 abstract class IntegrationTest extends Specification {
 
     private static GenericContainer REDIS_CONTAINER
