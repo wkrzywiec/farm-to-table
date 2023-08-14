@@ -29,6 +29,7 @@ import spock.lang.Title
 
 import java.time.Clock
 import java.time.Instant
+import java.time.ZoneOffset
 
 import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
 
@@ -43,7 +44,7 @@ class DeliveryFacadeSpec extends Specification {
     FakeMessagePublisher publisher
 
     var testTime = Instant.parse("2022-08-08T05:30:24.00Z")
-    Clock testClock = Clock.fixed(testTime)
+    Clock testClock = Clock.fixed(testTime, ZoneOffset.UTC)
 
     def setup() {
         eventStore = new InMemoryEventStore()
@@ -60,7 +61,7 @@ class DeliveryFacadeSpec extends Specification {
                 )
 
         var orderCreated = new OrderCreated(
-                delivery.getOrderId(), delivery.getCustomerId(),
+                delivery.getOrderId(), 1, delivery.getCustomerId(),
                 delivery.getFarmId(), delivery.getAddress(),
                 delivery.getItems().stream().map(i -> new Item(i.name, i.amount, i.pricePerItem)).toList(),
                 delivery.getDeliveryCharge(), delivery.getTotal())
@@ -93,13 +94,13 @@ class DeliveryFacadeSpec extends Specification {
         eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
 
         and:
-        var tipAddedToOrder = new TipAddedToOrder(delivery.orderId, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50))
+        var tipAddedToOrder = new TipAddedToOrder(delivery.orderId, 2, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50))
 
         when:
         facade.handle(tipAddedToOrder)
 
         then: "Event is saved in a store"
-        def expectedEvent = new TipAddedToDelivery(delivery.getOrderId(), BigDecimal.valueOf(5.55), BigDecimal.valueOf(50))
+        def expectedEvent = new TipAddedToDelivery(delivery.getOrderId(), 2, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50))
         def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
         storedEvents.size() == 2
         storedEvents[1].body() == expectedEvent
@@ -121,13 +122,13 @@ class DeliveryFacadeSpec extends Specification {
 
         and:
         var cancellationReason = "Not hungry anymore"
-        var orderCanceled = new OrderCanceled(delivery.orderId, cancellationReason)
+        var orderCanceled = new OrderCanceled(delivery.orderId, 2, cancellationReason)
 
         when:
         facade.handle(orderCanceled)
 
         then: "Event is saved in a store"
-        def expectedEvent = new DeliveryCanceled(delivery.getOrderId(), "Not hungry anymore")
+        def expectedEvent = new DeliveryCanceled(delivery.getOrderId(), 2, "Not hungry anymore")
         def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
         storedEvents.size() == 2
         storedEvents[1].body() == expectedEvent
@@ -151,13 +152,13 @@ class DeliveryFacadeSpec extends Specification {
         eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
 
         and:
-        var prepareFood = new PrepareFood(delivery.orderId)
+        var prepareFood = new PrepareFood(delivery.orderId, 2)
 
         when:
         facade.handle(prepareFood)
 
         then: "Event is saved in a store"
-        def expectedEvent = new FoodInPreparation(delivery.getOrderId())
+        def expectedEvent = new FoodInPreparation(delivery.getOrderId(), 3)
         def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
         storedEvents.size() == 2
         storedEvents[1].body() == expectedEvent
@@ -182,13 +183,13 @@ class DeliveryFacadeSpec extends Specification {
 
         and:
         var deliveryManId = "any-delivery-man-orderId"
-        var assignDeliveryMan = new AssignDeliveryMan(delivery.orderId, deliveryManId)
+        var assignDeliveryMan = new AssignDeliveryMan(delivery.orderId, 2, deliveryManId)
 
         when:
         facade.handle(assignDeliveryMan)
 
         then: "Event is saved in a store"
-        def expectedEvent = new DeliveryManAssigned(delivery.getOrderId(), deliveryManId)
+        def expectedEvent = new DeliveryManAssigned(delivery.getOrderId(), 3, deliveryManId)
         def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
         storedEvents.size() == 2
         storedEvents[1].body() == expectedEvent
@@ -208,16 +209,16 @@ class DeliveryFacadeSpec extends Specification {
         var deliveryManId = "any-delivery-man-orderId"
         var delivery = DeliveryTestData.aDelivery()
         eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
-        eventStore.store(firstMessage("orders", testClock, new DeliveryManAssigned(delivery.getOrderId(), deliveryManId)))
+        eventStore.store(firstMessage("orders", testClock, new DeliveryManAssigned(delivery.getOrderId(), 2, deliveryManId)))
 
         and:
-        var assignDeliveryMan = new UnAssignDeliveryMan(delivery.orderId)
+        var assignDeliveryMan = new UnAssignDeliveryMan(delivery.orderId, 2)
 
         when:
         facade.handle(assignDeliveryMan)
 
         then: "Event is saved in a store"
-        def expectedEvent = new DeliveryManUnAssigned(delivery.getOrderId(), deliveryManId)
+        def expectedEvent = new DeliveryManUnAssigned(delivery.getOrderId(), 3, deliveryManId)
         def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
         storedEvents.size() == 3
         storedEvents[2].body() == expectedEvent
@@ -237,16 +238,16 @@ class DeliveryFacadeSpec extends Specification {
         given:
         var delivery = DeliveryTestData.aDelivery()
         eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
-        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId(), 2)))
 
         and:
-        var foodReady = new FoodReady(delivery.orderId)
+        var foodReady = new FoodReady(delivery.orderId, 2)
 
         when:
         facade.handle(foodReady)
 
         then: "Event is saved in a store"
-        def expectedEvent = new FoodIsReady(delivery.getOrderId())
+        def expectedEvent = new FoodIsReady(delivery.getOrderId(), 3)
         def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
         storedEvents.size() == 3
         storedEvents[2].body() == expectedEvent
@@ -265,17 +266,17 @@ class DeliveryFacadeSpec extends Specification {
         given:
         var delivery = DeliveryTestData.aDelivery()
         eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
-        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
-        eventStore.store(firstMessage("orders", testClock, new FoodIsReady(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId(), 2)))
+        eventStore.store(firstMessage("orders", testClock, new FoodIsReady(delivery.getOrderId(), 3)))
 
         and:
-        var pickUpFood = new PickUpFood(delivery.orderId)
+        var pickUpFood = new PickUpFood(delivery.orderId, 3)
 
         when:
         facade.handle(pickUpFood)
 
         then: "Event is saved in a store"
-        def expectedEvent = new FoodWasPickedUp(delivery.getOrderId())
+        def expectedEvent = new FoodWasPickedUp(delivery.getOrderId(), 4)
         def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
         storedEvents.size() == 4
         storedEvents[3].body() == expectedEvent
@@ -295,18 +296,18 @@ class DeliveryFacadeSpec extends Specification {
         var delivery = DeliveryTestData.aDelivery()
                 .withStatus(DeliveryStatus.FOOD_PICKED)
         eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
-        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId())))
-        eventStore.store(firstMessage("orders", testClock, new FoodIsReady(delivery.getOrderId())))
-        eventStore.store(firstMessage("orders", testClock, new FoodWasPickedUp(delivery.getOrderId())))
+        eventStore.store(firstMessage("orders", testClock, new FoodInPreparation(delivery.getOrderId(), 2)))
+        eventStore.store(firstMessage("orders", testClock, new FoodIsReady(delivery.getOrderId(), 3)))
+        eventStore.store(firstMessage("orders", testClock, new FoodWasPickedUp(delivery.getOrderId(), 4)))
 
         and:
-        var deliverFood = new DeliverFood(delivery.orderId)
+        var deliverFood = new DeliverFood(delivery.orderId, 4)
 
         when:
         facade.handle(deliverFood)
 
         then: "Event is saved in a store"
-        def expectedEvent = new FoodDelivered(delivery.getOrderId())
+        def expectedEvent = new FoodDelivered(delivery.getOrderId(), 5)
         def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
         storedEvents.size() == 5
         storedEvents[4].body() == expectedEvent

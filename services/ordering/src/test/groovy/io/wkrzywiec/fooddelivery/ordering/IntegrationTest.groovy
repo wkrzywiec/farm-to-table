@@ -38,9 +38,9 @@ abstract class IntegrationTest extends Specification {
 
     private static PostgreSQLContainer POSTGRE_SQL_CONTAINER
     protected static final String JDBC_URL
-    protected static final String DB_NAME = "bff"
-    protected static final String DB_USERNAME = "bff"
-    protected static final String DB_PASS = "bff"
+    protected static final String DB_NAME = "ordering"
+    protected static final String DB_USERNAME = "ordering"
+    protected static final String DB_PASS = "ordering"
 
     @Shared
     protected JdbcTemplate jdbcTemplate

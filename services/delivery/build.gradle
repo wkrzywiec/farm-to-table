@@ -37,9 +37,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'io.vavr:vavr:0.10.4'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 	implementation 'com.google.code.gson:gson:2.9.0'
+	implementation 'org.postgresql:postgresql:42.5.1'
+	implementation 'org.liquibase:liquibase-core:4.23.0'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation "org.spockframework:spock-core:${spockVersion}"
@@ -50,6 +53,7 @@ dependencies {
 	implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
 
 	testImplementation "org.testcontainers:spock:${testcontainersVersion}"
+	testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
 
 	//this part is needed, because io.rest-assured:spring-mock-mvc depends on old lib for groovy - org.codehaus.groovy:groovy
 	modules {

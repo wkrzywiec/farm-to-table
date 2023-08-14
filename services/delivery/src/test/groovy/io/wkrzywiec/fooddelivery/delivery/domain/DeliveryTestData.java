@@ -48,7 +48,7 @@ import static java.lang.String.format;
     }
 
     public DeliveryCreated deliveryCreated() {
-        return new DeliveryCreated(orderId, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, total);
+        return new DeliveryCreated(orderId, 1, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, total);
     }
 
     public DeliveryTestData withOrderId(String orderId) {

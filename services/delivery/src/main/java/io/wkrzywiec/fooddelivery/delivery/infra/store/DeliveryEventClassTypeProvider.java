@@ -1,28 +1,12 @@
 package io.wkrzywiec.fooddelivery.delivery.infra.store;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.commons.infra.store.RedisEventStore;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventClassTypeProvider;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Profile("redis-event-store")
-@Component
-class RedisDeliveryEventStore extends RedisEventStore {
-
-    public RedisDeliveryEventStore(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
-        super(redisTemplate, objectMapper);
-    }
-
-    @Override
-    public String streamPrefix() {
-        return "delivery::";
-    }
+class DeliveryEventClassTypeProvider implements EventClassTypeProvider {
 
     @Override
     public Class<? extends DomainMessageBody> getClassType(String type) {
