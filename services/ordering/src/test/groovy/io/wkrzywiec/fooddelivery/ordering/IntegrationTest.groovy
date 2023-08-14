@@ -54,7 +54,7 @@ abstract class IntegrationTest extends Specification {
 
         if (useLocalInfrastructure()) {
             REDIS_PORT = 6379
-            JDBC_URL = "jdbc:postgresql://localhost:5432/bff"
+            JDBC_URL = "jdbc:postgresql://localhost:5432/ordering"
             return
         }
 
