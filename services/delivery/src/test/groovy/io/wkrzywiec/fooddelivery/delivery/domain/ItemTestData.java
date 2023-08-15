@@ -21,7 +21,7 @@ public class ItemTestData {
                 .build();
     }
 
-    io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item dto() {
+    public io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item dto() {
         return new io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item(name, amount, pricePerItem);
     }
 
