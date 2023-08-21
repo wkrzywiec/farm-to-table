@@ -1,17 +1,13 @@
 package io.wkrzywiec.fooddelivery.bff.inbox.redis
 
+import io.wkrzywiec.fooddelivery.bff.IntegrationTestWithSpring
 import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO
-import io.wkrzywiec.fooddelivery.commons.IntegrationTest
-import io.wkrzywiec.fooddelivery.commons.infra.RedisStreamTestClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.testcontainers.containers.GenericContainer
-import org.testcontainers.utility.DockerImageName
 import spock.lang.Subject
 
 import java.util.concurrent.TimeUnit
@@ -21,39 +17,7 @@ import static org.awaitility.Awaitility.await
 @Subject([RedisInbox, RedisInboxListener])
 @ActiveProfiles(["redis-inbox", "redis-stream"])
 @ContextConfiguration(initializers = IntegrationTestContainerInitializer)
-class RedisInboxIT extends IntegrationTest {
-
-    private static final GenericContainer REDIS
-    protected static final String REDIS_HOST
-    protected static final Integer REDIS_PORT
-
-    protected RedisStreamTestClient redisStreamsClient
-
-    @Autowired
-    private RedisTemplate redisTemplate
-
-    static {
-
-        if (useLocalInfrastructure()) {
-            REDIS_HOST = "localhost"
-            REDIS_PORT = 6379
-            return
-        }
-
-        REDIS = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-                .withExposedPorts(6379)
-        REDIS.start()
-        REDIS_HOST = REDIS.getHost()
-        REDIS_PORT = REDIS.getMappedPort(6379)
-    }
-
-    def setup() {
-        redisStreamsClient = new RedisStreamTestClient(redisTemplate)
-
-        System.out.println("Clearing 'orders' stream from old messages")
-        redisTemplate.opsForStream().trim("orders", 0)
-        redisTemplate.opsForStream().trim("ordering::any-id", 0)
-    }
+class RedisInboxIT extends IntegrationTestWithSpring {
 
     @Autowired
     private RedisInbox redisInboxPublisher

@@ -3,6 +3,7 @@ package io.wkrzywiec.fooddelivery.bff
 
 import io.wkrzywiec.fooddelivery.commons.infra.RedisStreamTestClient
 import org.postgresql.ds.PGSimpleDataSource
+import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
@@ -115,13 +116,18 @@ abstract class IntegrationTest extends Specification {
         return new JdbcTemplate(dataSource)
     }
 
-    private RedisTemplate configRedisTemplate() {
-        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration()
+    protected RedisConnectionFactory redisConnectionFactory() {
+        def redisConfiguration = new RedisStandaloneConfiguration()
         redisConfiguration.setHostName(REDIS_HOST)
         redisConfiguration.setPort(REDIS_PORT)
 
         def redisConnectionFactory = new LettuceConnectionFactory(redisConfiguration)
         redisConnectionFactory.afterPropertiesSet()
+        return redisConnectionFactory
+    }
+
+    private RedisTemplate configRedisTemplate() {
+        def redisConnectionFactory = redisConnectionFactory()
 
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>()
         redisTemplate.setConnectionFactory(redisConnectionFactory)

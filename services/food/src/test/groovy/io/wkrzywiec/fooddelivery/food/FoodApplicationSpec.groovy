@@ -1,6 +1,5 @@
 package io.wkrzywiec.fooddelivery.food
 
-import io.wkrzywiec.fooddelivery.commons.IntegrationTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
