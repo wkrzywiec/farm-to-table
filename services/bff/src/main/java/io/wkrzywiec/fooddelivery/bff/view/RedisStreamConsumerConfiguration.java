@@ -46,6 +46,4 @@ public class RedisStreamConsumerConfiguration extends RedisMessageConsumerConfig
     public RedisFoodItemRepository redisFoodItemRepository(StatefulRediSearchConnection<String, String> searchConnection, ObjectMapper objectMapper) {
         return new RedisFoodItemRepository(searchConnection, objectMapper);
     }
-
-    //todo prevent redisQueue from creating if in memory-profile
 }
