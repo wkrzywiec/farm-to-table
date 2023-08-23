@@ -80,6 +80,8 @@ The entire system is made of 5 microservices (1 React, 4 Java/Spring):
 | delivery | Java, Spring Boot | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_delivery&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_delivery) | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_delivery&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_delivery) |
 | food     | Java, Spring Boot | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_food&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_food)         | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_food&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_food)         |
 
+There is an additional module - *commons* - for Java classes that are reused in most modules. 
+
 ### C4 diagrams
 
 #### C4 container diagram
