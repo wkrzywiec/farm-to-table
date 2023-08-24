@@ -22,23 +22,29 @@ public class RedisStreamPublisher implements MessagePublisher {
     public void send(Message message) {
         log.info("Publishing '{}' message on channel: '{}', body: '{}'", message.header().type(), message.header().channel(), message.body());
 
-        String messageJson = null;
-        try {
-            messageJson = mapper.writeValueAsString(message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        log.info(messageJson);
-
-        ObjectRecord<String, String> record = StreamRecords.newRecord()
-                .ofObject(messageJson)
-                .withStreamKey(message.header().channel());
+        String messageJson = mapMessageToJsonString(message);
+        ObjectRecord<String, String> record = prepareRedisRecord(message, messageJson);
 
         RecordId recordId = redisTemplate.opsForStream()
                 .add(record);
 
         log.info("'{}' message was published on channel: '{}', full message: '{}'. Record id: {}",
                 message.header().type(), message.header().channel(), message, recordId.getValue());
+    }
+
+    private String mapMessageToJsonString(Message message) {
+        try {
+            var messageJson = mapper.writeValueAsString(message);
+            log.info(messageJson);
+            return messageJson;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static ObjectRecord<String, String> prepareRedisRecord(Message message, String messageJson) {
+        return StreamRecords.newRecord()
+                .ofObject(messageJson)
+                .withStreamKey(message.header().channel());
     }
 }

@@ -1,7 +1,7 @@
 package io.wkrzywiec.fooddelivery.bff.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.wkrzywiec.fooddelivery.bff.repository.RedisFoodItemRepository;
+import io.wkrzywiec.fooddelivery.bff.view.read.RedisFoodItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

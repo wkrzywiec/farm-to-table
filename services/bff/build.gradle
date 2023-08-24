@@ -2,7 +2,6 @@ plugins {
     id 'idea'
     id 'org.springframework.boot' version '2.7.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'org.liquibase.gradle' version '2.1.1'
     id 'java'
     id 'groovy'
     id 'jacoco'
@@ -15,7 +14,7 @@ version = '0.0.1-SNAPSHOT'
 description = 'farm-to-table backend for frontend'
 sourceCompatibility = '17'
 
-def activeDevProfiles = 'dev,redis'
+def activeDevProfiles = 'dev'
 
 configurations {
     compileOnly {
@@ -26,8 +25,8 @@ configurations {
 dependencies {
 
     def lombokVersion = '1.18.24'
-    def spockVersion = '2.1-groovy-3.0'
-    def testcontainersVersion = '1.17.3'
+    def spockVersion = '2.3-groovy-4.0'
+    def testcontainersVersion = '1.18.3'
 
     implementation "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
@@ -37,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'com.github.sonus21:rqueue-spring-boot-starter:2.10.2-RELEASE'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
     implementation 'io.vavr:vavr:0.10.4'
@@ -44,18 +44,35 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'com.redislabs:lettusearch:3.1.2'
     implementation 'com.redislabs:spring-redisearch:3.1.2'
+    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'org.liquibase:liquibase-core:4.23.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation "org.spockframework:spock-core:${spockVersion}"
     implementation "org.spockframework:spock-spring:${spockVersion}"
     implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
-    testImplementation 'org.codehaus.groovy:groovy-all:3.0.11'
-    testImplementation 'io.rest-assured:spring-mock-mvc:4.4.0'
+    testImplementation 'org.apache.groovy:groovy-all:4.0.13'
+    testImplementation 'io.rest-assured:spring-mock-mvc:5.3.1'
 
     testImplementation "org.testcontainers:spock:${testcontainersVersion}"
     testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
     testImplementation 'org.awaitility:awaitility:4.2.0'
+
+    //this part is needed, because io.rest-assured:spring-mock-mvc depends on old lib for groovy - org.codehaus.groovy:groovy
+    modules {
+        module("org.codehaus.groovy:groovy") {
+            replacedBy("org.apache.groovy:groovy", "conflicts in current rest-assured version")
+        }
+
+        module("org.codehaus.groovy:groovy-xml") {
+            replacedBy("org.apache.groovy:groovy-xml", "conflicts in current rest-assured version")
+        }
+
+        module("org.codehaus.groovy:groovy-json") {
+            replacedBy("org.apache.groovy:groovy-json", "conflicts in current rest-assured version")
+        }
+    }
 }
 
 bootRun {

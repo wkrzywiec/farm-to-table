@@ -1,0 +1,77 @@
+package io.wkrzywiec.fooddelivery.ordering.application
+
+import com.github.javafaker.Faker
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.RedisEventStore
+import io.wkrzywiec.fooddelivery.ordering.IntegrationTest
+import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated
+import io.wkrzywiec.fooddelivery.ordering.infra.stream.RedisOrdersChannelConsumer
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.ActiveProfiles
+import spock.lang.Subject
+
+import java.time.Instant
+import java.util.concurrent.TimeUnit
+
+import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
+import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await
+
+@ActiveProfiles(["redis-stream", "redis-event-store"])
+@Subject([RedisOrdersChannelConsumer, OrderingFacade, RedisEventStore])
+class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
+
+    @Autowired
+    private EventStore eventStore
+
+    def "Message is consumed and processed correctly"() {
+        given: "CreateOrder command"
+        Faker faker = new Faker()
+        var order = anOrder()
+                .withItems(
+                        anItem().withName(faker.food().dish()).withPricePerItem(2.5),
+                        anItem().withName(faker.food().dish()).withPricePerItem(3.0)
+                )
+                .withAddress(faker.address().fullAddress())
+
+        def body = order.createOrder()
+        def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), order.id, Instant.now())
+        def message = new Message(header, body)
+
+        when: "is published"
+        redisStreamsClient.publishMessage(message)
+
+        then: "resulting event is published"
+        await().atMost(5, TimeUnit.SECONDS)
+                .until {
+                    def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
+
+                    event.get("header").get("streamId").asText() == order.id
+                    event.get("header").get("type").asText() == "OrderCreated"
+                }
+
+        then: "resulting event is published"
+        await().atMost(5, TimeUnit.SECONDS)
+                .until {
+                    def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
+                    event.get("header").get("streamId").asText() == order.id
+                    event.get("header").get("type").asText() == "OrderCreated"
+                }
+
+        and: "event is saved in event store"
+        def events = eventStore.getEventsForOrder(order.id)
+        events.size() == 1
+        events[0].header().type() == "OrderCreated"
+
+        def eventBody = events[0].body()
+        eventBody instanceof OrderCreated
+        eventBody as OrderCreated == new OrderCreated(
+                order.id, 1, order.customerId,
+                order.farmId, order.address,
+                order.items.stream().map(i -> i.dto()).toList(),
+                order.deliveryCharge, order.total())
+    }
+}

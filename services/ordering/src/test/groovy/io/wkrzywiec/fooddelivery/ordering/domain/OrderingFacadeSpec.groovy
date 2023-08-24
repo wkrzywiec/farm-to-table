@@ -3,9 +3,9 @@ package io.wkrzywiec.fooddelivery.ordering.domain
 
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.FakeMessagePublisher
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
-import io.wkrzywiec.fooddelivery.commons.incoming.AddTip
-import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder
-import io.wkrzywiec.fooddelivery.commons.infra.repository.InMemoryEventStore
+import io.wkrzywiec.fooddelivery.commons.model.AddTip
+import io.wkrzywiec.fooddelivery.commons.model.CancelOrder
+import io.wkrzywiec.fooddelivery.commons.infra.store.InMemoryEventStore
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCanceled
@@ -19,8 +19,9 @@ import spock.lang.Title
 
 import java.time.Clock
 import java.time.Instant
+import java.time.ZoneOffset
 
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.message
+import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
 import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 
@@ -35,7 +36,7 @@ class OrderingFacadeSpec extends Specification {
     FakeMessagePublisher publisher
 
     var testTime = Instant.parse("2022-08-08T05:30:24.00Z")
-    Clock testClock = Clock.fixed(testTime)
+    Clock testClock = Clock.fixed(testTime, ZoneOffset.UTC)
 
     def setup() {
         eventStore = new InMemoryEventStore()
@@ -76,17 +77,17 @@ class OrderingFacadeSpec extends Specification {
     def "Cancel an order"() {
         given:
         var order = anOrder()
-        eventStore.store(message("orders", testClock, order.orderCreated()))
+        eventStore.store(firstMessage("orders", testClock, order.orderCreated()))
 
         and:
         var cancellationReason = "Not hungry anymore"
-        var cancelOrder = new CancelOrder(order.id, cancellationReason)
+        var cancelOrder = new CancelOrder(order.id, 2, cancellationReason)
 
         when:
         facade.handle(cancelOrder)
 
         then: "Event is saved in a store"
-        def expectedEvent = new OrderCanceled(order.getId(), cancellationReason)
+        def expectedEvent = new OrderCanceled(order.getId(), 3, cancellationReason)
         def storedEvents = eventStore.getEventsForOrder(order.getId())
         storedEvents.size() == 2
         storedEvents[1].body() == expectedEvent
@@ -106,16 +107,16 @@ class OrderingFacadeSpec extends Specification {
     def "Set order to IN_PROGRESS"() {
         given:
         var order = anOrder()
-        eventStore.store(message("orders", testClock, order.orderCreated()))
+        eventStore.store(firstMessage("orders", testClock, order.orderCreated()))
 
         and:
-        var foodInPreparation = new FoodInPreparation(order.id)
+        var foodInPreparation = new FoodInPreparation(order.id, 2)
 
         when:
         facade.handle(foodInPreparation)
 
         then: "Event is saved in a store"
-        def expectedEvent = new OrderInProgress(order.getId())
+        def expectedEvent = new OrderInProgress(order.getId(), 3)
         def storedEvents = eventStore.getEventsForOrder(order.getId())
         storedEvents.size() == 2
         storedEvents[1].body() == expectedEvent
@@ -141,11 +142,11 @@ class OrderingFacadeSpec extends Specification {
         var order = anOrder()
                 .withItems(anItem().withPricePerItem(itemCost))
                 .withDeliveryCharge(deliveryCharge)
-        eventStore.store(message("orders", testClock, order.orderCreated()))
+        eventStore.store(firstMessage("orders", testClock, order.orderCreated()))
 
         and:
         double tip = 20
-        var addTip = new AddTip(order.id, new BigDecimal(tip))
+        var addTip = new AddTip(order.id, 2, new BigDecimal(tip))
 
         when:
         facade.handle(addTip)
@@ -176,17 +177,17 @@ class OrderingFacadeSpec extends Specification {
     def "Complete an order"() {
         given:
         var order = anOrder()
-        eventStore.store(message("orders", testClock, order.orderCreated()))
-        eventStore.store(message("orders", testClock, new OrderInProgress(order.getId())))
+        eventStore.store(firstMessage("orders", testClock, order.orderCreated()))
+        eventStore.store(firstMessage("orders", testClock, new OrderInProgress(order.getId(), 2)))
 
         and:
-        var foodDelivered = new FoodDelivered(order.id)
+        var foodDelivered = new FoodDelivered(order.id, 3)
 
         when:
         facade.handle(foodDelivered)
 
         then: "Order is completed"
-        def expectedEvent = new OrderCompleted(order.getId())
+        def expectedEvent = new OrderCompleted(order.getId(), 4)
         def storedEvents = eventStore.getEventsForOrder(order.getId())
         storedEvents.size() == 3
         storedEvents[2].body() == expectedEvent
@@ -206,10 +207,10 @@ class OrderingFacadeSpec extends Specification {
 
     private void verifyEventHeader(Message event, String orderId, String eventType) {
         def header = event.header()
-        header.messageId() != null
+        header.id() != null
         header.channel() == ORDERS_CHANNEL
         header.type() == eventType
-        header.itemId() == orderId
+        header.streamId() == orderId
         header.createdAt() == testClock.instant()
     }
 }

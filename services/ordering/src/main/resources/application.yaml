@@ -1,12 +1,42 @@
 spring:
   application:
     name: 'farm-to-table_ordering'
+  profiles:
+    default: prod
+    group:
+      dev:
+        - redis-stream
+        - postgres-event-store
+        - dev-local
+      prod:
+        - redis-stream
+        - postgres-event-store
+      redis:
+        - redis-event-store
+        - redis-stream
+  liquibase:
+    enabled: false
+    change-log: db/changelog/changelog-master.xml
+  autoconfigure:
+    exclude: >
+      org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 management:
   endpoints:
     web:
       exposure:
         include: '*'
+
+---
+
+spring:
+  profiles: postgres-event-store
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:ordering}
+    username: ${POSTGRES_USERNAME:ordering}
+    password: ${POSTGRES_PASSWORD:ordering}
+  liquibase:
+    enabled: true
 
 ---
 server:

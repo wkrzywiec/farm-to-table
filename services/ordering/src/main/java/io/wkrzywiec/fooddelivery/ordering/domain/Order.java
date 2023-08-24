@@ -1,6 +1,6 @@
 package io.wkrzywiec.fooddelivery.ordering.domain;
 
-import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
+import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;
 import lombok.EqualsAndHashCode;
@@ -64,7 +64,7 @@ public class Order {
         return order;
     }
 
-    private static List<Item> mapItems(List<io.wkrzywiec.fooddelivery.commons.incoming.Item> items) {
+    private static List<Item> mapItems(List<io.wkrzywiec.fooddelivery.commons.model.Item> items) {
         return items.stream().map(dto -> Item.builder()
                 .name(dto.name())
                 .amount(dto.amount())

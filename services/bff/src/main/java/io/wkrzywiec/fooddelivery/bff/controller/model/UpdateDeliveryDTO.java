@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class UpdateDeliveryDTO {
 
     private String orderId;
+    private int version;
     @Schema(allowableValues = {"prepareFood", "foodReady", "pickUpFood", "deliverFood"}, required = true)
     private String status;
 }

@@ -80,6 +80,8 @@ The entire system is made of 5 microservices (1 React, 4 Java/Spring):
 | delivery | Java, Spring Boot | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_delivery&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_delivery) | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_delivery&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_delivery) |
 | food     | Java, Spring Boot | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_food&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_food)         | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_food&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_food)         |
 
+There is an additional module - *commons* - for Java classes that are reused in most modules. 
+
 ### C4 diagrams
 
 #### C4 container diagram
@@ -95,6 +97,23 @@ The majority of the backend application is designed to be configurable, allowing
 Currently, there is only one available profile called `redis`. However, there are plans to introduce additional profiles in the near future.
 
 ### Default configuration (`SOON`)
+
+#### How to access data
+
+##### postgres
+
+In order to check the content of postgres db use the pgAdmin4 bundled in docker-compose.yaml. 
+
+Link: http://localhost:5050
+
+Credentials:
+* username: admin@admin.com
+* password: admin
+
+During first login you may also be asked to provide a password to `postgres` server. It is plain and simple - `postgres`.
+
+After logging all available databases will be listed.
+
 
 ### `redis` configuration
 

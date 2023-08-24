@@ -3,8 +3,8 @@ package io.wkrzywiec.fooddelivery.delivery.domain;
 import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.commons.incoming.*;
-import io.wkrzywiec.fooddelivery.commons.infra.repository.EventStore;
+import io.wkrzywiec.fooddelivery.commons.model.*;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.*;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
@@ -35,6 +35,7 @@ public class DeliveryFacade {
         Delivery newDelivery = Delivery.from(orderCreated, clock.instant());
         var deliveryCreated = new DeliveryCreated(
                 newDelivery.getOrderId(),
+                1,
                 newDelivery.getCustomerId(),
                 newDelivery.getFarmId(),
                 newDelivery.getAddress(),
@@ -56,11 +57,12 @@ public class DeliveryFacade {
         log.info("Starting adding top for '{}' delivery", tipAddedToOrder.orderId());
 
         var delivery = findDelivery(tipAddedToOrder.orderId());
+        var currentVersion = getLatestVersionOfStream(tipAddedToOrder.orderId());
 
         process(
                 delivery,
                 () -> delivery.addTip(tipAddedToOrder.tip(), tipAddedToOrder.total()),
-                new TipAddedToDelivery(delivery.getOrderId(), tipAddedToOrder.tip(), tipAddedToOrder.total()),
+                new TipAddedToDelivery(delivery.getOrderId(), currentVersion + 1, tipAddedToOrder.tip(), tipAddedToOrder.total()),
                 "Failed to add tip."
         );
     }
@@ -73,11 +75,12 @@ public class DeliveryFacade {
             throw new DeliveryException(format("Failed to cancel a delivery. There is no delivery for an %s order", orderCanceled.orderId()));
         }
         var delivery = Delivery.from(storedEvents);
+        var currentVersion = getLatestVersionOfStream(orderCanceled.orderId());
 
         process(
                 delivery,
                 () -> delivery.cancel(orderCanceled.reason(), clock.instant()),
-                new DeliveryCanceled(orderCanceled.orderId(), orderCanceled.reason()),
+                new DeliveryCanceled(orderCanceled.orderId(), currentVersion + 1, orderCanceled.reason()),
                 "Failed to cancel an delivery."
         );
     }
@@ -90,7 +93,7 @@ public class DeliveryFacade {
         process(
                 delivery,
                 () -> delivery.foodInPreparation(clock.instant()),
-                new FoodInPreparation(delivery.getOrderId()),
+                new FoodInPreparation(delivery.getOrderId(), prepareFood.version() + 1),
                 "Failed to start food preparation."
         );
     }
@@ -103,7 +106,7 @@ public class DeliveryFacade {
         process(
                 delivery,
                 () -> delivery.assignDeliveryMan(assignDeliveryMan.deliveryManId()),
-                new DeliveryManAssigned(delivery.getOrderId(), assignDeliveryMan.deliveryManId()),
+                new DeliveryManAssigned(delivery.getOrderId(), assignDeliveryMan.version() + 1, assignDeliveryMan.deliveryManId()),
                 "Failed to assign delivery man."
         );
     }
@@ -116,7 +119,7 @@ public class DeliveryFacade {
         process(
                 delivery,
                 delivery::unAssignDeliveryMan,
-                new DeliveryManUnAssigned(delivery.getOrderId(), delivery.getDeliveryManId()),
+                new DeliveryManUnAssigned(delivery.getOrderId(), unAssignDeliveryMan.version() + 1, delivery.getDeliveryManId()),
                 "Failed to un assign delivery man."
         );
     }
@@ -126,11 +129,12 @@ public class DeliveryFacade {
         log.info("Starting food ready for '{}' delivery", foodReady.orderId());
 
         var delivery = findDelivery(foodReady.orderId());
+        var currentVersion = getLatestVersionOfStream(foodReady.orderId());
 
         process(
                 delivery,
                 () -> delivery.foodReady(clock.instant()),
-                new FoodIsReady(delivery.getOrderId()),
+                new FoodIsReady(delivery.getOrderId(), currentVersion + 1),
                 "Failed to set food as ready."
         );
     }
@@ -143,7 +147,7 @@ public class DeliveryFacade {
         process(
                 delivery,
                 () -> delivery.pickUpFood(clock.instant()),
-                new FoodWasPickedUp(delivery.getOrderId()),
+                new FoodWasPickedUp(delivery.getOrderId(), pickUpFood.version() + 1),
                 "Failed to set food as picked up."
         );
     }
@@ -156,7 +160,7 @@ public class DeliveryFacade {
         process(
                 delivery,
                 () -> delivery.deliverFood(clock.instant()),
-                new FoodDelivered(delivery.getOrderId()),
+                new FoodDelivered(delivery.getOrderId(), deliverFood.version() + 1  ),
                 "Failed to set food as delivered."
         );
     }
@@ -167,6 +171,10 @@ public class DeliveryFacade {
             throw new DeliveryException(format("There is no delivery with an orderId '%s'.", orderId));
         }
         return Delivery.from(storedEvents);
+    }
+
+    private int getLatestVersionOfStream(String orderId) {
+        return eventStore.getEventsForOrder(orderId).size();
     }
 
     private void process(Delivery delivery, CheckedRunnable runProcess, DomainMessageBody successEvent, String failureMessage) {
@@ -184,15 +192,16 @@ public class DeliveryFacade {
 
     private void publishingFailureEvent(String id, String message, Throwable ex) {
         log.error(message + " Publishing DeliveryProcessingError event", ex);
-        Message event = resultingEvent(id, new DeliveryProcessingError(id, message, ex.getLocalizedMessage()));
+        int version = getLatestVersionOfStream(id);
+        Message event = resultingEvent(id, new DeliveryProcessingError(id, version, message, ex.getLocalizedMessage()));
         publisher.send(event);
     }
 
     private Message resultingEvent(String orderId, DomainMessageBody eventBody) {
-        return new Message(eventHeader(orderId, eventBody.getClass().getSimpleName()), eventBody);
+        return new Message(eventHeader(orderId, eventBody.version(), eventBody.getClass().getSimpleName()), eventBody);
     }
 
-    private Header eventHeader(String orderId, String type) {
-        return new Header(UUID.randomUUID().toString(), ORDERS_CHANNEL, type, orderId, clock.instant());
+    private Header eventHeader(String orderId, int version, String type) {
+        return new Header(UUID.randomUUID().toString(), version, ORDERS_CHANNEL, type, orderId, clock.instant());
     }
 }

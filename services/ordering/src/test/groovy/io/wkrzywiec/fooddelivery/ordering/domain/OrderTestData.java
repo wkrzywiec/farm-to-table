@@ -1,6 +1,6 @@
 package io.wkrzywiec.fooddelivery.ordering.domain;
 
-import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
+import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated;
 import lombok.Getter;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -15,6 +15,7 @@ import static java.lang.String.format;
  class OrderTestData {
 
     private String id = UUID.randomUUID().toString();
+    private int version = 1;
     private String customerId = "default-customer-id";
     private String farmId = "default-farm-id";
     private OrderStatus status = CREATED;
@@ -47,16 +48,26 @@ import static java.lang.String.format;
     }
 
      public CreateOrder createOrder() {
-        return new CreateOrder(id, customerId, farmId, items.stream().map(ItemTestData::dto).toList(), address, deliveryCharge);
+        return new CreateOrder(id, version, customerId, farmId, items.stream().map(ItemTestData::dto).toList(), address, deliveryCharge);
     }
 
     public OrderCreated orderCreated() {
          var entity = entity();
-         return new OrderCreated(id, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, entity.getTotal());
+         return new OrderCreated(id, version, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, entity.getTotal());
+    }
+
+    public BigDecimal total() {
+         var entity = entity();
+         return entity.getTotal();
     }
 
      public OrderTestData withId(String id) {
         this.id = id;
+        return this;
+    }
+
+    public OrderTestData withVersion(int version) {
+        this.version = version;
         return this;
     }
 

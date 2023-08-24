@@ -4,8 +4,8 @@ import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO
 import io.wkrzywiec.fooddelivery.bff.controller.model.CancelOrderDTO
 import io.wkrzywiec.fooddelivery.bff.controller.model.CreateOrderDTO
 import io.wkrzywiec.fooddelivery.bff.controller.model.ItemDTO
-import io.wkrzywiec.fooddelivery.bff.inbox.InMemoryInboxPublisher
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher
+import io.wkrzywiec.fooddelivery.bff.inbox.InMemoryInbox
+import io.wkrzywiec.fooddelivery.bff.inbox.Inbox
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 class OrdersControllerSpec extends Specification {
 
     @SpringBean
-    private InboxPublisher inboxPublisher = new InMemoryInboxPublisher()
+    private Inbox inboxPublisher = new InMemoryInbox()
 
     @Autowired
     private MockMvc mockMvc

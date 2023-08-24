@@ -1,6 +1,6 @@
 package io.wkrzywiec.fooddelivery.bff.controller;
 
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher;
+import io.wkrzywiec.fooddelivery.bff.inbox.Inbox;
 import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO;
 import io.wkrzywiec.fooddelivery.bff.controller.model.CreateOrderDTO;
 import io.wkrzywiec.fooddelivery.bff.controller.model.ResponseDTO;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @RestController
 public class OrdersController {
 
-    private final InboxPublisher inboxPublisher;
+    private final Inbox inbox;
     private static final String ORDERING_INBOX = "ordering-inbox";
 
     @PostMapping("/orders")
@@ -29,7 +29,7 @@ public class OrdersController {
             log.info("Generated {} id for a new order", id);
         }
 
-        inboxPublisher.storeMessage(ORDERING_INBOX + ":create", createOrder);
+        inbox.storeMessage(ORDERING_INBOX + ":create", createOrder);
 
         return ResponseEntity.accepted().body(new ResponseDTO(createOrder.getId()));
     }
@@ -38,7 +38,7 @@ public class OrdersController {
     ResponseEntity<ResponseDTO> cancelAnOrder(@PathVariable String orderId, @RequestBody CancelOrderDTO cancelOrderD) {
         log.info("Received request to update an '{}' order, update: {}", orderId, cancelOrderD);
         cancelOrderD.setOrderId(orderId);
-        inboxPublisher.storeMessage(ORDERING_INBOX + ":cancel", cancelOrderD);
+        inbox.storeMessage(ORDERING_INBOX + ":cancel", cancelOrderD);
 
         return ResponseEntity.accepted().body(new ResponseDTO(orderId));
     }
@@ -47,7 +47,7 @@ public class OrdersController {
     ResponseEntity<ResponseDTO> addTip(@PathVariable String orderId, @RequestBody AddTipDTO addTip) {
         log.info("Received request to add tip to '{}' an order, value: {}", orderId, addTip);
         addTip.setOrderId(orderId);
-        inboxPublisher.storeMessage(ORDERING_INBOX + ":tip", addTip);
+        inbox.storeMessage(ORDERING_INBOX + ":tip", addTip);
 
         return ResponseEntity.accepted().body(new ResponseDTO(orderId));
     }

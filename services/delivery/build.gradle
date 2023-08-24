@@ -25,7 +25,7 @@ configurations {
 dependencies {
 
 	def lombokVersion = '1.18.24'
-	def spockVersion = '2.1-groovy-3.0'
+	def spockVersion = '2.3-groovy-4.0'
 	def testcontainersVersion = '1.17.3'
 
 	implementation "org.projectlombok:lombok:${lombokVersion}"
@@ -37,19 +37,38 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'io.vavr:vavr:0.10.4'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 	implementation 'com.google.code.gson:gson:2.9.0'
+	implementation 'org.postgresql:postgresql:42.5.1'
+	implementation 'org.liquibase:liquibase-core:4.23.0'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation "org.spockframework:spock-core:${spockVersion}"
 	implementation "org.spockframework:spock-spring:${spockVersion}"
-	testImplementation 'org.codehaus.groovy:groovy-all:3.0.11'
-	testImplementation 'io.rest-assured:spring-mock-mvc:4.4.0'
+	testImplementation 'org.apache.groovy:groovy-all:4.0.13'
+	testImplementation 'io.rest-assured:spring-mock-mvc:5.3.1'
 	implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
 	implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
 
 	testImplementation "org.testcontainers:spock:${testcontainersVersion}"
+	testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
+
+	//this part is needed, because io.rest-assured:spring-mock-mvc depends on old lib for groovy - org.codehaus.groovy:groovy
+	modules {
+		module("org.codehaus.groovy:groovy") {
+			replacedBy("org.apache.groovy:groovy", "conflicts in current rest-assured version")
+		}
+
+		module("org.codehaus.groovy:groovy-xml") {
+			replacedBy("org.apache.groovy:groovy-xml", "conflicts in current rest-assured version")
+		}
+
+		module("org.codehaus.groovy:groovy-json") {
+			replacedBy("org.apache.groovy:groovy-json", "conflicts in current rest-assured version")
+		}
+	}
 }
 
 bootRun {

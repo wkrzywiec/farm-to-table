@@ -1,23 +1,17 @@
 package io.wkrzywiec.fooddelivery.bff.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher;
+import io.wkrzywiec.fooddelivery.bff.inbox.Inbox;
 import io.wkrzywiec.fooddelivery.bff.controller.model.ChangeDeliveryManDTO;
 import io.wkrzywiec.fooddelivery.bff.controller.model.ResponseDTO;
 import io.wkrzywiec.fooddelivery.bff.controller.model.UpdateDeliveryDTO;
-import io.wkrzywiec.fooddelivery.bff.repository.DeliveryViewRepository;
-import io.wkrzywiec.fooddelivery.bff.view.DeliveryView;
-import io.wkrzywiec.fooddelivery.bff.view.outgoing.DeliveryCreated;
+import io.wkrzywiec.fooddelivery.bff.view.read.DeliveryViewRepository;
+import io.wkrzywiec.fooddelivery.bff.view.create.DeliveryView;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-
-import static java.util.Optional.ofNullable;
 
 @Slf4j
 @RestController
@@ -25,7 +19,7 @@ import static java.util.Optional.ofNullable;
 public class DeliveryController {
 
     private final DeliveryViewRepository repository;
-    private final InboxPublisher inboxPublisher;
+    private final Inbox inbox;
     private static final String DELIVERY_INBOX = "delivery-inbox";
 
     @GetMapping("/deliveries")
@@ -48,7 +42,7 @@ public class DeliveryController {
     ResponseEntity<ResponseDTO> updateADelivery(@PathVariable String orderId, @RequestBody UpdateDeliveryDTO updateDelivery) {
         log.info("Received request to update a delivery for an '{}' order, update: {}", orderId, updateDelivery);
         updateDelivery.setOrderId(orderId);
-        inboxPublisher.storeMessage(DELIVERY_INBOX + ":update", updateDelivery);
+        inbox.storeMessage(DELIVERY_INBOX + ":update", updateDelivery);
 
         return ResponseEntity.accepted().body(new ResponseDTO(orderId));
     }
@@ -57,7 +51,7 @@ public class DeliveryController {
     ResponseEntity<ResponseDTO> deliveryMan(@PathVariable String orderId, @RequestBody ChangeDeliveryManDTO changeDeliveryMan) {
         log.info("Received request to assign '{}' delivery man to an '{}' order", changeDeliveryMan.getDeliveryManId(), orderId);
         changeDeliveryMan.setOrderId(orderId);
-        inboxPublisher.storeMessage(DELIVERY_INBOX + ":delivery-man", changeDeliveryMan);
+        inbox.storeMessage(DELIVERY_INBOX + ":delivery-man", changeDeliveryMan);
 
         return ResponseEntity.accepted().body(new ResponseDTO(orderId));
     }

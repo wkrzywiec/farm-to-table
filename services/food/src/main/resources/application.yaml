@@ -4,6 +4,13 @@ spring:
       matching-strategy: ant_path_matcher
   application:
     name: 'farm-to-table_food'
+  profiles:
+    default: prod
+    group:
+      dev:
+        - redis
+      prod:
+        - redis
 
 management:
   endpoints:
@@ -17,9 +24,11 @@ server:
 
 spring:
   profiles: dev
+
+---
+
+spring:
+  profiles: redis
   redis:
     host: localhost
     port: 6379
----
-spring:
-  profiles: prod
