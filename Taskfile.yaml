@@ -94,5 +94,5 @@ tasks:
     cmds:
       - task: infra:clean
       - docker compose rm
-      - docker image rm $(docker image ls -q --filter "reference=services_*")
+      - docker image rm $(docker image ls -q --filter "reference=services-*")
 

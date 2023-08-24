@@ -6,11 +6,11 @@ spring:
     group:
       dev:
         - redis-stream
-        - redis-event-store
+        - postgres-event-store
         - dev-local
       prod:
         - redis-stream
-        - redis-event-store
+        - postgres-event-store
       redis:
         - redis-event-store
         - redis-stream
@@ -26,6 +26,17 @@ management:
     web:
       exposure:
         include: '*'
+
+---
+
+spring:
+  profiles: postgres-event-store
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:delivery}
+    username: ${POSTGRES_USERNAME:delivery}
+    password: ${POSTGRES_PASSWORD:delivery}
+  liquibase:
+    enabled: true
 
 ---
 server:
