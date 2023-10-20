@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: 'jvm_micrometer'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['bff:8080']
+        labels:
+          application: 'bff'
+      - targets: ['food:8080']
+        labels:
+          application: 'food'
+      - targets: ['ordering:8080']
+        labels:
+          application: 'ordering'
+      - targets: ['delivery:8080']
+        labels:
+          application: 'delivery'
