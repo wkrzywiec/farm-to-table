@@ -1,10 +1,3 @@
-fix use docker compose in container
-expose ports
-share maven cache
-share gradle cache
-lighter docker image
-
-
 # Food Delivery
 [![master](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/master.yaml/badge.svg)](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/master.yaml) ![GitHub](https://img.shields.io/github/license/wkrzywiec/food-delivery-app) ![GitHub issues](https://img.shields.io/github/issues/wkrzywiec/food-delivery-app)
 

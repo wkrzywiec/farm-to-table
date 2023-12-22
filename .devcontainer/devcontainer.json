@@ -2,25 +2,20 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/java
 {
-    "name": "food-to-table-devcontainer",
+    "name": "farm-to-table-devcontainer",
     // Explicitly declaring which source-code folder to mount and where to mount it in the container
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
     "workspaceFolder": "/workspace",
     "dockerComposeFile": "docker-compose.yml",
     "service": "ftt-devcontainer",
-    // "build": {
-    //  // https://containers.dev/guide/dockerfile
-    //  "dockerfile": "../Dockerfile"
-    // },
     "features": {},
+    "remoteUser": "vscode",
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind", // Binding the host docker socket to the container
-        "source=m2volume,target=/home/vscode/.m2/repository,type=volume" // Establishing a persistent volume for maven local repository downloads
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gradle,target=/home/vscode/.gradle,type=bind,consistency=cached", // Establishing a persistent volume for Gradle local repository downloads
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.m2,target=/home/vscode/.m2,type=bind,consistency=cached", // Establishing a persistent volume for maven local repository downloads
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.npmrc,target=/home/vscode/.npmrc,type=bind,consistency=cached" // Establishing a persistent volume for maven local repository downloads
     ],
-    // Docker-from-Docker recommendations
-    // Per https://github.com/microsoft/vscode-dev-containers/tree/main/containers/docker-from-docker
-    "overrideCommand": false,
-    "remoteUser": "vscode",
     "containerEnv": {
         // You can specify environment variables here, which will be available to the application via System.getenv()
         "CUSTOM_PROP": "Team"
@@ -33,5 +28,12 @@
                 "mhutchie.git-graph"
             ]
         }
-    }
+    },
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		8081, 8082, 8083, 8084
+	],
+    // Docker-from-Docker recommendations
+    // Per https://github.com/microsoft/vscode-dev-containers/tree/main/containers/docker-from-docker
+    "overrideCommand": false
 }
