@@ -1,32 +1,13 @@
-plugins {
-	id 'idea'
-	id 'org.springframework.boot' version '2.7.1'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
-	id 'groovy'
-	id 'jacoco'
-	id "org.barfuin.gradle.jacocolog" version "3.0.0-RC2"
-	id 'org.sonarqube' version "4.2.0.3129"
-}
 
-group = 'io.wkrzywiec'
-version = '0.0.1-SNAPSHOT'
 description = 'farm-to-table ordering domain'
-sourceCompatibility = '17'
 
 def activeDevProfiles = 'dev'
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
 dependencies {
 
-	def lombokVersion = '1.18.24'
+	def lombokVersion = '1.18.32'
 	def spockVersion = '2.3-groovy-4.0'
-	def testcontainersVersion = '1.17.3'
+	def testcontainersVersion = '1.19.7'
 
 	implementation "org.projectlombok:lombok:${lombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
@@ -49,7 +30,7 @@ dependencies {
 	implementation "org.spockframework:spock-core:${spockVersion}"
 	implementation "org.spockframework:spock-spring:${spockVersion}"
 	implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
-	implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
+	implementation 'org.yaml:snakeyaml:1.30'
 	implementation 'org.apache.groovy:groovy-all:4.0.13'
 	implementation 'io.rest-assured:spring-mock-mvc:5.3.1'
 
@@ -75,34 +56,6 @@ dependencies {
 
 bootRun {
 	args = ["--spring.profiles.active=" + activeDevProfiles]
-}
-
-test {
-	useJUnitPlatform()
-}
-
-jacocoTestReport {
-	reports {
-		xml.required = true
-	}
-	dependsOn = [
-	        'test'
-	]
-}
-
-jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			limit {
-//                todo: work on test coverage
-				minimum = 0.1
-			}
-		}
-	}
-}
-
-repositories {
-	mavenCentral()
 }
 
 sonarqube {

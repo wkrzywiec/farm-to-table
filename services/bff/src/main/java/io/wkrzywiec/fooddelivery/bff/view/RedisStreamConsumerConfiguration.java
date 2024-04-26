@@ -2,6 +2,7 @@ package io.wkrzywiec.fooddelivery.bff.view;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redislabs.lettusearch.StatefulRediSearchConnection;
+import com.redislabs.lettusearch.impl.StatefulRediSearchConnectionImpl;
 import io.wkrzywiec.fooddelivery.bff.view.read.DeliveryViewRepository;
 import io.wkrzywiec.fooddelivery.bff.view.read.RedisDeliveryViewRepository;
 import io.wkrzywiec.fooddelivery.bff.view.read.RedisFoodItemRepository;
@@ -41,6 +42,11 @@ public class RedisStreamConsumerConfiguration extends RedisMessageConsumerConfig
     public DeliveryViewRepository redisDeliveryViewRepository(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
         return new RedisDeliveryViewRepository(redisTemplate, objectMapper);
     }
+
+//    @Bean
+//    public StatefulRediSearchConnection searchConnection() {
+//        return new StatefulRediSearchConnectionImpl();
+//    }
 
     @Bean
     public RedisFoodItemRepository redisFoodItemRepository(StatefulRediSearchConnection<String, String> searchConnection, ObjectMapper objectMapper) {

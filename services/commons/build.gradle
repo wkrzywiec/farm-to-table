@@ -1,58 +1,33 @@
-plugins {
-    id 'idea'
-    id 'org.springframework.boot' version '2.7.1'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
-    id 'groovy'
-    id 'jacoco'
-    id "org.barfuin.gradle.jacocolog" version "3.0.0-RC2"
-    id 'org.sonarqube' version "4.2.0.3129"
-}
 
-group = 'io.wkrzywiec'
-version = '0.0.1-SNAPSHOT'
 description = 'farm-to-table common libraries'
-sourceCompatibility = '17'
-
-bootJar {
-    enabled = false
-}
-
-jar {
-    enabled = true
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntime.extendsFrom testRuntime
-}
 
 dependencies {
 
+    //todo - remove this?
     def springBootVersion = '2.7.1'
-    def lombokVersion = '1.18.24'
-    def spockVersion = '2.3-groovy-4.0'
-    def testcontainersVersion = '1.18.3'
+    def lombokVersion = '1.18.32'
+    def spockVersion = '2.4-M4-groovy-4.0'
+    def testcontainersVersion = '1.19.7'
 
     implementation "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    implementation "org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+
+    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.11.5'
+
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
-    implementation 'org.postgresql:postgresql:42.5.1'
-    implementation "org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}"
-    implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
 
-    implementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+
+    implementation 'org.apache.groovy:groovy-all:4.0.13'
     implementation "org.spockframework:spock-core:${spockVersion}"
     implementation "org.spockframework:spock-spring:${spockVersion}"
-    implementation 'org.apache.groovy:groovy-all:4.0.13'
     implementation 'io.rest-assured:spring-mock-mvc:5.3.1'
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.11.5'
 
     implementation "org.testcontainers:spock:${testcontainersVersion}"
     implementation "org.testcontainers:postgresql:${testcontainersVersion}"
@@ -73,27 +48,18 @@ dependencies {
     }
 }
 
-test {
-    useJUnitPlatform()
+bootJar {
+    enabled = false
 }
 
-jacocoTestReport {
-    reports {
-        xml.required = true
-    }
-    dependsOn = [
-            'test'
-    ]
+jar {
+    enabled = true
 }
 
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.0
-            }
-        }
-    }
+configurations {
+
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntime.extendsFrom testRuntime
 }
 
 sonarqube {
