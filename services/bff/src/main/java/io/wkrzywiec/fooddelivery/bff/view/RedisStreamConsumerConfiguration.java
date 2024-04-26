@@ -1,13 +1,12 @@
 package io.wkrzywiec.fooddelivery.bff.view;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.redislabs.lettusearch.StatefulRediSearchConnection;
-import com.redislabs.lettusearch.impl.StatefulRediSearchConnectionImpl;
+import com.redis.lettucemod.api.StatefulRedisModulesConnection;
+import io.wkrzywiec.fooddelivery.bff.view.create.RedisDeliveryViewProcessor;
+import io.wkrzywiec.fooddelivery.bff.view.create.RedisOrdersChannelConsumer;
 import io.wkrzywiec.fooddelivery.bff.view.read.DeliveryViewRepository;
 import io.wkrzywiec.fooddelivery.bff.view.read.RedisDeliveryViewRepository;
 import io.wkrzywiec.fooddelivery.bff.view.read.RedisFoodItemRepository;
-import io.wkrzywiec.fooddelivery.bff.view.create.RedisDeliveryViewProcessor;
-import io.wkrzywiec.fooddelivery.bff.view.create.RedisOrdersChannelConsumer;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisMessageConsumerConfig;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
 import org.springframework.context.annotation.Bean;
@@ -43,13 +42,8 @@ public class RedisStreamConsumerConfiguration extends RedisMessageConsumerConfig
         return new RedisDeliveryViewRepository(redisTemplate, objectMapper);
     }
 
-//    @Bean
-//    public StatefulRediSearchConnection searchConnection() {
-//        return new StatefulRediSearchConnectionImpl();
-//    }
-
     @Bean
-    public RedisFoodItemRepository redisFoodItemRepository(StatefulRediSearchConnection<String, String> searchConnection, ObjectMapper objectMapper) {
+    public RedisFoodItemRepository redisFoodItemRepository(StatefulRedisModulesConnection<String, String> searchConnection, ObjectMapper objectMapper) {
         return new RedisFoodItemRepository(searchConnection, objectMapper);
     }
 }
