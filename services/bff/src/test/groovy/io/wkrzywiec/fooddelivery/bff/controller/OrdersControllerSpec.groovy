@@ -1,11 +1,12 @@
 package io.wkrzywiec.fooddelivery.bff.controller
 
-import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO
-import io.wkrzywiec.fooddelivery.bff.controller.model.CancelOrderDTO
-import io.wkrzywiec.fooddelivery.bff.controller.model.CreateOrderDTO
-import io.wkrzywiec.fooddelivery.bff.controller.model.ItemDTO
-import io.wkrzywiec.fooddelivery.bff.inbox.InMemoryInbox
-import io.wkrzywiec.fooddelivery.bff.inbox.Inbox
+import io.wkrzywiec.fooddelivery.bff.application.controller.OrdersController
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.AddTipDTO
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.CancelOrderDTO
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.CreateOrderDTO
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.ItemDTO
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.inmemory.InMemoryInbox
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.Inbox
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc

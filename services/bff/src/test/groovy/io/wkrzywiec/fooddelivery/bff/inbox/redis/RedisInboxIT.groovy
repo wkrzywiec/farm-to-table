@@ -1,7 +1,9 @@
 package io.wkrzywiec.fooddelivery.bff.inbox.redis
 
 import io.wkrzywiec.fooddelivery.bff.IntegrationTestWithSpring
-import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.AddTipDTO
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.redis.RedisInbox
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.redis.RedisInboxListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
@@ -15,7 +17,7 @@ import java.util.concurrent.TimeUnit
 import static org.awaitility.Awaitility.await
 
 @Subject([RedisInbox, RedisInboxListener])
-@ActiveProfiles(["redis-inbox", "redis-stream"])
+@ActiveProfiles(["redis-inbox", "redis-search"])
 @ContextConfiguration(initializers = IntegrationTestContainerInitializer)
 class RedisInboxIT extends IntegrationTestWithSpring {
 
