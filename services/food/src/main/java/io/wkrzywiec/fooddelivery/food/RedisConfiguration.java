@@ -1,12 +1,15 @@
 package io.wkrzywiec.fooddelivery.food;
 
-import com.redislabs.modules.rejson.JReJSON;
 import io.wkrzywiec.fooddelivery.food.repository.FoodItemRepository;
 import io.wkrzywiec.fooddelivery.food.repository.RedisFoodItemRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import redis.clients.jedis.DefaultJedisClientConfig;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.UnifiedJedis;
+import redis.clients.jedis.json.commands.RedisJsonV2Commands;
 
 @Configuration
 @Profile("redis")
@@ -18,12 +21,12 @@ public class RedisConfiguration {
     private int redisPort;
 
     @Bean
-    public JReJSON redisJson() {
-        return new JReJSON(redisHost, redisPort);
+    public RedisJsonV2Commands redisJson() {
+        return new UnifiedJedis(HostAndPort.from(redisHost + ":" + redisPort), DefaultJedisClientConfig.builder().build());
     }
 
     @Bean
-    public FoodItemRepository redisFoodItemRepository(JReJSON jReJSON) {
-        return new RedisFoodItemRepository(jReJSON);
+    public FoodItemRepository redisFoodItemRepository(RedisJsonV2Commands redisJson) {
+        return new RedisFoodItemRepository(redisJson);
     }
 }

@@ -82,7 +82,7 @@ abstract class IntegrationTest extends Specification {
 
     @DynamicPropertySource
     static void registerContainerProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.redis.host", () -> REDIS_HOST)
-        registry.add("spring.redis.port", () -> REDIS_PORT)
+        registry.add("spring.data.redis.host", () -> REDIS_HOST)
+        registry.add("spring.data.redis.port", () -> REDIS_PORT)
     }
 }
