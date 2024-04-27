@@ -6,14 +6,14 @@ spring:
     group:
       dev:
         - postgres-inbox
-        - redis-stream
+        - redis-search
         - dev-local
       prod:
         - postgres-inbox
-        - redis-stream
+        - redis-search
       redis:
         - redis-inbox
-        - redis-stream
+        - redis-search
         - dev-local
   mvc:
     pathmatch:
@@ -37,7 +37,9 @@ management:
 ---
 
 spring:
-  profiles: postgres-inbox
+  config:
+    activate:
+      on-profile: postgres-inbox
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:bff}
     username: ${POSTGRES_USERNAME:bff}
@@ -48,7 +50,9 @@ spring:
 ---
 
 spring:
-  profiles: dev-local
+  config:
+    activate:
+      on-profile: dev-local
 
 server:
   port: 8081

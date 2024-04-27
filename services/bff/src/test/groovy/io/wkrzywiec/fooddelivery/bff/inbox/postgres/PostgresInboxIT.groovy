@@ -3,8 +3,10 @@ package io.wkrzywiec.fooddelivery.bff.inbox.postgres
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.wkrzywiec.fooddelivery.bff.IntegrationTest
-import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxMessageProcessor
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.AddTipDTO
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.InboxMessageProcessor
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.postgres.PostgresInbox
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.postgres.PostgresInboxListener
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
 import org.springframework.dao.EmptyResultDataAccessException
 import spock.lang.Subject

@@ -26,12 +26,16 @@ server:
   port: 8084
 
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
 
 ---
 
 spring:
-  profiles: redis
+  config:
+    activate:
+      on-profile: redis
   redis:
     host: localhost
     port: 6379

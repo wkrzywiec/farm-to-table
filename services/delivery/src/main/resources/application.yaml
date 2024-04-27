@@ -22,18 +22,28 @@ spring:
       org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 management:
+  endpoint:
+    metrics:  
+      enabled: true
+    prometheus:
+      enabled: true
   endpoints:
     web:
       exposure:
         include: '*'
   metrics:
+    export:
+      prometheus:
+        enabled: true
     tags:
       application: ${spring.application.name}
 
 ---
 
 spring:
-  profiles: postgres-event-store
+  config:
+    activate:
+      on-profile: postgres-event-store
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:delivery}
     username: ${POSTGRES_USERNAME:delivery}
@@ -46,8 +56,12 @@ server:
   port: 8083
 
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
 
 ---
 spring:
-  profiles: prod
+  config:
+    activate:
+      on-profile: prod
