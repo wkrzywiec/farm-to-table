@@ -3,8 +3,6 @@ description = 'farm-to-table common libraries'
 
 dependencies {
 
-    //todo - remove this?
-    def springBootVersion = '2.7.1'
     def lombokVersion = '1.18.32'
     def spockVersion = '2.4-M4-groovy-4.0'
     def testcontainersVersion = '1.19.7'
@@ -12,9 +10,9 @@ dependencies {
     implementation "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-    implementation "org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}"
-    implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
-    implementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.springframework.boot:spring-boot-starter-test"
 
     implementation 'org.postgresql:postgresql:42.7.3'
     implementation 'io.micrometer:micrometer-registry-prometheus:1.12.5'
