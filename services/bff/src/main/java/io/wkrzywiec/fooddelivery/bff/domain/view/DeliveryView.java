@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.bff.domain.view.redis.create;
+package io.wkrzywiec.fooddelivery.bff.domain.view;
 
 import io.wkrzywiec.fooddelivery.commons.model.Item;
 import lombok.*;

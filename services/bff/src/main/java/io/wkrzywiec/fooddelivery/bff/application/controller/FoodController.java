@@ -1,7 +1,7 @@
 package io.wkrzywiec.fooddelivery.bff.application.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.wkrzywiec.fooddelivery.bff.domain.view.redis.read.RedisFoodItemRepository;
+import io.wkrzywiec.fooddelivery.bff.domain.view.redis.read.RedisFoodItemViewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 public class FoodController {
 
-    private final RedisFoodItemRepository repository;
+    private final RedisFoodItemViewRepository repository;
 
     @GetMapping("/foods")
     List<JsonNode> findFoodItems(@RequestParam(name="q") String query) {

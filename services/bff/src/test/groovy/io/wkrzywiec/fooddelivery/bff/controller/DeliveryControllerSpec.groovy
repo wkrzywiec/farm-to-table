@@ -5,7 +5,7 @@ import io.wkrzywiec.fooddelivery.bff.application.controller.model.ChangeDelivery
 import io.wkrzywiec.fooddelivery.bff.application.controller.model.UpdateDeliveryDTO
 import io.wkrzywiec.fooddelivery.bff.domain.inbox.inmemory.InMemoryInbox
 import io.wkrzywiec.fooddelivery.bff.domain.inbox.Inbox
-import io.wkrzywiec.fooddelivery.bff.domain.view.redis.read.DeliveryViewRepository
+import io.wkrzywiec.fooddelivery.bff.domain.view.DeliveryViewRepository
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc

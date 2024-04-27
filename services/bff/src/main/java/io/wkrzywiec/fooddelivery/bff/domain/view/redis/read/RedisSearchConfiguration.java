@@ -88,7 +88,7 @@ public class RedisSearchConfiguration {
     }
 
     @Bean
-    public RedisFoodItemRepository redisFoodItemRepository(StatefulRedisModulesConnection<String, String> searchConnection, ObjectMapper objectMapper) {
-        return new RedisFoodItemRepository(searchConnection, objectMapper);
+    public RedisFoodItemViewRepository redisFoodItemRepository(StatefulRedisModulesConnection<String, String> searchConnection, ObjectMapper objectMapper) {
+        return new RedisFoodItemViewRepository(searchConnection, objectMapper);
     }
 }

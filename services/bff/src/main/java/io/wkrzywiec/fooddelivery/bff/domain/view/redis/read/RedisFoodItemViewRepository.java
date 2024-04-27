@@ -6,12 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
 import com.redis.lettucemod.api.sync.RediSearchCommands;
 import com.redis.lettucemod.search.SearchResults;
+import io.wkrzywiec.fooddelivery.bff.domain.view.FoodItemViewRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @RequiredArgsConstructor
-public class RedisFoodItemRepository {
+public class RedisFoodItemViewRepository implements FoodItemViewRepository {
 
     private final StatefulRedisModulesConnection<String, String> searchConnection;
     private final ObjectMapper objectMapper;

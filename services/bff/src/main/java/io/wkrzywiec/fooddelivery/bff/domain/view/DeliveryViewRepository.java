@@ -1,6 +1,4 @@
-package io.wkrzywiec.fooddelivery.bff.domain.view.redis.read;
-
-import io.wkrzywiec.fooddelivery.bff.domain.view.redis.create.DeliveryView;
+package io.wkrzywiec.fooddelivery.bff.domain.view;
 
 import java.util.List;
 import java.util.Optional;

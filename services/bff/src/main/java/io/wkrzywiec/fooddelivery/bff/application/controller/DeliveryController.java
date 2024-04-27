@@ -4,8 +4,8 @@ import io.wkrzywiec.fooddelivery.bff.application.controller.model.ChangeDelivery
 import io.wkrzywiec.fooddelivery.bff.application.controller.model.ResponseDTO;
 import io.wkrzywiec.fooddelivery.bff.application.controller.model.UpdateDeliveryDTO;
 import io.wkrzywiec.fooddelivery.bff.domain.inbox.Inbox;
-import io.wkrzywiec.fooddelivery.bff.domain.view.redis.read.DeliveryViewRepository;
-import io.wkrzywiec.fooddelivery.bff.domain.view.redis.create.DeliveryView;
+import io.wkrzywiec.fooddelivery.bff.domain.view.DeliveryViewRepository;
+import io.wkrzywiec.fooddelivery.bff.domain.view.DeliveryView;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

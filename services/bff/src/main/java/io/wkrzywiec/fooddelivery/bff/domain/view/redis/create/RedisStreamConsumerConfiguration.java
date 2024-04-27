@@ -1,7 +1,7 @@
 package io.wkrzywiec.fooddelivery.bff.domain.view.redis.create;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.bff.domain.view.redis.read.DeliveryViewRepository;
+import io.wkrzywiec.fooddelivery.bff.domain.view.DeliveryViewRepository;
 import io.wkrzywiec.fooddelivery.bff.domain.view.redis.read.RedisDeliveryViewRepository;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisMessageConsumerConfig;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
