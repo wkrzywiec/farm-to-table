@@ -13,6 +13,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
     implementation "org.springframework.boot:spring-boot-starter-test"
+    implementation "org.springframework.boot:spring-boot-starter-web"
 
     implementation 'org.postgresql:postgresql:42.7.3'
     implementation 'io.micrometer:micrometer-registry-prometheus:1.12.5'
@@ -22,7 +23,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.2'
 
 
-    testImplementation 'org.apache.groovy:groovy-all:4.0.21'
+    implementation 'org.apache.groovy:groovy-all:4.0.21'
     testImplementation "org.spockframework:spock-core:${spockVersion}"
     testImplementation "org.spockframework:spock-spring:${spockVersion}"
     testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
