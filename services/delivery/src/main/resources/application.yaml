@@ -21,12 +21,6 @@ spring:
     exclude: >
       org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
-# todo is it needed?
-server:
-  tomcat:
-    mbeanregistry:
-      enabled: true
-
 management:
   endpoint:
     metrics:  

@@ -22,13 +22,13 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.2'
 
 
-    implementation 'org.apache.groovy:groovy-all:4.0.21'
-    implementation "org.spockframework:spock-core:${spockVersion}"
-    implementation "org.spockframework:spock-spring:${spockVersion}"
-    implementation 'io.rest-assured:spring-mock-mvc:5.4.0'
+    testImplementation 'org.apache.groovy:groovy-all:4.0.21'
+    testImplementation "org.spockframework:spock-core:${spockVersion}"
+    testImplementation "org.spockframework:spock-spring:${spockVersion}"
+    testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
 
-    implementation "org.testcontainers:spock:${testcontainersVersion}"
-    implementation "org.testcontainers:postgresql:${testcontainersVersion}"
+    testImplementation "org.testcontainers:spock:${testcontainersVersion}"
+    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
 
     //this part is needed, because io.rest-assured:spring-mock-mvc depends on old lib for groovy - org.codehaus.groovy:groovy
     modules {

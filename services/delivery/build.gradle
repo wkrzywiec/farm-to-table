@@ -26,17 +26,17 @@ dependencies {
 	implementation 'org.apache.commons:commons-lang3:3.14.0'
 	implementation 'com.google.code.gson:gson:2.10.1'
 
-	//todo - implementation -> testImplementation
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.apache.groovy:groovy-all:4.0.21'
-	implementation "org.spockframework:spock-core:${spockVersion}"
-	implementation "org.spockframework:spock-spring:${spockVersion}"
+	testImplementation "org.spockframework:spock-core:${spockVersion}"
+	testImplementation "org.spockframework:spock-spring:${spockVersion}"
 	testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
 	testImplementation "org.testcontainers:spock:${testcontainersVersion}"
 	testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
 
-	implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
-	implementation 'org.yaml:snakeyaml:2.2'
+	testImplementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
+	testImplementation 'org.yaml:snakeyaml:2.2'
 
 	//this part is needed, because io.rest-assured:spring-mock-mvc depends on old lib for groovy - org.codehaus.groovy:groovy
 	modules {

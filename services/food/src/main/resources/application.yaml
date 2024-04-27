@@ -11,11 +11,6 @@ spring:
         - redis
       prod:
         - redis
-# todo is it needed?
-server:
-  tomcat:
-    mbeanregistry:
-      enabled: true
 
 management:
   endpoints:
