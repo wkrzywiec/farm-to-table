@@ -29,7 +29,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
 
-    //todo - implementetion -> testImplementation
+    //todo - implementation -> testImplementation
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.apache.groovy:groovy-all:4.0.21'
     implementation "org.spockframework:spock-core:${spockVersion}"

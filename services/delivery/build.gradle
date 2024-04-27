@@ -1,12 +1,11 @@
 
 description = 'farm-to-table delivery domain'
-
 def activeDevProfiles = 'dev,redis'
 
 dependencies {
 
 	def lombokVersion = '1.18.32'
-	def spockVersion = '2.3-groovy-4.0'
+	def spockVersion = '2.4-M4-groovy-4.0'
 	def testcontainersVersion = '1.19.7'
 
 	implementation "org.projectlombok:lombok:${lombokVersion}"
@@ -19,22 +18,25 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'io.vavr:vavr:0.10.4'
-	implementation 'org.apache.commons:commons-lang3:3.12.0'
-	implementation 'com.google.code.gson:gson:2.9.0'
-	implementation 'org.postgresql:postgresql:42.5.1'
-	implementation 'org.liquibase:liquibase-core:4.23.0'
 
+	implementation 'org.postgresql:postgresql:42.7.3'
+	implementation 'org.liquibase:liquibase-core:4.27.0'
+
+	implementation 'io.vavr:vavr:0.10.4'
+	implementation 'org.apache.commons:commons-lang3:3.14.0'
+	implementation 'com.google.code.gson:gson:2.10.1'
+
+	//todo - implementation -> testImplementation
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.apache.groovy:groovy-all:4.0.21'
 	implementation "org.spockframework:spock-core:${spockVersion}"
 	implementation "org.spockframework:spock-spring:${spockVersion}"
-	testImplementation 'org.apache.groovy:groovy-all:4.0.13'
-	testImplementation 'io.rest-assured:spring-mock-mvc:5.3.1'
-	implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
-	implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
-
+	testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
 	testImplementation "org.testcontainers:spock:${testcontainersVersion}"
 	testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
+
+	implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
+	implementation 'org.yaml:snakeyaml:2.2'
 
 	//this part is needed, because io.rest-assured:spring-mock-mvc depends on old lib for groovy - org.codehaus.groovy:groovy
 	modules {
