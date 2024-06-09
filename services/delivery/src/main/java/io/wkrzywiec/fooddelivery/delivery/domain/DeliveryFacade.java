@@ -167,7 +167,7 @@ public class DeliveryFacade {
 
     private Delivery findDelivery(String orderId) {
         var storedEvents = eventStore.getEventsForOrder(orderId);
-        if (storedEvents.size() == 0) {
+        if (storedEvents.isEmpty()) {
             throw new DeliveryException(format("There is no delivery with an orderId '%s'.", orderId));
         }
         return Delivery.from(storedEvents);

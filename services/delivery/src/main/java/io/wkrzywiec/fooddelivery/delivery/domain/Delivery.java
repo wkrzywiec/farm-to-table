@@ -78,7 +78,6 @@ public class Delivery {
                     Map<String, String> metadata = new HashMap<>();
                     metadata.put("creationTimestamp", event.header().createdAt().toString());
                     delivery.metadata = metadata;
-                    return delivery;
                 }
 
                 case TipAddedToDelivery tipAddedToDelivery -> {
