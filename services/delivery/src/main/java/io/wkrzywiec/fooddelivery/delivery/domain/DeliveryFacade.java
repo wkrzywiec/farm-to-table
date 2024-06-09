@@ -71,7 +71,7 @@ public class DeliveryFacade {
         log.info("'{}' order was canceled. Canceling delivery", orderCanceled.orderId());
 
         var storedEvents = eventStore.getEventsForOrder(orderCanceled.orderId());
-        if (storedEvents.size() == 0) {
+        if (storedEvents.isEmpty()) {
             throw new DeliveryException(format("Failed to cancel a delivery. There is no delivery for an %s order", orderCanceled.orderId()));
         }
         var delivery = Delivery.from(storedEvents);
@@ -112,7 +112,7 @@ public class DeliveryFacade {
     }
 
     public void handle(UnAssignDeliveryMan unAssignDeliveryMan) {
-        log.info("Un assigning a delivery man from a '{}' delivery", unAssignDeliveryMan.orderId());
+        log.info("Unassigning a delivery man from a '{}' delivery", unAssignDeliveryMan.orderId());
 
         var delivery = findDelivery(unAssignDeliveryMan.orderId());
 
