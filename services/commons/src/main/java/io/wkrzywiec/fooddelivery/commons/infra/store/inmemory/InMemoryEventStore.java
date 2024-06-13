@@ -1,6 +1,7 @@
 package io.wkrzywiec.fooddelivery.commons.infra.store.inmemory;
 
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 
 import java.util.ArrayList;
@@ -20,7 +21,18 @@ public class InMemoryEventStore implements EventStore {
     }
 
     @Override
+    public void store(EventEntity event) {
+        //todo implement me
+    }
+
+    @Override
     public List<Message> getEventsForOrder(String orderId) {
         return store.getOrDefault(orderId, List.of());
+    }
+
+    @Override
+    public List<EventEntity> fetchEventsForChannelAndStream(String streamId) {
+        //todo implement me
+        return List.of();
     }
 }

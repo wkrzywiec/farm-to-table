@@ -7,6 +7,7 @@ import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventClassTypeProvider;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +53,20 @@ public class RedisEventStore implements EventStore {
     }
 
     @Override
+    public void store(EventEntity event) {
+        //todo implement me
+    }
+
+    @Override
     public List<Message> getEventsForOrder(String orderId) {
         log.info("Fetching events from '{}{}' Redis stream", streamPrefix, orderId);
         return getAllMessagesInStream(streamPrefix + orderId);
+    }
+
+    @Override
+    public List<EventEntity> fetchEventsForChannelAndStream(String streamId) {
+        //todo implement me
+        return List.of();
     }
 
     private List<Message> getAllMessagesInStream(String stream) {
