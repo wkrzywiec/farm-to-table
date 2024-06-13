@@ -1,0 +1,60 @@
+package io.wkrzywiec.fooddelivery.commons.infra.store;
+
+import java.time.Instant;
+import java.util.UUID;
+
+// mapper pomiędzy eventem domenowym, a descriptorem; argumenty - eventy domenowe, channel
+public class EventEntity {
+
+    protected String id;
+    protected String streamId;
+    protected int version;
+    protected String channel;
+    protected String type;
+    protected DomainEvent data;
+    protected Instant addedAt;
+
+    private EventEntity() {}
+
+    public EventEntity(String id, String streamId, int version, String channel, String type, DomainEvent data, Instant addedAt) {
+        this.id = id;
+        this.streamId = streamId;
+        this.version = version;
+        this.channel = channel;
+        this.type = type;
+        this.data = data;
+        this.addedAt = addedAt;
+    }
+
+    public static EventEntity newEventEntity(DomainEvent domainEvent, String channel) {
+        return new EventEntity(UUID.randomUUID().toString(), domainEvent.streamId(), domainEvent.version(), channel, domainEvent.getClass().toString(), domainEvent, null);
+    }
+
+    public String id() {
+        return id;
+    }
+
+    public String streamId() {
+        return streamId;
+    }
+
+    public int version() {
+        return version;
+    }
+
+    public String channel() {
+        return channel;
+    }
+
+    public String type() {
+        return type;
+    }
+
+    public DomainEvent data() {
+        return data;
+    }
+
+    public Instant addedAt() {
+        return addedAt;
+    }
+}

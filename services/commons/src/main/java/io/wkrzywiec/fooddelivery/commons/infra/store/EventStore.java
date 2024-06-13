@@ -7,8 +7,15 @@ import java.util.List;
 public interface EventStore {
 
     List<Message> getEventsForOrder(String orderId);
+    List<EventEntity> fetchEventsForChannelAndStream(String streamId);
+
     void store(Message event);
-    default void store(List<Message> events) {
+    default void storeMessages(List<Message> events) {
+        events.forEach(this::store);
+    }
+
+    void store(EventEntity event);
+    default void store(List<EventEntity> events) {
         events.forEach(this::store);
     }
 }

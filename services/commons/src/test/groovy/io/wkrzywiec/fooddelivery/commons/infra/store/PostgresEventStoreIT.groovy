@@ -4,6 +4,7 @@ import io.wkrzywiec.fooddelivery.commons.CommonsIntegrationTest
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody
+import io.wkrzywiec.fooddelivery.commons.infra.store.postgres.PostgresEventStore
 import spock.lang.Subject
 
 import java.time.Clock

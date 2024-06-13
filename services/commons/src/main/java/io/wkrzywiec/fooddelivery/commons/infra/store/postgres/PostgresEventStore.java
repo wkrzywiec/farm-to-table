@@ -1,9 +1,13 @@
-package io.wkrzywiec.fooddelivery.commons.infra.store;
+package io.wkrzywiec.fooddelivery.commons.infra.store.postgres;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventClassTypeProvider;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -15,12 +19,14 @@ public class PostgresEventStore implements EventStore {
 
     private final JdbcTemplate jdbcTemplate;
     private final MessagePostgresRowMapper messagePostgresRowMapper;
+    private final EventPostgresRowMapper eventPostgresRowMapper;
     private final ObjectMapper objectMapper;
 
     public PostgresEventStore(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper, EventClassTypeProvider eventClassTypeProvider) {
         this.jdbcTemplate = jdbcTemplate;
         this.objectMapper = objectMapper;
-        messagePostgresRowMapper = new MessagePostgresRowMapper(objectMapper, eventClassTypeProvider);
+        this.messagePostgresRowMapper = new MessagePostgresRowMapper(objectMapper, eventClassTypeProvider);
+        this.eventPostgresRowMapper = new EventPostgresRowMapper(objectMapper, eventClassTypeProvider);
     }
 
     @Override
@@ -44,9 +50,37 @@ public class PostgresEventStore implements EventStore {
         log.info("Event was stored.");
     }
 
+    @Override
+    public void store(EventEntity event) {
+        log.info("Saving event in a store. Event: {}", event);
+
+        var bodyAsJsonString = mapEventBody(event.data());
+
+        jdbcTemplate.update("""
+                insert into events(id, stream_id, version, channel, type, data)
+                values(?, ?, ?, ?, ?, ?::jsonb, ?)
+                """,
+                event.id(),
+                event.streamId(),
+                event.version(),
+                event.channel(),
+                event.type(),
+                bodyAsJsonString
+        );
+        log.info("Event was stored.");
+    }
+
     private String mapEventBody(DomainMessageBody body) throws RuntimeException {
         try {
             return objectMapper.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to map DomainMessageBody to JSON before storing event.", e);
+        }
+    }
+
+    private String mapEventBody(DomainEvent domainEvent) throws RuntimeException {
+        try {
+            return objectMapper.writeValueAsString(domainEvent);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to map DomainMessageBody to JSON before storing event.", e);
         }
@@ -58,10 +92,22 @@ public class PostgresEventStore implements EventStore {
         return getAllMessagesInStream(orderId);
     }
 
+    @Override
+    public List<EventEntity> fetchEventsForChannelAndStream(String streamId) {
+
+        return jdbcTemplate.query("""
+                SELECT id, stream_id, version, channel, type, data, added_at
+                FROM events
+                WHERE stream_id = ? ORDER BY version ASC;
+                """,
+                eventPostgresRowMapper,
+                streamId);
+    }
+
     private List<Message> getAllMessagesInStream(String streamId) {
 
         return jdbcTemplate.query("""
-                SELECT id, stream_id, version, channel, type, body, created_at
+                SELECT id, stream_id, version, channel, type, data, added_at
                 FROM events
                 WHERE stream_id = ? ORDER BY version ASC;
                 """,

@@ -4,8 +4,7 @@ import com.github.javafaker.Faker
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
-import io.wkrzywiec.fooddelivery.commons.infra.store.PostgresEventStore
-import io.wkrzywiec.fooddelivery.commons.model.Item
+import io.wkrzywiec.fooddelivery.commons.infra.store.postgres.PostgresEventStore
 import io.wkrzywiec.fooddelivery.ordering.IntegrationTest
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated

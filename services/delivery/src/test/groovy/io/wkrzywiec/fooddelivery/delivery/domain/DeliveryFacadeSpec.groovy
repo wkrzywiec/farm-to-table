@@ -2,7 +2,7 @@ package io.wkrzywiec.fooddelivery.delivery.domain
 
 
 import io.wkrzywiec.fooddelivery.commons.model.AssignDeliveryMan
-import io.wkrzywiec.fooddelivery.commons.infra.store.InMemoryEventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.inmemory.InMemoryEventStore
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
 import io.wkrzywiec.fooddelivery.commons.model.DeliverFood
 import io.wkrzywiec.fooddelivery.commons.model.FoodReady

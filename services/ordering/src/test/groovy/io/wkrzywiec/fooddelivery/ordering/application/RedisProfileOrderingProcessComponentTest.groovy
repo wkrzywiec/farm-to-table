@@ -4,7 +4,7 @@ import com.github.javafaker.Faker
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
-import io.wkrzywiec.fooddelivery.commons.infra.store.RedisEventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore
 import io.wkrzywiec.fooddelivery.ordering.IntegrationTest
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated

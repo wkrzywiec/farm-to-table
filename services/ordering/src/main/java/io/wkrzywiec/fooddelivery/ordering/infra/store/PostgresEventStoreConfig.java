@@ -2,7 +2,7 @@ package io.wkrzywiec.fooddelivery.ordering.infra.store;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
-import io.wkrzywiec.fooddelivery.commons.infra.store.PostgresEventStore;
+import io.wkrzywiec.fooddelivery.commons.infra.store.postgres.PostgresEventStore;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -5,7 +5,7 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.FakeMessagePublisher
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.model.AddTip
 import io.wkrzywiec.fooddelivery.commons.model.CancelOrder
-import io.wkrzywiec.fooddelivery.commons.infra.store.InMemoryEventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.inmemory.InMemoryEventStore
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCanceled
