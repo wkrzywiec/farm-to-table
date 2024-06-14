@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import groovy.util.logging.Slf4j
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import org.springframework.data.redis.connection.stream.ObjectRecord
 import org.springframework.data.redis.connection.stream.ReadOffset
 import org.springframework.data.redis.connection.stream.RecordId
@@ -45,11 +45,11 @@ class RedisStreamTestClient {
                 .build()
     }
 
-    public String publishMessage(Message message) {
+    public String publishMessage(IntegrationMessage message) {
         publishMessage(message.header().channel(), message)
     }
 
-    public String publishMessage(String streamName, Message message) {
+    public String publishMessage(String streamName, IntegrationMessage message) {
         log.info("Publishing '{}' message to stream: '{}', body: '{}'", message.header().type(), streamName, message.body())
 
         String messageJson = null

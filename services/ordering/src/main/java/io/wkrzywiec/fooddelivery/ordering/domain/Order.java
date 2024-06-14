@@ -1,7 +1,7 @@
 package io.wkrzywiec.fooddelivery.ordering.domain;
 
 import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -72,9 +72,9 @@ public class Order {
                 .build()).toList();
     }
 
-    static Order from(List<Message> events) {
+    static Order from(List<IntegrationMessage> events) {
         Order order = null;
-        for (Message event: events) {
+        for (IntegrationMessage event: events) {
             if (event.body() instanceof OrderCreated created) {
                 order = new Order(
                         created.orderId(), created.customerId(),

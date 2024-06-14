@@ -2,7 +2,7 @@ package io.wkrzywiec.fooddelivery.delivery.application
 
 import com.github.javafaker.Faker
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
 import io.wkrzywiec.fooddelivery.commons.infra.store.postgres.PostgresEventStore
 import io.wkrzywiec.fooddelivery.delivery.IntegrationTest
@@ -45,7 +45,7 @@ class DefaultProfileDeliveryProcessComponentTest extends IntegrationTest {
                 delivery.getDeliveryCharge(), delivery.getTotal())
 
         def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), delivery.orderId, Instant.now())
-        def message = new Message(header, body)
+        def message = new IntegrationMessage(header, body)
 
         when:
         redisStreamsClient.publishMessage(message)

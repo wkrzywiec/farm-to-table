@@ -1,38 +1,43 @@
 package io.wkrzywiec.fooddelivery.commons.infra.store.inmemory;
 
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public class InMemoryEventStore implements EventStore {
 
-    Map<String, List<Message>> store = new ConcurrentHashMap<>();
+    Map<String, List<IntegrationMessage>> storeOld = new ConcurrentHashMap<>();
+    Map<String, List<EventEntity>> store = new ConcurrentHashMap<>();
 
     @Override
-    public void store(Message event) {
-        var stream = store.getOrDefault(event.body().orderId(), new ArrayList<>());
+    public void store(IntegrationMessage event) {
+        var stream = storeOld.getOrDefault(event.body().orderId(), new ArrayList<>());
         stream.add(event);
-        store.put(event.body().orderId(), stream);
+        storeOld.put(event.body().orderId(), stream);
     }
 
     @Override
     public void store(EventEntity event) {
-        //todo implement me
+        log.info("Persisting '{}' event in event store. {}", event.type(), event);
+        var stream = store.getOrDefault(event.streamId(), new ArrayList<>());
+        stream.add(event);
+        store.put(event.streamId(), stream);
     }
 
     @Override
-    public List<Message> getEventsForOrder(String orderId) {
-        return store.getOrDefault(orderId, List.of());
+    public List<IntegrationMessage> getEventsForOrder(String orderId) {
+        return storeOld.getOrDefault(orderId, List.of());
     }
 
     @Override
-    public List<EventEntity> fetchEventsForChannelAndStream(String streamId) {
-        //todo implement me
-        return List.of();
+    public List<EventEntity> fetchEvents(String channel, String streamId) {
+        return store.getOrDefault(streamId, List.of());
     }
 }

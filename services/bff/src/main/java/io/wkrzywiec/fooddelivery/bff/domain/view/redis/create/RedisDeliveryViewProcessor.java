@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.bff.domain.view.DeliveryStatus;
 import io.wkrzywiec.fooddelivery.bff.domain.view.DeliveryView;
 import io.wkrzywiec.fooddelivery.bff.domain.view.incoming.*;
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,14 +21,14 @@ public class RedisDeliveryViewProcessor {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    void handle(DomainMessageBody event) {
+    void handle(IntegrationMessageBody event) {
         log.info("Updating delivery view based on event: {}", event);
         DeliveryView deliveryView = getDeliveryView(event);
         deliveryView = updateDeliveryViewModel(event, deliveryView);
         storeViewModel(deliveryView);
     }
 
-    private DeliveryView getDeliveryView(DomainMessageBody event) {
+    private DeliveryView getDeliveryView(IntegrationMessageBody event) {
         var deliveryViewOptional = ofNullable(redisTemplate.opsForHash().get("delivery-view", event.orderId()));
 
         DeliveryView deliveryView = null;
@@ -58,7 +58,7 @@ public class RedisDeliveryViewProcessor {
         redisTemplate.opsForHash().put("delivery-view", deliveryView.getOrderId(), messageJson);
     }
 
-    private DeliveryView updateDeliveryViewModel(DomainMessageBody event, DeliveryView deliveryView) {
+    private DeliveryView updateDeliveryViewModel(IntegrationMessageBody event, DeliveryView deliveryView) {
         if (event instanceof DeliveryCreated created) {
             deliveryView = new DeliveryView(
                     created.orderId(), created.customerId(),

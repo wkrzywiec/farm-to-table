@@ -2,7 +2,7 @@ package io.wkrzywiec.fooddelivery.ordering.application
 
 import com.github.javafaker.Faker
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
 import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore
 import io.wkrzywiec.fooddelivery.ordering.IntegrationTest
@@ -39,7 +39,7 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
 
         def body = order.createOrder()
         def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), order.id, Instant.now())
-        def message = new Message(header, body)
+        def message = new IntegrationMessage(header, body)
 
         when: "is published"
         redisStreamsClient.publishMessage(message)

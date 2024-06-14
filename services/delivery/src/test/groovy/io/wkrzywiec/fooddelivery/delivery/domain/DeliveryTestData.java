@@ -1,12 +1,17 @@
 package io.wkrzywiec.fooddelivery.delivery.domain;
 
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated;
 import lombok.Getter;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.*;
 
+import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity;
+import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.ORDERS_CHANNEL;
 import static java.lang.String.format;
 
 @Getter
@@ -49,6 +54,10 @@ import static java.lang.String.format;
 
     public DeliveryCreated deliveryCreated() {
         return new DeliveryCreated(orderId, 1, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, total);
+    }
+
+    public EventEntity deliveryCreatedEvent(Clock clock) {
+        return newEventEntity(new DeliveryEvent.DeliveryCreated(orderId, 0, customerId, farmId, address, items.stream().map(ItemTestData::entity).toList(), deliveryCharge, total), ORDERS_CHANNEL, clock);
     }
 
     public DeliveryTestData withOrderId(String orderId) {

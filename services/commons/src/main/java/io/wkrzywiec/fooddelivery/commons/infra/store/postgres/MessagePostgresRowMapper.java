@@ -3,9 +3,9 @@ package io.wkrzywiec.fooddelivery.commons.infra.store.postgres;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventClassTypeProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,16 +17,16 @@ import java.time.Instant;
 
 @RequiredArgsConstructor
 @Slf4j
-class MessagePostgresRowMapper implements RowMapper<Message> {
+class MessagePostgresRowMapper implements RowMapper<IntegrationMessage> {
 
     private final ObjectMapper objectMapper;
     private final EventClassTypeProvider caster;
 
     @Override
-    public Message mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public IntegrationMessage mapRow(ResultSet rs, int rowNum) throws SQLException {
         String eventType = rs.getString("type");
-        DomainMessageBody body = extractBody(rs, eventType);
-        return new Message(
+        IntegrationMessageBody body = extractBody(rs, eventType);
+        return new IntegrationMessage(
                 new Header(
                         rs.getString("id"),
                         rs.getInt("version"),
@@ -47,7 +47,7 @@ class MessagePostgresRowMapper implements RowMapper<Message> {
         return rs.getTimestamp(columnName).toInstant();
     }
 
-    private DomainMessageBody extractBody(ResultSet rs, String eventType) throws SQLException {
+    private IntegrationMessageBody extractBody(ResultSet rs, String eventType) throws SQLException {
         String bodyAsString = rs.getString("body");
         JsonNode bodyAsJsonNode = mapToJsonNode(bodyAsString);
         return mapEventBody(bodyAsJsonNode, eventType);
@@ -62,12 +62,12 @@ class MessagePostgresRowMapper implements RowMapper<Message> {
         }
     }
 
-    private DomainMessageBody mapEventBody(JsonNode eventBody, String eventType) {
-        Class<? extends DomainMessageBody> classType = caster.getClassType(eventType);
+    private IntegrationMessageBody mapEventBody(JsonNode eventBody, String eventType) {
+        Class<? extends IntegrationMessageBody> classType = caster.getClassType(eventType);
         return mapEventBody(eventBody, classType);
     }
 
-    private <T extends DomainMessageBody> T mapEventBody(JsonNode eventBody, Class<T> valueType) {
+    private <T extends IntegrationMessageBody> T mapEventBody(JsonNode eventBody, Class<T> valueType) {
         try {
             return objectMapper.treeToValue(eventBody, valueType);
         } catch (JsonProcessingException e) {

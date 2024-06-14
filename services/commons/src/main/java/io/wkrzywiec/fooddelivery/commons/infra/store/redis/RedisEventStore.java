@@ -3,9 +3,9 @@ package io.wkrzywiec.fooddelivery.commons.infra.store.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventClassTypeProvider;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
@@ -28,7 +28,7 @@ public class RedisEventStore implements EventStore {
     private final String streamPrefix;
 
     @Override
-    public void store(Message event) {
+    public void store(IntegrationMessage event) {
         log.info("Storing event in a stream '{}', body: '{}'", streamPrefix + event.body().orderId(), event);
 
         String messageJsonAsString;
@@ -58,18 +58,18 @@ public class RedisEventStore implements EventStore {
     }
 
     @Override
-    public List<Message> getEventsForOrder(String orderId) {
+    public List<IntegrationMessage> getEventsForOrder(String orderId) {
         log.info("Fetching events from '{}{}' Redis stream", streamPrefix, orderId);
         return getAllMessagesInStream(streamPrefix + orderId);
     }
 
     @Override
-    public List<EventEntity> fetchEventsForChannelAndStream(String streamId) {
+    public List<EventEntity> fetchEvents(String channel, String streamId) {
         //todo implement me
         return List.of();
     }
 
-    private List<Message> getAllMessagesInStream(String stream) {
+    private List<IntegrationMessage> getAllMessagesInStream(String stream) {
 
         var streamReadOptions = StreamReadOptions.empty()
                 .block(Duration.ofMillis(1000))
@@ -94,11 +94,11 @@ public class RedisEventStore implements EventStore {
         }
     }
 
-    private Message mapToDomainEvent(JsonNode eventAsJson) {
+    private IntegrationMessage mapToDomainEvent(JsonNode eventAsJson) {
         var eventType = eventAsJson.get("header").get("type").asText();
         var eventBody =  eventAsJson.get("body");
-        Class<? extends DomainMessageBody> classType = eventClassTypeProvider.getClassType(eventType);
-        return new Message(mapEventHeader(eventAsJson), mapEventBody(eventBody, classType));
+        Class<? extends IntegrationMessageBody> classType = eventClassTypeProvider.getClassType(eventType);
+        return new IntegrationMessage(mapEventHeader(eventAsJson), mapEventBody(eventBody, classType));
     }
 
     private Header mapEventHeader(JsonNode eventAsJson) {
@@ -110,7 +110,7 @@ public class RedisEventStore implements EventStore {
         }
     }
 
-    private <T extends DomainMessageBody> T mapEventBody(JsonNode eventBody, Class<T> valueType) {
+    private <T extends IntegrationMessageBody> T mapEventBody(JsonNode eventBody, Class<T> valueType) {
         try {
             return objectMapper.treeToValue(eventBody, valueType);
         } catch (JsonProcessingException e) {

@@ -1,28 +1,15 @@
 package io.wkrzywiec.fooddelivery.delivery.domain
 
-
-import io.wkrzywiec.fooddelivery.commons.model.AssignDeliveryMan
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.FakeMessagePublisher
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity
 import io.wkrzywiec.fooddelivery.commons.infra.store.inmemory.InMemoryEventStore
+import io.wkrzywiec.fooddelivery.commons.model.*
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
-import io.wkrzywiec.fooddelivery.commons.model.DeliverFood
-import io.wkrzywiec.fooddelivery.commons.model.FoodReady
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCanceled
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated
-import io.wkrzywiec.fooddelivery.commons.model.PickUpFood
-import io.wkrzywiec.fooddelivery.commons.model.PrepareFood
-import io.wkrzywiec.fooddelivery.commons.model.UnAssignDeliveryMan
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.TipAddedToOrder
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCanceled
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryManAssigned
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryManUnAssigned
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.FoodDelivered
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.FoodInPreparation
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.FoodWasPickedUp
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.FoodIsReady
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.FakeMessagePublisher
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.TipAddedToDelivery
+import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Title
@@ -31,7 +18,8 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
+import static io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage.firstMessage
+import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity
 
 @Subject(DeliveryFacade)
 @Title("Specification for delivery process")
@@ -70,28 +58,22 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(orderCreated)
 
         then: "Event is saved in a store"
-        def expectedEvent = delivery.deliveryCreated()
-        def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
+        def expectedEvent = delivery.deliveryCreatedEvent(testClock)
+        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
         storedEvents.size() == 1
-        storedEvents[0].body() == expectedEvent
-
-        and:
-        Delivery.from(storedEvents).getStatus() == DeliveryStatus.CREATED
+        def actualEvent = storedEvents[0]
+        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
 
         and: "DeliveryCreated event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-
+        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) { event ->
             verifyEventHeader(event, delivery.orderId, "DeliveryCreated")
-
-            def body = event.body() as DeliveryCreated
-            body == expectedEvent
         }
     }
 
     def "Add tip to delivery"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(delivery.deliveryCreatedEvent(testClock))
 
         and:
         var tipAddedToOrder = new TipAddedToOrder(delivery.orderId, 2, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50))
@@ -100,25 +82,24 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(tipAddedToOrder)
 
         then: "Event is saved in a store"
-        def expectedEvent = new TipAddedToDelivery(delivery.getOrderId(), 2, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50))
-        def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
+        //todo extract to method
+        def expectedEvent = eventEntity(new DeliveryEvent.TipAddedToDelivery(delivery.getOrderId(), 1, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50)))
+        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
         storedEvents.size() == 2
-        storedEvents[1].body() == expectedEvent
+        def actualEvent = storedEvents[1]
+        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
 
         and: "TipAddedToDelivery event is published on 'orders' channel"
+        //todo extract to method
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-
             verifyEventHeader(event, delivery.orderId, "TipAddedToDelivery")
-
-            def body = event.body() as TipAddedToDelivery
-            body == expectedEvent
         }
     }
 
     def "Cancel a delivery"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(firstMessage("orders", testClock, delivery.deliveryCreated()))
+        eventStore.store(delivery.deliveryCreatedEvent(testClock))
 
         and:
         var cancellationReason = "Not hungry anymore"
@@ -128,21 +109,15 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(orderCanceled)
 
         then: "Event is saved in a store"
-        def expectedEvent = new DeliveryCanceled(delivery.getOrderId(), 2, "Not hungry anymore")
-        def storedEvents = eventStore.getEventsForOrder(delivery.getOrderId())
+        def expectedEvent = eventEntity(new DeliveryEvent.DeliveryCanceled(delivery.getOrderId(), 1, "Not hungry anymore"))
+        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
         storedEvents.size() == 2
-        storedEvents[1].body() == expectedEvent
-
-        and:
-        Delivery.from(storedEvents).getStatus() == DeliveryStatus.CANCELED
+        def actualEvent = storedEvents[1]
+        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
 
         and: "DeliveryCancelled event is published on 'orders' channel"
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-
             verifyEventHeader(event, delivery.orderId, "DeliveryCanceled")
-
-            def body = event.body() as DeliveryCanceled
-            body == expectedEvent
         }
     }
 
@@ -322,7 +297,15 @@ class DeliveryFacadeSpec extends Specification {
         }
     }
 
-    private void verifyEventHeader(Message event, String orderId, String eventType) {
+    private EventEntity eventEntity(DeliveryEvent deliveryEvent) {
+        return newEventEntity(deliveryEvent, ORDERS_CHANNEL, testClock)
+    }
+
+    private static boolean eventsAreEqualIgnoringId(EventEntity expected, EventEntity actual) {
+        expected.properties.findAll { it.key != "id" } == actual.properties.findAll { it.key != "id" }
+    }
+
+    private void verifyEventHeader(IntegrationMessage event, String orderId, String eventType) {
         def header = event.header()
         header.id() != null
         header.channel() == ORDERS_CHANNEL

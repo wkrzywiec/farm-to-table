@@ -1,6 +1,6 @@
 package io.wkrzywiec.fooddelivery.commons.model;
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -12,5 +12,5 @@ public record CreateOrder(
         String farmId,
         List<Item> items,
         String address,
-        BigDecimal deliveryCharge) implements DomainMessageBody {
+        BigDecimal deliveryCharge) implements IntegrationMessageBody {
 }

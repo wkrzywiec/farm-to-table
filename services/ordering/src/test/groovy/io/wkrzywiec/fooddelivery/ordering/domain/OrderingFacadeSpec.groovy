@@ -2,7 +2,7 @@ package io.wkrzywiec.fooddelivery.ordering.domain
 
 
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.FakeMessagePublisher
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.model.AddTip
 import io.wkrzywiec.fooddelivery.commons.model.CancelOrder
 import io.wkrzywiec.fooddelivery.commons.infra.store.inmemory.InMemoryEventStore
@@ -21,7 +21,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
+import static io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage.firstMessage
 import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 
@@ -205,7 +205,7 @@ class OrderingFacadeSpec extends Specification {
         }
     }
 
-    private void verifyEventHeader(Message event, String orderId, String eventType) {
+    private void verifyEventHeader(IntegrationMessage event, String orderId, String eventType) {
         def header = event.header()
         header.id() != null
         header.channel() == ORDERS_CHANNEL

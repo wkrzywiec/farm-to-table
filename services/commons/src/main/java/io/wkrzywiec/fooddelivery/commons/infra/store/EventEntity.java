@@ -1,9 +1,15 @@
 package io.wkrzywiec.fooddelivery.commons.infra.store;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-// mapper pomiędzy eventem domenowym, a descriptorem; argumenty - eventy domenowe, channel
+@ToString
+@EqualsAndHashCode
 public class EventEntity {
 
     protected String id;
@@ -26,8 +32,18 @@ public class EventEntity {
         this.addedAt = addedAt;
     }
 
-    public static EventEntity newEventEntity(DomainEvent domainEvent, String channel) {
-        return new EventEntity(UUID.randomUUID().toString(), domainEvent.streamId(), domainEvent.version(), channel, domainEvent.getClass().toString(), domainEvent, null);
+    public static List<EventEntity> newEventEntities(List<DomainEvent> domainEvents , String channel, Clock clock) {
+        return domainEvents.stream()
+                .map(domainEvent -> newEventEntity(domainEvent, channel, clock))
+                .toList();
+    }
+
+    public static EventEntity newEventEntity(DomainEvent domainEvent, String channel, Clock clock) {
+        return new EventEntity(
+                UUID.randomUUID().toString(), domainEvent.streamId(),
+                domainEvent.version(), channel,
+                domainEvent.getClass().getSimpleName(), domainEvent,
+                clock.instant());
     }
 
     public String id() {

@@ -1,12 +1,12 @@
 package io.wkrzywiec.fooddelivery.ordering.domain;
 
 import io.vavr.control.Try;
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 import io.wkrzywiec.fooddelivery.commons.model.AddTip;
 import io.wkrzywiec.fooddelivery.commons.model.CancelOrder;
 import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered;
@@ -45,7 +45,7 @@ public class OrderingFacade {
                 newOrder.getDeliveryCharge(),
                 newOrder.getTotal());
 
-        Message event = resultingEvent(
+        IntegrationMessage event = resultingEvent(
                 newOrder.getId(),
                 orderCreated
         );
@@ -115,25 +115,25 @@ public class OrderingFacade {
                 .andFinally(() -> log.info("Setting an '{}' order to COMPLETED state has been completed", foodDelivered.orderId()));
     }
 
-    private static int incrementVersionAndReturn(DomainMessageBody causeMessage) {
+    private static int incrementVersionAndReturn(IntegrationMessageBody causeMessage) {
         return causeMessage.version() + 1;
     }
 
-    private void publishSuccessEvent(String orderId, DomainMessageBody eventObject) {
+    private void publishSuccessEvent(String orderId, IntegrationMessageBody eventObject) {
         log.info("Publishing success event: {}", eventObject);
-        Message event = resultingEvent(orderId, eventObject);
+        IntegrationMessage event = resultingEvent(orderId, eventObject);
         eventStore.store(event);
         publisher.send(event);
     }
 
     private void publishingFailureEvent(String id, String message, int version, Throwable ex) {
         log.error(message + " Publishing OrderProcessingError event", ex);
-        Message event = resultingEvent(id, new OrderProcessingError(id, version, message, ex.getLocalizedMessage()));
+        IntegrationMessage event = resultingEvent(id, new OrderProcessingError(id, version, message, ex.getLocalizedMessage()));
         publisher.send(event);
     }
 
-    private Message resultingEvent(String orderId, DomainMessageBody eventBody) {
-        return new Message(eventHeader(orderId, eventBody.getClass().getSimpleName(), eventBody.version()), eventBody);
+    private IntegrationMessage resultingEvent(String orderId, IntegrationMessageBody eventBody) {
+        return new IntegrationMessage(eventHeader(orderId, eventBody.getClass().getSimpleName(), eventBody.version()), eventBody);
     }
 
     private Header eventHeader(String orderId, String type, int version) {

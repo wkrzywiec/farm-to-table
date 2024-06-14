@@ -1,6 +1,6 @@
 package io.wkrzywiec.fooddelivery.ordering.infra.store;
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventClassTypeProvider;
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class OrderingEventClassTypeProvider implements EventClassTypeProvider {
     @Override
-    public Class<? extends DomainMessageBody> getClassType(String type) {
+    public Class<? extends IntegrationMessageBody> getClassType(String type) {
         return switch (type) {
             case "OrderCreated" -> OrderCreated.class;
             case "OrderCanceled" -> OrderCanceled.class;

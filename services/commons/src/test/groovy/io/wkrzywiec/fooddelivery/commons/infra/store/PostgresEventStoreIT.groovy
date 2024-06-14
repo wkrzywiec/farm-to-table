@@ -1,8 +1,8 @@
 package io.wkrzywiec.fooddelivery.commons.infra.store
 
 import io.wkrzywiec.fooddelivery.commons.CommonsIntegrationTest
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody
 import io.wkrzywiec.fooddelivery.commons.infra.store.postgres.PostgresEventStore
 import spock.lang.Subject
@@ -12,7 +12,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 import static io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody.aSampleEvent
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
+import static io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage.firstMessage
 
 @Subject(PostgresEventStore)
 class PostgresEventStoreIT extends CommonsIntegrationTest {
@@ -36,7 +36,7 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
         eventStore.store(event)
 
         then:
-        List<Message> storedEvents = eventStore.getEventsForOrder(eventBody.orderId())
+        List<IntegrationMessage> storedEvents = eventStore.getEventsForOrder(eventBody.orderId())
         storedEvents.size() == 1
         def storedEvent = storedEvents.get(0)
         storedEvent == event
@@ -45,7 +45,7 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
     private class IntegrationTestEventTestClassProvider implements EventClassTypeProvider {
 
         @Override
-        Class<? extends DomainMessageBody> getClassType(String type) {
+        Class<? extends IntegrationMessageBody> getClassType(String type) {
             return IntegrationTestEventBody.class
         }
     }

@@ -1,10 +1,10 @@
 package io.wkrzywiec.fooddelivery.commons.infra.messaging.redis
 
 import io.wkrzywiec.fooddelivery.commons.CommonsIntegrationTest
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
 import io.wkrzywiec.fooddelivery.commons.infra.ObjectMapperConfig
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
 import io.wkrzywiec.fooddelivery.commons.infra.RedisStreamTestClient
 
@@ -38,7 +38,7 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
     def "Publish JSON message to Redis stream"() {
         given: "A message"
         String itemId = UUID.randomUUID()
-        Message message = event(
+        IntegrationMessage message = event(
                 itemId,
                 aSampleEvent(Instant.now())
         )
@@ -70,8 +70,8 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
         return redisTemplate
     }
 
-    private Message event(String itemId, DomainMessageBody eventBody) {
-        return new Message(eventHeader(itemId, eventBody.getClass().getSimpleName()), eventBody)
+    private IntegrationMessage event(String itemId, IntegrationMessageBody eventBody) {
+        return new IntegrationMessage(eventHeader(itemId, eventBody.getClass().getSimpleName()), eventBody)
     }
 
     private Header eventHeader(String itemId, String messageType) {

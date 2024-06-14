@@ -1,15 +1,16 @@
 package io.wkrzywiec.fooddelivery.delivery.domain;
 
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @ToString
 public class Delivery {
+    private int version;
     private String orderId;
     private String customerId;
     private String farmId;
@@ -29,13 +31,18 @@ public class Delivery {
     private BigDecimal deliveryCharge = new BigDecimal(0);
     private BigDecimal tip = new BigDecimal(0);
     private BigDecimal total = new BigDecimal(0);
+
+    //todo remove metadata
     private Map<String, String> metadata = new HashMap<>();
+
+    List<DomainEvent> changes = new ArrayList<>();
 
     Delivery() {};
 
     public static Delivery from(OrderCreated orderCreated, Instant creationTimestamp) {
         var delivery = new Delivery();
 
+        delivery.version = 0;
         delivery.orderId = orderCreated.orderId();
         delivery.customerId = orderCreated.customerId();
         delivery.farmId = orderCreated.farmId();
@@ -48,6 +55,15 @@ public class Delivery {
         Map<String, String> metadata = new HashMap<>();
         metadata.put("creationTimestamp", creationTimestamp.toString());
         delivery.metadata = metadata;
+
+        delivery.changes.add(
+                new DeliveryEvent.DeliveryCreated(
+                        delivery.orderId, delivery.version,
+                        delivery.customerId, delivery.farmId,
+                        delivery.address, delivery.items,
+                        delivery.deliveryCharge, delivery.total
+                )
+        );
         return delivery;
     }
 
@@ -59,9 +75,9 @@ public class Delivery {
                 .build()).toList();
     }
 
-    public static Delivery from(List<Message> events) {
+    public static Delivery from(List<IntegrationMessage> events) {
         Delivery delivery = null;
-        for (Message event: events) {
+        for (IntegrationMessage event: events) {
             switch (event.body()) {
                 case DeliveryCreated created -> {
                     delivery = new Delivery();
@@ -140,6 +156,83 @@ public class Delivery {
         return delivery;
     }
 
+    public static Delivery from1(List<DeliveryEvent> events) {
+        Delivery delivery = null;
+        for (DeliveryEvent event: events) {
+            switch (event) {
+                case DeliveryEvent.DeliveryCreated created -> {
+                    delivery = new Delivery();
+
+                    delivery.version = created.version();
+                    delivery.orderId = created.orderId();
+                    delivery.customerId = created.customerId();
+                    delivery.farmId = created.farmId();
+                    delivery.status = DeliveryStatus.CREATED;
+                    delivery.address = created.address();
+                    delivery.items = created.items();
+                    delivery.deliveryCharge = created.deliveryCharge();
+                    delivery.total = created.total();
+                }
+
+                case DeliveryEvent.TipAddedToDelivery tipAddedToDelivery -> {
+                    delivery.tip = tipAddedToDelivery.tip();
+                    delivery.total = tipAddedToDelivery.total();
+                }
+
+                case DeliveryEvent.DeliveryCanceled ignored -> {
+                    delivery.status = DeliveryStatus.CANCELED;
+                }
+//
+//                case FoodInPreparation foodInPreparation -> {
+//                    var metadata = delivery.getMetadata();
+//                    metadata.put("foodPreparationTimestamp", event.header().createdAt().toString());
+//
+//                    delivery.metadata = metadata;
+//                    delivery.status = DeliveryStatus.FOOD_IN_PREPARATION;
+//                }
+//
+//                case DeliveryManAssigned deliveryManAssigned -> {
+//                    delivery.deliveryManId = deliveryManAssigned.deliveryManId();
+//                }
+//
+//                case DeliveryManUnAssigned deliveryManUnAssigned -> {
+//                    delivery.deliveryManId = null;
+//                }
+//
+//                case FoodIsReady foodIsReady -> {
+//                    var metadata = delivery.getMetadata();
+//                    metadata.put("foodReadyTimestamp", event.header().createdAt().toString());
+//
+//                    delivery.metadata = metadata;
+//                    delivery.status = DeliveryStatus.FOOD_READY;
+//                }
+//
+//                case FoodWasPickedUp foodWasPickedUp -> {
+//                    var metadata = delivery.getMetadata();
+//                    metadata.put("foodPickedUpTimestamp", event.header().createdAt().toString());
+//
+//                    delivery.metadata = metadata;
+//                    delivery.status = DeliveryStatus.FOOD_PICKED;
+//                }
+//
+//                case FoodDelivered foodDelivered -> {
+//                    var metadata = delivery.getMetadata();
+//                    metadata.put("foodDeliveredTimestamp", event.header().createdAt().toString());
+//
+//                    delivery.metadata = metadata;
+//                    delivery.status = DeliveryStatus.FOOD_DELIVERED;
+//                }
+
+                default -> throw new IllegalArgumentException("Failed to replay events to build delivery object. Unhandled events: " + event.getClass());
+            }
+        }
+        return delivery;
+    }
+
+    public List<DomainEvent> uncommittedChanges() {
+        return changes;
+    }
+
     public void cancel(String reason, Instant cancellationTimestamp) {
         if (status != DeliveryStatus.CREATED) {
             throw new DeliveryException(format("Failed to cancel a %s delivery. It's not possible do it for a delivery with '%s' status", orderId, status));
@@ -150,6 +243,9 @@ public class Delivery {
         if (reason != null) {
             metadata.put("cancellationReason", reason);
         }
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.DeliveryCanceled(orderId, version, reason));
     }
 
     public void foodInPreparation(Instant foodPreparationTimestamp) {
@@ -211,5 +307,12 @@ public class Delivery {
     public void addTip(BigDecimal tip, BigDecimal total) {
         this.tip = tip;
         this.total = total;
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.TipAddedToDelivery(orderId, version, tip, total));
+    }
+
+    private void increaseVersion() {
+        this.version = this.version + 1;
     }
 }

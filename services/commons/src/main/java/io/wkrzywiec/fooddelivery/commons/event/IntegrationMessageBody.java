@@ -1,6 +1,6 @@
 package io.wkrzywiec.fooddelivery.commons.event;
 
-public interface DomainMessageBody {
+public interface IntegrationMessageBody {
     String orderId();
     int version();
 }

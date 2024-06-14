@@ -2,8 +2,8 @@ package io.wkrzywiec.fooddelivery.commons.infra.store.postgres;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
 import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventClassTypeProvider;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
@@ -30,7 +30,7 @@ public class PostgresEventStore implements EventStore {
     }
 
     @Override
-    public void store(Message event) throws RuntimeException {
+    public void store(IntegrationMessage event) throws RuntimeException {
         log.info("Saving event in a store. Event: {}", event);
 
         var bodyAsJsonString = mapEventBody(event.body());
@@ -70,7 +70,7 @@ public class PostgresEventStore implements EventStore {
         log.info("Event was stored.");
     }
 
-    private String mapEventBody(DomainMessageBody body) throws RuntimeException {
+    private String mapEventBody(IntegrationMessageBody body) throws RuntimeException {
         try {
             return objectMapper.writeValueAsString(body);
         } catch (JsonProcessingException e) {
@@ -87,24 +87,24 @@ public class PostgresEventStore implements EventStore {
     }
 
     @Override
-    public List<Message> getEventsForOrder(String orderId) {
+    public List<IntegrationMessage> getEventsForOrder(String orderId) {
         log.info("Fetching events from event store for streamId: '{}'", orderId);
         return getAllMessagesInStream(orderId);
     }
 
     @Override
-    public List<EventEntity> fetchEventsForChannelAndStream(String streamId) {
+    public List<EventEntity> fetchEvents(String channel, String streamId) {
 
         return jdbcTemplate.query("""
                 SELECT id, stream_id, version, channel, type, data, added_at
                 FROM events
-                WHERE stream_id = ? ORDER BY version ASC;
+                WHERE channel = ? AND stream_id = ? ORDER BY version ASC;
                 """,
                 eventPostgresRowMapper,
-                streamId);
+                channel, streamId);
     }
 
-    private List<Message> getAllMessagesInStream(String streamId) {
+    private List<IntegrationMessage> getAllMessagesInStream(String streamId) {
 
         return jdbcTemplate.query("""
                 SELECT id, stream_id, version, channel, type, data, added_at
