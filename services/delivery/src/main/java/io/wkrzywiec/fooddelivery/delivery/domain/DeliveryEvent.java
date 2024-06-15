@@ -37,4 +37,36 @@ public interface DeliveryEvent extends DomainEvent {
             int version,
             String reason
     ) implements DeliveryEvent {}
+
+    record DeliveryManAssigned(
+            String orderId,
+            int version,
+            String deliveryManId
+    ) implements DeliveryEvent {}
+
+    record DeliveryManUnAssigned(
+            String orderId,
+            int version,
+            String deliveryManId
+    ) implements DeliveryEvent {}
+
+    record FoodInPreparation(
+            String orderId,
+            int version
+    ) implements DeliveryEvent {}
+
+    record FoodIsReady(
+            String orderId,
+            int version
+    ) implements DeliveryEvent {}
+
+    record FoodWasPickedUp(
+            String orderId,
+            int version
+    ) implements DeliveryEvent {}
+
+    record FoodDelivered(
+            String orderId,
+            int version
+    ) implements DeliveryEvent {}
 }

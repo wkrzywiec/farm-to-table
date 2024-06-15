@@ -33,14 +33,14 @@ class DeliveryEventClassTypeProvider implements EventClassTypeProvider {
     public Class<? extends DomainEvent> getClassType1(String type) {
         return switch (type) {
             case "DeliveryCreated" -> DeliveryEvent.DeliveryCreated.class;
-//            case "TipAddedToDelivery" -> TipAddedToDelivery.class;
-//            case "DeliveryCanceled" -> DeliveryCanceled.class;
-//            case "FoodInPreparation" -> FoodInPreparation.class;
-//            case "DeliveryManAssigned" -> DeliveryManAssigned.class;
-//            case "DeliveryManUnAssigned" -> DeliveryManUnAssigned.class;
-//            case "FoodIsReady" -> FoodIsReady.class;
-//            case "FoodWasPickedUp" -> FoodWasPickedUp.class;
-//            case "FoodDelivered" -> FoodDelivered.class;
+            case "TipAddedToDelivery" -> DeliveryEvent.TipAddedToDelivery.class;
+            case "DeliveryCanceled" -> DeliveryEvent.DeliveryCanceled.class;
+            case "FoodInPreparation" -> DeliveryEvent.FoodInPreparation.class;
+            case "DeliveryManAssigned" -> DeliveryEvent.DeliveryManAssigned.class;
+            case "DeliveryManUnAssigned" -> DeliveryEvent.DeliveryManUnAssigned.class;
+            case "FoodIsReady" -> DeliveryEvent.FoodIsReady.class;
+            case "FoodWasPickedUp" -> DeliveryEvent.FoodWasPickedUp.class;
+            case "FoodDelivered" -> DeliveryEvent.FoodDelivered.class;
             default -> {
                 log.error("There is not logic for mapping {} event from a store", type);
                 throw new IllegalArgumentException();
