@@ -9,6 +9,7 @@ import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Slf4j
@@ -31,15 +32,16 @@ public class PostgresEventStore implements EventStore {
         var bodyAsJsonString = mapEventData(event.data());
 
         jdbcTemplate.update("""
-                insert into events(id, stream_id, version, channel, type, data)
-                values(?, ?, ?, ?, ?, ?::jsonb)
+                insert into events(id, stream_id, version, channel, type, data, added_at)
+                values(?, ?, ?, ?, ?, ?::jsonb, ?)
                 """,
                 event.id(),
                 event.streamId(),
                 event.version(),
                 event.channel(),
                 event.type(),
-                bodyAsJsonString
+                bodyAsJsonString,
+                Timestamp.from(event.addedAt())
         );
         log.info("Event was stored.");
     }

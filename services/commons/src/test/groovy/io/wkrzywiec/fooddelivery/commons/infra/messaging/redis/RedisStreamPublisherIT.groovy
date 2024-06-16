@@ -15,7 +15,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 
 import java.time.Instant
 
-import static io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody.aSampleEvent
+import static io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestMessageBody.aSampleEvent
 
 class RedisStreamPublisherIT extends CommonsIntegrationTest {
 
@@ -50,7 +50,7 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
         def publishedMessage = redis.getLatestMessageFromStreamAsJson(testChannel)
 
         publishedMessage.get("header").get("streamId").asText() == itemId
-        publishedMessage.get("header").get("type").asText() == "IntegrationTestEventBody"
+        publishedMessage.get("header").get("type").asText() == "IntegrationTestMessageBody"
         publishedMessage.get("body").get("orderId").asText() == "some test text"
     }
 
