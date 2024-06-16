@@ -24,7 +24,7 @@ class EventPostgresRowMapper implements RowMapper<EventEntity> {
     @Override
     public EventEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
         String eventType = rs.getString("type");
-        DomainEvent event = extractBody(rs, eventType);
+        DomainEvent event = extractData(rs, eventType);
         return new EventEntity(
                 rs.getString("id"),
                 rs.getString("stream_id"),
@@ -43,8 +43,8 @@ class EventPostgresRowMapper implements RowMapper<EventEntity> {
         return rs.getTimestamp(columnName).toInstant();
     }
 
-    private DomainEvent extractBody(ResultSet rs, String eventType) throws SQLException {
-        String bodyAsString = rs.getString("body");
+    private DomainEvent extractData(ResultSet rs, String eventType) throws SQLException {
+        String bodyAsString = rs.getString("data");
         JsonNode bodyAsJsonNode = mapToJsonNode(bodyAsString);
         return mapEventBody(bodyAsJsonNode, eventType);
     }

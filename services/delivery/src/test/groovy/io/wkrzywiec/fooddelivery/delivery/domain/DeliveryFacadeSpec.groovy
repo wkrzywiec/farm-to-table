@@ -9,7 +9,6 @@ import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCanceled
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.TipAddedToOrder
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Title
@@ -18,14 +17,12 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage.firstMessage
 import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity
+import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.ORDERS_CHANNEL
 
 @Subject(DeliveryFacade)
 @Title("Specification for delivery process")
 class DeliveryFacadeSpec extends Specification {
-
-    private final String ORDERS_CHANNEL = "orders"
 
     DeliveryFacade facade
     InMemoryEventStore eventStore

@@ -58,7 +58,7 @@ public class PostgresEventStore implements EventStore {
 
         jdbcTemplate.update("""
                 insert into events(id, stream_id, version, channel, type, data)
-                values(?, ?, ?, ?, ?, ?::jsonb, ?)
+                values(?, ?, ?, ?, ?, ?::jsonb)
                 """,
                 event.id(),
                 event.streamId(),
