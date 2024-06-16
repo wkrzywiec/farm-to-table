@@ -6,6 +6,7 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
 import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore
 import io.wkrzywiec.fooddelivery.delivery.IntegrationTest
+import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryEvent
 import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated
 import io.wkrzywiec.fooddelivery.delivery.infra.stream.RedisOrdersChannelConsumer
@@ -19,6 +20,7 @@ import spock.lang.Subject
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
+import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.ORDERS_CHANNEL
 import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryTestData.aDelivery
 import static io.wkrzywiec.fooddelivery.delivery.domain.ItemTestData.anItem
 
@@ -60,16 +62,16 @@ class RedisProfileDeliveryProcessComponentTest extends IntegrationTest {
                 }
 
         and: "event is saved in event store"
-        def events = eventStore.getEventsForOrder(delivery.orderId)
+        def events = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.orderId)
         events.size() == 1
-        events[0].header().type() == "DeliveryCreated"
+        events[0].type() == "DeliveryCreated"
 
-        def eventBody = events[0].body()
-        eventBody instanceof DeliveryCreated
-        eventBody as DeliveryCreated == new DeliveryCreated(
-                delivery.orderId, 1, delivery.customerId,
+        def eventBody = events[0].data()
+        eventBody instanceof DeliveryEvent.DeliveryCreated
+        eventBody as DeliveryEvent.DeliveryCreated == new DeliveryEvent.DeliveryCreated(
+                delivery.orderId, 0, delivery.customerId,
                 delivery.farmId, delivery.address,
-                delivery.items.stream().map(i -> i.dto()).toList(),
+                delivery.items.stream().map(i -> i.entity()).toList(),
                 delivery.deliveryCharge, delivery.total)
     }
 }

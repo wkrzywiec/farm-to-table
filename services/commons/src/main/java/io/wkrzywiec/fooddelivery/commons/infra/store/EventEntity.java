@@ -1,15 +1,13 @@
 package io.wkrzywiec.fooddelivery.commons.infra.store;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@ToString
-@EqualsAndHashCode
+@Data
 public class EventEntity {
 
     protected String id;

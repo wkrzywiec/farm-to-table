@@ -46,7 +46,7 @@ abstract class IntegrationTest extends Specification {
 
     protected static boolean useLocalInfrastructure() {
         // change it to `true` in order to use it with infra from docker-compose.yaml
-        false
+        true
     }
 
     static {
