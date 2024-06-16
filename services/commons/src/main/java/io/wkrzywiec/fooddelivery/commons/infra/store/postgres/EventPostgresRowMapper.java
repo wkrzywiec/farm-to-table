@@ -59,7 +59,7 @@ class EventPostgresRowMapper implements RowMapper<EventEntity> {
     }
 
     private DomainEvent mapEventBody(JsonNode eventBody, String eventType) {
-        Class<? extends DomainEvent> classType = caster.getClassType1(eventType);
+        Class<? extends DomainEvent> classType = caster.getClassType(eventType);
         return mapEventBody(eventBody, classType);
     }
 

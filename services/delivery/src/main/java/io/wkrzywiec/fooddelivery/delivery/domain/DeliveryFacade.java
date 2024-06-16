@@ -191,10 +191,6 @@ public class DeliveryFacade {
         return eventEntities;
     }
 
-    private int getLatestVersionOfStream(String orderId) {
-        return eventStore.getEventsForOrder(orderId).size();
-    }
-
 //    private void process(Delivery delivery, CheckedRunnable runProcess, IntegrationMessageBody successEvent, String failureMessage) {
 //        Try.run(runProcess)
 //                .onSuccess(v -> publishSuccessEvent(delivery.getOrderId(), successEvent))
@@ -208,12 +204,12 @@ public class DeliveryFacade {
 //        publisher.send(event);
 //    }
 
-    private void publishingFailureEvent(String id, String message, Throwable ex) {
-        log.error(message + " Publishing DeliveryProcessingError event", ex);
-        int version = getLatestVersionOfStream(id);
-        IntegrationMessage event = resultingEvent(id, new DeliveryProcessingError(id, version, message, ex.getLocalizedMessage()));
-        publisher.send(event);
-    }
+//    private void publishingFailureEvent(String id, String message, Throwable ex) {
+//        log.error(message + " Publishing DeliveryProcessingError event", ex);
+////        int version = getLatestVersionOfStream(id);
+//        IntegrationMessage event = resultingEvent(id, new DeliveryProcessingError(id, version, message, ex.getLocalizedMessage()));
+//        publisher.send(event);
+//    }
 
     private IntegrationMessage resultingEvent(String orderId, IntegrationMessageBody eventBody) {
         return new IntegrationMessage(eventHeader(orderId, eventBody.version(), eventBody.getClass().getSimpleName()), eventBody);
