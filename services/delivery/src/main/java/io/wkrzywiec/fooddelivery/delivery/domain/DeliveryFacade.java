@@ -35,7 +35,7 @@ public class DeliveryFacade {
     public void handle(OrderCreated orderCreated) {
         log.info("Preparing a delivery for an '{}' order.", orderCreated.orderId());
 
-        Delivery newDelivery = Delivery.from(orderCreated, clock.instant());
+        Delivery newDelivery = Delivery.from(orderCreated);
         storeAndPublishEvents(newDelivery);
 
         log.info("New delivery with an orderId: '{}' was created", newDelivery.getOrderId());

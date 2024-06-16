@@ -30,14 +30,11 @@ public class Delivery {
     private BigDecimal tip = new BigDecimal(0);
     private BigDecimal total = new BigDecimal(0);
 
-    //todo remove metadata
-    private Map<String, String> metadata = new HashMap<>();
-
     List<DomainEvent> changes = new ArrayList<>();
 
     Delivery() {};
 
-    public static Delivery from(OrderCreated orderCreated, Instant creationTimestamp) {
+    public static Delivery from(OrderCreated orderCreated) {
         var delivery = new Delivery();
 
         delivery.version = 0;
@@ -49,10 +46,6 @@ public class Delivery {
         delivery.items = mapItems(orderCreated.items());
         delivery.deliveryCharge = orderCreated.deliveryCharge();
         delivery.total = orderCreated.total();
-
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("creationTimestamp", creationTimestamp.toString());
-        delivery.metadata = metadata;
 
         delivery.changes.add(
                 new DeliveryEvent.DeliveryCreated(
@@ -148,11 +141,6 @@ public class Delivery {
             throw new DeliveryException(format("Failed to cancel a %s delivery. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.CANCELED;
-        metadata.put("cancellationTimestamp", cancellationTimestamp.toString());
-
-        if (reason != null) {
-            metadata.put("cancellationReason", reason);
-        }
 
         increaseVersion();
         changes.add(new DeliveryEvent.DeliveryCanceled(orderId, version, reason));
@@ -163,7 +151,6 @@ public class Delivery {
             throw new DeliveryException(format("Failed to start food preparation for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.FOOD_IN_PREPARATION;
-        metadata.put("foodPreparationTimestamp", foodPreparationTimestamp.toString());
 
         increaseVersion();
         changes.add(new DeliveryEvent.FoodInPreparation(orderId, version));
@@ -174,7 +161,6 @@ public class Delivery {
             throw new DeliveryException(format("Failed to set food ready for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.FOOD_READY;
-        metadata.put("foodReadyTimestamp", foodReadyTimestamp.toString());
 
         increaseVersion();
         changes.add(new DeliveryEvent.FoodIsReady(orderId, version));
@@ -185,7 +171,6 @@ public class Delivery {
             throw new DeliveryException(format("Failed to set food as picked up for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.FOOD_PICKED;
-        metadata.put("foodPickedUpTimestamp", foodPickedUpTimestamp.toString());
 
         increaseVersion();
         changes.add(new DeliveryEvent.FoodWasPickedUp(orderId, version));
@@ -196,7 +181,6 @@ public class Delivery {
             throw new DeliveryException(format("Failed to set food as delivered for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.FOOD_DELIVERED;
-        metadata.put("foodDeliveredTimestamp", foodDeliveredTimestamp.toString());
 
         increaseVersion();
         changes.add(new DeliveryEvent.FoodDelivered(orderId, version));
