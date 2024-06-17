@@ -55,11 +55,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(orderCreated)
 
         then: "Event is saved in a store"
-        def expectedEvent = delivery.deliveryCreatedEvent(testClock)
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 1
-        def actualEvent = storedEvents[0]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                delivery.deliveryCreated(),
+                1
+        )
 
         and: "DeliveryCreated event is published on 'orders' channel"
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) { event ->
@@ -70,7 +69,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Add tip to delivery"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(delivery.deliveryCreatedEvent(testClock))
+        eventStore.store(delivery.deliveryCreatedEntity(testClock))
 
         and:
         var tipAddedToOrder = new TipAddedToOrder(delivery.orderId, 2, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50))
@@ -79,12 +78,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(tipAddedToOrder)
 
         then: "Event is saved in a store"
-        //todo extract to method
-        def expectedEvent = eventEntity(new DeliveryEvent.TipAddedToDelivery(delivery.getOrderId(), 1, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50)))
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 2
-        def actualEvent = storedEvents[1]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                new DeliveryEvent.TipAddedToDelivery(delivery.getOrderId(), 1, BigDecimal.valueOf(5.55), BigDecimal.valueOf(50)),
+                2
+        )
 
         and: "TipAddedToDelivery event is published on 'orders' channel"
         //todo extract to method
@@ -96,7 +93,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Cancel a delivery"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(delivery.deliveryCreatedEvent(testClock))
+        eventStore.store(delivery.deliveryCreatedEntity(testClock))
 
         and:
         var cancellationReason = "Not hungry anymore"
@@ -106,11 +103,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(orderCanceled)
 
         then: "Event is saved in a store"
-        def expectedEvent = eventEntity(new DeliveryEvent.DeliveryCanceled(delivery.getOrderId(), 1, "Not hungry anymore"))
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 2
-        def actualEvent = storedEvents[1]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                new DeliveryEvent.DeliveryCanceled(delivery.getOrderId(), 1, "Not hungry anymore"),
+                2
+        )
 
         and: "DeliveryCancelled event is published on 'orders' channel"
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
@@ -121,7 +117,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Food in preparation"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(delivery.deliveryCreatedEvent(testClock))
+        eventStore.store(delivery.deliveryCreatedEntity(testClock))
 
         and:
         var prepareFood = new PrepareFood(delivery.orderId, 2)
@@ -130,11 +126,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(prepareFood)
 
         then: "Event is saved in a store"
-        def expectedEvent = eventEntity(new DeliveryEvent.FoodInPreparation(delivery.getOrderId(), 1))
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 2
-        def actualEvent = storedEvents[1]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                new DeliveryEvent.FoodInPreparation(delivery.getOrderId(), 1),
+                2
+        )
 
         and: "FoodInPreparation event is published on 'orders' channel"
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
@@ -145,7 +140,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Assign delivery man to delivery"() {
         given:
         var delivery = DeliveryTestData.aDelivery().withDeliveryManId(null)
-        eventStore.store(delivery.deliveryCreatedEvent(testClock))
+        eventStore.store(delivery.deliveryCreatedEntity(testClock))
 
         and:
         var deliveryManId = "any-delivery-man-orderId"
@@ -155,11 +150,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(assignDeliveryMan)
 
         then: "Event is saved in a store"
-        def expectedEvent = eventEntity(new DeliveryEvent.DeliveryManAssigned(delivery.getOrderId(), 1, deliveryManId))
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 2
-        def actualEvent = storedEvents[1]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                new DeliveryEvent.DeliveryManAssigned(delivery.getOrderId(), 1, deliveryManId),
+                2
+        )
 
         and: "DeliveryManAssigned event is published on 'orders' channel"
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
@@ -171,7 +165,7 @@ class DeliveryFacadeSpec extends Specification {
         given:
         var deliveryManId = "any-delivery-man-orderId"
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(delivery.deliveryCreatedEvent(testClock))
+        eventStore.store(delivery.deliveryCreatedEntity(testClock))
         eventStore.store(eventEntity(new DeliveryEvent.DeliveryManAssigned(delivery.getOrderId(), 1, deliveryManId)))
 
         and:
@@ -181,11 +175,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(assignDeliveryMan)
 
         then: "Event is saved in a store"
-        def expectedEvent = eventEntity(new DeliveryEvent.DeliveryManUnAssigned(delivery.getOrderId(), 2, deliveryManId))
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 3
-        def actualEvent = storedEvents[2]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                new DeliveryEvent.DeliveryManUnAssigned(delivery.getOrderId(), 2, deliveryManId),
+                3
+        )
 
 
         and: "DeliveryManUnAssigned event is published on 'orders' channel"
@@ -197,7 +190,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Food is ready"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(delivery.deliveryCreatedEvent(testClock))
+        eventStore.store(delivery.deliveryCreatedEntity(testClock))
         eventStore.store(eventEntity(new DeliveryEvent.FoodInPreparation(delivery.getOrderId(), 1)))
 
         and:
@@ -207,11 +200,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(foodReady)
 
         then: "Event is saved in a store"
-        def expectedEvent = eventEntity(new DeliveryEvent.FoodIsReady(delivery.getOrderId(), 2))
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 3
-        def actualEvent = storedEvents[2]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                new DeliveryEvent.FoodIsReady(delivery.getOrderId(), 2),
+                3
+        )
 
         and: "FoodIsRead event is published on 'orders' channel"
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
@@ -222,7 +214,7 @@ class DeliveryFacadeSpec extends Specification {
     def "Food is picked up"() {
         given:
         var delivery = DeliveryTestData.aDelivery()
-        eventStore.store(delivery.deliveryCreatedEvent(testClock))
+        eventStore.store(delivery.deliveryCreatedEntity(testClock))
         eventStore.store(eventEntity(new DeliveryEvent.FoodInPreparation(delivery.getOrderId(), 1)))
         eventStore.store(eventEntity(new DeliveryEvent.FoodIsReady(delivery.getOrderId(), 2)))
 
@@ -233,11 +225,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(pickUpFood)
 
         then: "Event is saved in a store"
-        def expectedEvent = eventEntity(new DeliveryEvent.FoodWasPickedUp(delivery.getOrderId(), 3))
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 4
-        def actualEvent = storedEvents[3]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                new DeliveryEvent.FoodWasPickedUp(delivery.getOrderId(), 3),
+                4
+        )
 
         and: "FoodIsPickedUp event is published on 'orders' channel"
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
@@ -249,7 +240,7 @@ class DeliveryFacadeSpec extends Specification {
         given:
         var delivery = DeliveryTestData.aDelivery()
                 .withStatus(DeliveryStatus.FOOD_PICKED)
-        eventStore.store(delivery.deliveryCreatedEvent(testClock))
+        eventStore.store(delivery.deliveryCreatedEntity(testClock))
         eventStore.store(eventEntity(new DeliveryEvent.FoodInPreparation(delivery.getOrderId(), 1)))
         eventStore.store(eventEntity(new DeliveryEvent.FoodIsReady(delivery.getOrderId(), 2)))
         eventStore.store(eventEntity(new DeliveryEvent.FoodWasPickedUp(delivery.getOrderId(), 3)))
@@ -261,11 +252,10 @@ class DeliveryFacadeSpec extends Specification {
         facade.handle(deliverFood)
 
         then: "Event is saved in a store"
-        def expectedEvent = eventEntity(new DeliveryEvent.FoodDelivered(delivery.getOrderId(), 4))
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.getOrderId())
-        storedEvents.size() == 5
-        def actualEvent = storedEvents[4]
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        verifyEventInStore(
+                new DeliveryEvent.FoodDelivered(delivery.getOrderId(), 4),
+                5
+        )
 
         and: "FoodDelivered event is published on 'orders' channel"
         with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
@@ -275,6 +265,14 @@ class DeliveryFacadeSpec extends Specification {
 
     private EventEntity eventEntity(DeliveryEvent deliveryEvent) {
         return newEventEntity(deliveryEvent, ORDERS_CHANNEL, testClock)
+    }
+
+    private void verifyEventInStore(DeliveryEvent expectedDomainEvent, int expectedStreamSize) {
+        def expectedEvent = eventEntity(expectedDomainEvent)
+        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, expectedDomainEvent.streamId())
+        assert storedEvents.size() == expectedStreamSize
+        def actualEvent = storedEvents.last
+        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
     }
 
     private static boolean eventsAreEqualIgnoringId(EventEntity expected, EventEntity actual) {

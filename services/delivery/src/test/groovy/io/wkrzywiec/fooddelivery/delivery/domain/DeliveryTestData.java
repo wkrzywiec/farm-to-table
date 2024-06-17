@@ -1,6 +1,5 @@
 package io.wkrzywiec.fooddelivery.delivery.domain;
 
-import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
 import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated;
 import lombok.Getter;
@@ -52,12 +51,16 @@ import static java.lang.String.format;
         return delivery;
     }
 
-    public DeliveryCreated deliveryCreated() {
+    public DeliveryCreated deliveryCreatedIntegrationEvent() {
         return new DeliveryCreated(orderId, 1, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, total);
     }
 
-    public EventEntity deliveryCreatedEvent(Clock clock) {
-        return newEventEntity(new DeliveryEvent.DeliveryCreated(orderId, 0, customerId, farmId, address, items.stream().map(ItemTestData::entity).toList(), deliveryCharge, total), ORDERS_CHANNEL, clock);
+    public EventEntity deliveryCreatedEntity(Clock clock) {
+        return newEventEntity(deliveryCreated(), ORDERS_CHANNEL, clock);
+    }
+
+    public DeliveryEvent deliveryCreated() {
+         return new DeliveryEvent.DeliveryCreated(orderId, 0, customerId, farmId, address, items.stream().map(ItemTestData::entity).toList(), deliveryCharge, total);
     }
 
     public DeliveryTestData withOrderId(String orderId) {
