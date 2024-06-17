@@ -18,7 +18,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity
-//todo do somthing with this orders channel
 import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.ORDERS_CHANNEL
 
 @Subject(DeliveryFacade)

@@ -30,7 +30,6 @@ class DefaultProfileDeliveryProcessComponentTest extends IntegrationTest {
     @Autowired
     private EventStore eventStore
 
-    //todo refactor to other use case - to cover both loading and inserting events
     def "Delivery is created"() {
         given:
         Faker faker = new Faker()
