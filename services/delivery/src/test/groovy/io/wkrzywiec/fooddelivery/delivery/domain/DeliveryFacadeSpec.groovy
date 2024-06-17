@@ -18,6 +18,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity
+//todo do somthing with this orders channel
 import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.ORDERS_CHANNEL
 
 @Subject(DeliveryFacade)
@@ -61,9 +62,7 @@ class DeliveryFacadeSpec extends Specification {
         )
 
         and: "DeliveryCreated event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) { event ->
-            verifyEventHeader(event, delivery.orderId, "DeliveryCreated")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "DeliveryCreated")
     }
 
     def "Add tip to delivery"() {
@@ -84,10 +83,7 @@ class DeliveryFacadeSpec extends Specification {
         )
 
         and: "TipAddedToDelivery event is published on 'orders' channel"
-        //todo extract to method
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-            verifyEventHeader(event, delivery.orderId, "TipAddedToDelivery")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "TipAddedToDelivery")
     }
 
     def "Cancel a delivery"() {
@@ -109,9 +105,7 @@ class DeliveryFacadeSpec extends Specification {
         )
 
         and: "DeliveryCancelled event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-            verifyEventHeader(event, delivery.orderId, "DeliveryCanceled")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "DeliveryCanceled")
     }
 
     def "Food in preparation"() {
@@ -132,9 +126,7 @@ class DeliveryFacadeSpec extends Specification {
         )
 
         and: "FoodInPreparation event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-            verifyEventHeader(event, delivery.orderId, "FoodInPreparation")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "FoodInPreparation")
     }
 
     def "Assign delivery man to delivery"() {
@@ -156,9 +148,7 @@ class DeliveryFacadeSpec extends Specification {
         )
 
         and: "DeliveryManAssigned event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-            verifyEventHeader(event, delivery.orderId, "DeliveryManAssigned")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "DeliveryManAssigned")
     }
 
     def "Un assign delivery man from delivery"() {
@@ -182,9 +172,7 @@ class DeliveryFacadeSpec extends Specification {
 
 
         and: "DeliveryManUnAssigned event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-            verifyEventHeader(event, delivery.orderId, "DeliveryManUnAssigned")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "DeliveryManUnAssigned")
     }
 
     def "Food is ready"() {
@@ -206,9 +194,7 @@ class DeliveryFacadeSpec extends Specification {
         )
 
         and: "FoodIsRead event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-            verifyEventHeader(event, delivery.orderId, "FoodIsRead")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "FoodIsRead")
     }
 
     def "Food is picked up"() {
@@ -231,9 +217,7 @@ class DeliveryFacadeSpec extends Specification {
         )
 
         and: "FoodIsPickedUp event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-            verifyEventHeader(event, delivery.orderId, "FoodWasPickedUp")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "FoodWasPickedUp")
     }
 
     def "Food is delivered"() {
@@ -258,9 +242,7 @@ class DeliveryFacadeSpec extends Specification {
         )
 
         and: "FoodDelivered event is published on 'orders' channel"
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) {event ->
-            verifyEventHeader(event, delivery.orderId, "FoodDelivered")
-        }
+        verifyIntegrationEvent(delivery.getOrderId(), "FoodDelivered")
     }
 
     private EventEntity eventEntity(DeliveryEvent deliveryEvent) {
@@ -277,6 +259,12 @@ class DeliveryFacadeSpec extends Specification {
 
     private static boolean eventsAreEqualIgnoringId(EventEntity expected, EventEntity actual) {
         expected.properties.findAll { it.key != "id" } == actual.properties.findAll { it.key != "id" }
+    }
+
+    private void verifyIntegrationEvent(String orderId, String eventType) {
+        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) { event ->
+            verifyEventHeader(event, orderId, eventType)
+        }
     }
 
     private void verifyEventHeader(IntegrationMessage event, String orderId, String eventType) {
