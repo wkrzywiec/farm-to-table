@@ -51,10 +51,6 @@ import static java.lang.String.format;
         return delivery;
     }
 
-    public DeliveryCreated deliveryCreatedIntegrationEvent() {
-        return new DeliveryCreated(orderId, 1, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, total);
-    }
-
     public EventEntity deliveryCreatedEntity(Clock clock) {
         return newEventEntity(deliveryCreated(), ORDERS_CHANNEL, clock);
     }

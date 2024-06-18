@@ -1,5 +1,6 @@
 package io.wkrzywiec.fooddelivery.ordering.domain;
 
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
 import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;
@@ -17,8 +18,8 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @ToString
 public class Order {
-
     private String id;
+    private int version;
     private String customerId;
     private String farmId;
     private OrderStatus status;
@@ -27,15 +28,16 @@ public class Order {
     private BigDecimal deliveryCharge;
     private BigDecimal tip = new BigDecimal(0);
     private BigDecimal total = new BigDecimal(0);
-    private Map<String, String> metadata;
+
+    List<DomainEvent> changes = new ArrayList<>();
 
     private Order() {}
 
     private Order(String id, String customerId, String farmId, List<Item> items, String address, BigDecimal deliveryCharge) {
-        this(id, customerId, farmId, CREATED, address, items, deliveryCharge, BigDecimal.ZERO, new HashMap<>());
+        this(id, customerId, farmId, CREATED, address, items, deliveryCharge, BigDecimal.ZERO);
     }
 
-    private Order(String id, String customerId, String farmId, OrderStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip, Map<String, String> metadata) {
+    private Order(String id, String customerId, String farmId, OrderStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip) {
         if (id == null) {
             this.id = UUID.randomUUID().toString();
         } else {
@@ -48,7 +50,6 @@ public class Order {
         this.items = items;
         this.deliveryCharge = deliveryCharge;
         this.tip = tip;
-        this.metadata = metadata;
         this.calculateTotal();
     }
 
@@ -61,6 +62,14 @@ public class Order {
                 createOrder.address(),
                 createOrder.deliveryCharge());
 
+        order.changes.add(
+                new OrderingEvent.OrderCreated(
+                        order.id, 0,
+                        order.customerId, order.farmId,
+                        order.address, order.items,
+                        order.deliveryCharge, order.total
+                )
+        );
         return order;
     }
 
@@ -72,60 +81,52 @@ public class Order {
                 .build()).toList();
     }
 
-    static Order from(List<IntegrationMessage> events) {
+    static Order from(List<OrderingEvent> events) {
         Order order = null;
-        for (IntegrationMessage event: events) {
-            if (event.body() instanceof OrderCreated created) {
-                order = new Order(
-                        created.orderId(), created.customerId(),
-                        created.farmId(), mapItems(created.items()),
-                        created.address(), created.deliveryCharge()
-                );
-            }
+        for (OrderingEvent event: events) {
+            switch (event) {
+                case OrderingEvent.OrderCreated created -> {
+                    order = new Order();
 
-            if (event.body() instanceof OrderCanceled canceled) {
-                var meta = order.getMetadata();
-                meta.put("cancellationReason", canceled.reason());
-                order = new Order(
-                        order.getId(), order.getCustomerId(),
-                        order.getFarmId(), CANCELED,
-                        order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), order.getTip(),
-                        meta
-                );
-            }
+                    order.id = created.orderId();
+                    order.version = 0;
+                    order.status = CREATED;
+                    order.customerId = created.customerId();
+                    order.farmId = created.farmId();
+                    order.items = created.items();
+                    order.address = created.address();
+                    order.deliveryCharge = created.deliveryCharge();
+                    order.tip = BigDecimal.ZERO;
+                }
 
-            if (event.body() instanceof OrderInProgress) {
-                order = new Order(
-                        order.getId(), order.getCustomerId(),
-                        order.getFarmId(), IN_PROGRESS,
-                        order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), order.getTip(),
-                        order.getMetadata()
-                );
-            }
+                case OrderingEvent.OrderCanceled canceled -> {
+                    order.status = CANCELED;
+                    order.version = canceled.version();
+                }
 
-            if (event.body() instanceof TipAddedToOrder tipAdded) {
-                order = new Order(
-                        order.getId(), order.getCustomerId(),
-                        order.getFarmId(), order.getStatus(),
-                        order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), tipAdded.tip(),
-                        order.getMetadata()
-                );
-            }
+                case OrderingEvent.OrderInProgress inProgress -> {
+                    order.status = IN_PROGRESS;
+                    order.version = inProgress.version();
+                }
 
-            if (event.body() instanceof OrderCompleted) {
-                order = new Order(
-                        order.getId(), order.getCustomerId(),
-                        order.getFarmId(), COMPLETED,
-                        order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), order.getTip(),
-                        order.getMetadata()
-                );
+                case OrderingEvent.TipAddedToOrder tipAdded -> {
+                    order.tip = tipAdded.tip();
+                    order.version = tipAdded.version();
+                }
+
+                case OrderingEvent.OrderCompleted completed -> {
+                    order.status = COMPLETED;
+                    order.version = completed.version();
+                }
+
+                default -> throw new IllegalArgumentException("Failed to replay events to build order object. Unhandled events: " + event.getClass());
             }
         }
         return order;
+    }
+
+    List<DomainEvent> uncommittedChanges() {
+        return changes;
     }
 
     void calculateTotal() {
@@ -142,14 +143,16 @@ public class Order {
         }
         this.status = CANCELED;
 
-        if (reason != null) {
-            metadata.put("cancellationReason", reason);
-        }
+        increaseVersion();
+        changes.add(new OrderingEvent.OrderCanceled(id, version, reason));
     }
 
     void setInProgress() {
         if (status == CREATED) {
             this.status = IN_PROGRESS;
+
+            increaseVersion();
+            changes.add(new OrderingEvent.OrderInProgress(id, version));
             return;
         }
         throw new OrderingException(format("Failed to set an '%s' order to IN_PROGRESS. It's not allowed to do it for an order with '%s' status", id, status));
@@ -158,13 +161,23 @@ public class Order {
     public void addTip(BigDecimal tip) {
         this.tip = tip;
         this.calculateTotal();
+
+        increaseVersion();
+        changes.add(new OrderingEvent.TipAddedToOrder(id, version, tip, total));
     }
 
     public void complete() {
         if (status == IN_PROGRESS) {
             this.status = COMPLETED;
+
+            increaseVersion();
+            changes.add(new OrderingEvent.OrderCompleted(id, version));
             return;
         }
         throw new OrderingException(format("Failed to set an '%s' order to COMPLETED. It's not allowed to do it for an order with '%s' status", id, status));
+    }
+
+    private void increaseVersion() {
+        this.version = this.version + 1;
     }
 }

@@ -203,23 +203,6 @@ public class DeliveryFacade {
         return Delivery.from(storedEvents.stream().map(eventEntity -> (DeliveryEvent) eventEntity.data()).toList());
     }
 
-    private void storeAndPublishEvents(Delivery delivery) {
-        List<EventEntity> eventEntities = storeUncommittedEvents(delivery);
-        prepareAndPublishIntegrationEvents(eventEntities);
-    }
-
-    private void prepareAndPublishIntegrationEvents(List<EventEntity> eventEntities) {
-        List<IntegrationMessage> integrationEvents = integrationEvents(eventEntities, DeliveryEventMapper.INSTANCE);
-        publisher.send(integrationEvents);
-    }
-
-    private List<EventEntity> storeUncommittedEvents(Delivery delivery) {
-        List<DomainEvent> domainEvents = delivery.uncommittedChanges();
-        List<EventEntity> eventEntities = newEventEntities(domainEvents, ORDERS_CHANNEL, clock);
-        eventStore.store(eventEntities);
-        return eventEntities;
-    }
-
     private void process(String streamId, CheckedRunnable runProcess, String failureMessage) {
         Try.run(runProcess)
                 .onFailure(ex -> publishingFailureEvent(streamId, failureMessage, ex));
@@ -237,5 +220,22 @@ public class DeliveryFacade {
 
     private Header eventHeader(String orderId, int version, String type) {
         return new Header(UUID.randomUUID().toString(), version, ORDERS_CHANNEL, type, orderId, clock.instant());
+    }
+
+    private void storeAndPublishEvents(Delivery delivery) {
+        List<EventEntity> eventEntities = storeUncommittedEvents(delivery);
+        prepareAndPublishIntegrationEvents(eventEntities);
+    }
+
+    private List<EventEntity> storeUncommittedEvents(Delivery delivery) {
+        List<DomainEvent> domainEvents = delivery.uncommittedChanges();
+        List<EventEntity> eventEntities = newEventEntities(domainEvents, ORDERS_CHANNEL, clock);
+        eventStore.store(eventEntities);
+        return eventEntities;
+    }
+
+    private void prepareAndPublishIntegrationEvents(List<EventEntity> eventEntities) {
+        List<IntegrationMessage> integrationEvents = integrationEvents(eventEntities, DeliveryEventMapper.INSTANCE);
+        publisher.send(integrationEvents);
     }
 }

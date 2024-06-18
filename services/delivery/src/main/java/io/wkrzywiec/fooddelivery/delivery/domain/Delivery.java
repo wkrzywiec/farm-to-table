@@ -18,8 +18,8 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @ToString
 public class Delivery {
-    private int version;
     private String orderId;
+    private int version;
     private String customerId;
     private String farmId;
     private String deliveryManId;
@@ -73,7 +73,7 @@ public class Delivery {
                 case DeliveryEvent.DeliveryCreated created -> {
                     delivery = new Delivery();
 
-                    delivery.version = created.version();
+                    delivery.version = 0;
                     delivery.orderId = created.orderId();
                     delivery.customerId = created.customerId();
                     delivery.farmId = created.farmId();

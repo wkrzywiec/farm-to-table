@@ -244,16 +244,16 @@ class DeliveryFacadeSpec extends Specification {
         verifyIntegrationEvent(delivery.getOrderId(), "FoodDelivered")
     }
 
-    private EventEntity eventEntity(DeliveryEvent deliveryEvent) {
-        return newEventEntity(deliveryEvent, ORDERS_CHANNEL, testClock)
-    }
-
     private void verifyEventInStore(DeliveryEvent expectedDomainEvent, int expectedStreamSize) {
         def expectedEvent = eventEntity(expectedDomainEvent)
         def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, expectedDomainEvent.streamId())
         assert storedEvents.size() == expectedStreamSize
         def actualEvent = storedEvents.last
-        eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+        assert eventsAreEqualIgnoringId(expectedEvent, actualEvent)
+    }
+
+    private EventEntity eventEntity(DeliveryEvent deliveryEvent) {
+        return newEventEntity(deliveryEvent, ORDERS_CHANNEL, testClock)
     }
 
     private static boolean eventsAreEqualIgnoringId(EventEntity expected, EventEntity actual) {
