@@ -18,7 +18,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity
-import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.ORDERS_CHANNEL
+import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.DELIVERY_CHANNEL
 
 @Subject(DeliveryFacade)
 @Title("Specification for delivery process")
@@ -246,14 +246,14 @@ class DeliveryFacadeSpec extends Specification {
 
     private void verifyEventInStore(DeliveryEvent expectedDomainEvent, int expectedStreamSize) {
         def expectedEvent = eventEntity(expectedDomainEvent)
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, expectedDomainEvent.streamId())
+        def storedEvents = eventStore.fetchEvents(DELIVERY_CHANNEL, expectedDomainEvent.streamId())
         assert storedEvents.size() == expectedStreamSize
         def actualEvent = storedEvents.last
         assert eventsAreEqualIgnoringId(expectedEvent, actualEvent)
     }
 
     private EventEntity eventEntity(DeliveryEvent deliveryEvent) {
-        return newEventEntity(deliveryEvent, ORDERS_CHANNEL, testClock)
+        return newEventEntity(deliveryEvent, DELIVERY_CHANNEL, testClock)
     }
 
     private static boolean eventsAreEqualIgnoringId(EventEntity expected, EventEntity actual) {
@@ -261,7 +261,7 @@ class DeliveryFacadeSpec extends Specification {
     }
 
     private void verifyIntegrationEvent(String orderId, String eventType) {
-        with(publisher.messages.get(ORDERS_CHANNEL).get(0)) { event ->
+        with(publisher.messages.get(DELIVERY_CHANNEL).get(0)) { event ->
             verifyEventHeader(event, orderId, eventType)
         }
     }
@@ -269,7 +269,7 @@ class DeliveryFacadeSpec extends Specification {
     private void verifyEventHeader(IntegrationMessage event, String orderId, String eventType) {
         def header = event.header()
         header.id() != null
-        header.channel() == ORDERS_CHANNEL
+        header.channel() == DELIVERY_CHANNEL
         header.type() == eventType
         header.streamId() == orderId
         header.createdAt() == testClock.instant()

@@ -1,7 +1,6 @@
 package io.wkrzywiec.fooddelivery.delivery.domain;
 
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated;
 import lombok.Getter;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
@@ -10,7 +9,7 @@ import java.time.Clock;
 import java.util.*;
 
 import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity;
-import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.ORDERS_CHANNEL;
+import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.DELIVERY_CHANNEL;
 import static java.lang.String.format;
 
 @Getter
@@ -52,7 +51,7 @@ import static java.lang.String.format;
     }
 
     public EventEntity deliveryCreatedEntity(Clock clock) {
-        return newEventEntity(deliveryCreated(), ORDERS_CHANNEL, clock);
+        return newEventEntity(deliveryCreated(), DELIVERY_CHANNEL, clock);
     }
 
     public DeliveryEvent deliveryCreated() {

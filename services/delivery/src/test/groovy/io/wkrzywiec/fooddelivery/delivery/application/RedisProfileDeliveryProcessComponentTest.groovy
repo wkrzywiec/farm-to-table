@@ -8,7 +8,6 @@ import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore
 import io.wkrzywiec.fooddelivery.delivery.IntegrationTest
 import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryEvent
 import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated
 import io.wkrzywiec.fooddelivery.delivery.infra.stream.RedisOrdersChannelConsumer
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated
@@ -20,7 +19,7 @@ import spock.lang.Subject
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.ORDERS_CHANNEL
+import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.DELIVERY_CHANNEL
 import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryTestData.aDelivery
 import static io.wkrzywiec.fooddelivery.delivery.domain.ItemTestData.anItem
 
@@ -55,14 +54,14 @@ class RedisProfileDeliveryProcessComponentTest extends IntegrationTest {
         then:
         Awaitility.await().atMost(5, TimeUnit.SECONDS)
                 .until {
-                    def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
+                    def event = redisStreamsClient.getLatestMessageFromStreamAsJson(DELIVERY_CHANNEL)
 
                     event.get("header").get("streamId").asText() == delivery.orderId
                     event.get("header").get("type").asText() == "DeliveryCreated"
                 }
 
         and: "event is saved in event store"
-        def events = eventStore.fetchEvents(ORDERS_CHANNEL, delivery.orderId)
+        def events = eventStore.fetchEvents(DELIVERY_CHANNEL, delivery.orderId)
         events.size() == 1
         events[0].type() == "DeliveryCreated"
 

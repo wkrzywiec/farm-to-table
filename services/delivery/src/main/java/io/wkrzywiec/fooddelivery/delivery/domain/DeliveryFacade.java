@@ -29,7 +29,7 @@ import static java.lang.String.format;
 @Component
 public class DeliveryFacade {
 
-    public static final String ORDERS_CHANNEL = "orders";
+    public static final String DELIVERY_CHANNEL = "delivery";
     private final EventStore eventStore;
     private final MessagePublisher publisher;
     private final Clock clock;
@@ -196,7 +196,7 @@ public class DeliveryFacade {
     }
 
     private Delivery findDelivery(String orderId) {
-        var storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, orderId);
+        var storedEvents = eventStore.fetchEvents(DELIVERY_CHANNEL, orderId);
         if (storedEvents.isEmpty()) {
             throw new DeliveryException(format("There is no delivery with an orderId '%s'.", orderId));
         }
@@ -219,7 +219,7 @@ public class DeliveryFacade {
     }
 
     private Header eventHeader(String orderId, int version, String type) {
-        return new Header(UUID.randomUUID().toString(), version, ORDERS_CHANNEL, type, orderId, clock.instant());
+        return new Header(UUID.randomUUID().toString(), version, DELIVERY_CHANNEL, type, orderId, clock.instant());
     }
 
     private void storeAndPublishEvents(Delivery delivery) {
@@ -229,7 +229,7 @@ public class DeliveryFacade {
 
     private List<EventEntity> storeUncommittedEvents(Delivery delivery) {
         List<DomainEvent> domainEvents = delivery.uncommittedChanges();
-        List<EventEntity> eventEntities = newEventEntities(domainEvents, ORDERS_CHANNEL, clock);
+        List<EventEntity> eventEntities = newEventEntities(domainEvents, DELIVERY_CHANNEL, clock);
         eventStore.store(eventEntities);
         return eventEntities;
     }
