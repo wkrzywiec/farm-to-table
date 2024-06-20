@@ -77,7 +77,7 @@ services:
       - ./infra/postgres:/docker-entrypoint-initdb.d
 
   pgadmin:
-    image: dpage/pgadmin4:7.4
+    image: dpage/pgadmin4:8.8
     container_name: pgadmin
     restart: always
     environment:

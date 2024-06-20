@@ -1,5 +1,6 @@
 package io.wkrzywiec.fooddelivery.food.repository;
 
+import com.google.gson.Gson;
 import io.wkrzywiec.fooddelivery.food.controller.FoodItemDTO;
 import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.json.commands.RedisJsonV2Commands;
@@ -12,6 +13,7 @@ import java.util.UUID;
 public class RedisFoodItemRepository implements FoodItemRepository {
 
     private final RedisJsonV2Commands redisJson;
+    final Gson gson = new Gson();
 
     public List<FoodItemDTO> saveAll(List<FoodItemDTO> foodItemDTOs) {
         List<FoodItemDTO> result = new ArrayList<>();
@@ -22,7 +24,7 @@ public class RedisFoodItemRepository implements FoodItemRepository {
             }
 
             String key = getKey(food);
-            redisJson.jsonSet(key, food);
+            redisJson.jsonSet(key, gson.toJson(food));
             result.add(food);
         }
 
