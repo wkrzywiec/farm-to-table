@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wkrzywiec.fooddelivery.bff.domain.view.incoming.*;
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +13,14 @@ import org.springframework.data.redis.connection.stream.MapRecord;
 
 @Slf4j
 @RequiredArgsConstructor
-public class RedisOrdersChannelConsumer implements RedisStreamListener {
+public class RedisDeliveryChannelConsumer implements RedisStreamListener {
 
     private final RedisDeliveryViewProcessor processor;
     private final ObjectMapper objectMapper;
 
     @Override
     public String streamName() {
-        return "orders";
+        return "delivery";
     }
 
     @Override
@@ -43,7 +43,7 @@ public class RedisOrdersChannelConsumer implements RedisStreamListener {
             var messageAsJson = objectMapper.readTree(payloadMessage);
             Header header = map(messageAsJson.get("header"), Header.class);
 
-            DomainMessageBody event = switch (header.type()) {
+            IntegrationMessageBody event = switch (header.type()) {
                 case "DeliveryCreated" -> mapMessageBody(messageAsJson, DeliveryCreated.class);
                 case "TipAddedToDelivery" -> mapMessageBody(messageAsJson, TipAddedToDelivery.class);
                 case "DeliveryCanceled" -> mapMessageBody(messageAsJson, DeliveryCanceled.class);

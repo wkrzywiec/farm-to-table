@@ -13,7 +13,7 @@ public class ItemTestData {
 
     private ItemTestData() {};
 
-    Item entity() {
+    public Item entity() {
         return Item.builder()
                 .name(name)
                 .amount(amount)

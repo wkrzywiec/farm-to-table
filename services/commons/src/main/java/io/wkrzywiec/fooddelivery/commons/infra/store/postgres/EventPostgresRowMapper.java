@@ -1,11 +1,11 @@
-package io.wkrzywiec.fooddelivery.commons.infra.store;
+package io.wkrzywiec.fooddelivery.commons.infra.store.postgres;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventClassTypeProvider;
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,26 +16,23 @@ import java.time.Instant;
 
 @RequiredArgsConstructor
 @Slf4j
-class MessagePostgresRowMapper implements RowMapper<Message> {
+class EventPostgresRowMapper implements RowMapper<EventEntity> {
 
     private final ObjectMapper objectMapper;
     private final EventClassTypeProvider caster;
 
     @Override
-    public Message mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public EventEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
         String eventType = rs.getString("type");
-        DomainMessageBody body = extractBody(rs, eventType);
-        return new Message(
-                new Header(
-                        rs.getString("id"),
-                        rs.getInt("version"),
-                        rs.getString("channel"),
-                        eventType,
-                        rs.getString("stream_id"),
-                        extractInstant(rs, "created_at")
-                ),
-                body
-
+        DomainEvent event = extractData(rs, eventType);
+        return new EventEntity(
+                rs.getString("id"),
+                rs.getString("stream_id"),
+                rs.getInt("version"),
+                rs.getString("channel"),
+                eventType,
+                event,
+                extractInstant(rs, "added_at")
         );
     }
 
@@ -46,8 +43,8 @@ class MessagePostgresRowMapper implements RowMapper<Message> {
         return rs.getTimestamp(columnName).toInstant();
     }
 
-    private DomainMessageBody extractBody(ResultSet rs, String eventType) throws SQLException {
-        String bodyAsString = rs.getString("body");
+    private DomainEvent extractData(ResultSet rs, String eventType) throws SQLException {
+        String bodyAsString = rs.getString("data");
         JsonNode bodyAsJsonNode = mapToJsonNode(bodyAsString);
         return mapEventBody(bodyAsJsonNode, eventType);
     }
@@ -61,12 +58,12 @@ class MessagePostgresRowMapper implements RowMapper<Message> {
         }
     }
 
-    private DomainMessageBody mapEventBody(JsonNode eventBody, String eventType) {
-        Class<? extends DomainMessageBody> classType = caster.getClassType(eventType);
+    private DomainEvent mapEventBody(JsonNode eventBody, String eventType) {
+        Class<? extends DomainEvent> classType = caster.getClassType(eventType);
         return mapEventBody(eventBody, classType);
     }
 
-    private <T extends DomainMessageBody> T mapEventBody(JsonNode eventBody, Class<T> valueType) {
+    private <T extends DomainEvent> T mapEventBody(JsonNode eventBody, Class<T> valueType) {
         try {
             return objectMapper.treeToValue(eventBody, valueType);
         } catch (JsonProcessingException e) {

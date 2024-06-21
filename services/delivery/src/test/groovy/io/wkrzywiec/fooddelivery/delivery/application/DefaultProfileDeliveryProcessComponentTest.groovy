@@ -2,14 +2,14 @@ package io.wkrzywiec.fooddelivery.delivery.application
 
 import com.github.javafaker.Faker
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
-import io.wkrzywiec.fooddelivery.commons.infra.store.PostgresEventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.postgres.PostgresEventStore
 import io.wkrzywiec.fooddelivery.delivery.IntegrationTest
+import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryEvent
 import io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.Item
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.DeliveryCreated
 import io.wkrzywiec.fooddelivery.delivery.infra.stream.RedisOrdersChannelConsumer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
@@ -19,6 +19,7 @@ import spock.lang.Subject
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
+import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryFacade.DELIVERY_CHANNEL
 import static io.wkrzywiec.fooddelivery.delivery.domain.DeliveryTestData.aDelivery
 import static io.wkrzywiec.fooddelivery.delivery.domain.ItemTestData.anItem
 
@@ -45,7 +46,7 @@ class DefaultProfileDeliveryProcessComponentTest extends IntegrationTest {
                 delivery.getDeliveryCharge(), delivery.getTotal())
 
         def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), delivery.orderId, Instant.now())
-        def message = new Message(header, body)
+        def message = new IntegrationMessage(header, body)
 
         when:
         redisStreamsClient.publishMessage(message)
@@ -53,23 +54,23 @@ class DefaultProfileDeliveryProcessComponentTest extends IntegrationTest {
         then:
         Awaitility.await().atMost(5, TimeUnit.SECONDS)
                 .until {
-                    def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
+                    def event = redisStreamsClient.getLatestMessageFromStreamAsJson(DELIVERY_CHANNEL)
 
                     event.get("header").get("streamId").asText() == delivery.orderId
                     event.get("header").get("type").asText() == "DeliveryCreated"
                 }
 
         and: "event is saved in event store"
-        def events = eventStore.getEventsForOrder(delivery.orderId)
+        def events = eventStore.fetchEvents(DELIVERY_CHANNEL, delivery.orderId)
         events.size() == 1
-        events[0].header().type() == "DeliveryCreated"
+        events[0].type() == "DeliveryCreated"
 
-        def eventBody = events[0].body()
-        eventBody instanceof DeliveryCreated
-        eventBody as DeliveryCreated == new DeliveryCreated(
-                delivery.orderId, 1, delivery.customerId,
+        def eventBody = events[0].data()
+        eventBody instanceof DeliveryEvent.DeliveryCreated
+        eventBody as DeliveryEvent.DeliveryCreated == new DeliveryEvent.DeliveryCreated(
+                delivery.orderId, 0, delivery.customerId,
                 delivery.farmId, delivery.address,
-                delivery.items.stream().map(i -> i.dto()).toList(),
+                delivery.items.stream().map(i -> i.entity()).toList(),
                 delivery.deliveryCharge, delivery.total)
     }
 }

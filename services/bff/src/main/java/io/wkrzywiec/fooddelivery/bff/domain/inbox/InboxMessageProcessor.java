@@ -1,10 +1,10 @@
 package io.wkrzywiec.fooddelivery.bff.domain.inbox;
 
 import io.wkrzywiec.fooddelivery.bff.application.controller.model.*;
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 import io.wkrzywiec.fooddelivery.commons.model.*;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,7 @@ public class InboxMessageProcessor {
         messagePublisher.send(command);
     }
 
-    private DomainMessageBody commandBody(UpdateDeliveryDTO updateDeliveryDTO) {
+    private IntegrationMessageBody commandBody(UpdateDeliveryDTO updateDeliveryDTO) {
         return switch (updateDeliveryDTO.getStatus()) {
             case "prepareFood" -> new PrepareFood(updateDeliveryDTO.getOrderId(), updateDeliveryDTO.getVersion());
             case "foodReady" -> new FoodReady(updateDeliveryDTO.getOrderId(), updateDeliveryDTO.getVersion());
@@ -71,15 +71,15 @@ public class InboxMessageProcessor {
         messagePublisher.send(command);
     }
 
-    private Message command(String orderId, DomainMessageBody commandBody) {
-        return new Message(commandHeader(orderId, commandBody.getClass().getSimpleName()), commandBody);
+    private IntegrationMessage command(String orderId, IntegrationMessageBody commandBody) {
+        return new IntegrationMessage(commandHeader(orderId, commandBody.getClass().getSimpleName()), commandBody);
     }
 
     private Header commandHeader(String orderId, String type) {
         return new Header(UUID.randomUUID().toString(), 1, ORDERS_CHANNEL, type, orderId, clock.instant());
     }
 
-    private DomainMessageBody commandBody(ChangeDeliveryManDTO changeDeliveryManDTO) {
+    private IntegrationMessageBody commandBody(ChangeDeliveryManDTO changeDeliveryManDTO) {
         if (changeDeliveryManDTO.getDeliveryManId() == null) {
             return new UnAssignDeliveryMan(changeDeliveryManDTO.getOrderId(), changeDeliveryManDTO.getVersion());
         }

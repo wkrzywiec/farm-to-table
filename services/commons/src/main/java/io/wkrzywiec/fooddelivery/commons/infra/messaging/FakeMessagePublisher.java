@@ -9,10 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class FakeMessagePublisher implements MessagePublisher {
 
-    public ConcurrentHashMap<String, List<Message>> messages = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, List<IntegrationMessage>> messages = new ConcurrentHashMap<>();
 
     @Override
-    public void send(Message message) {
+    public void send(IntegrationMessage message) {
       log.info("Publishing '{}' message on channel: '{}', body: '{}'", message.header().type(), message.header().channel(), message.body());
       var channel = message.header().channel();
 

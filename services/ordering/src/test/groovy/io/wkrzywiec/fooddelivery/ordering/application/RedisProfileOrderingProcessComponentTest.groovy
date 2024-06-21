@@ -2,12 +2,12 @@ package io.wkrzywiec.fooddelivery.ordering.application
 
 import com.github.javafaker.Faker
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
-import io.wkrzywiec.fooddelivery.commons.infra.store.RedisEventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore
 import io.wkrzywiec.fooddelivery.ordering.IntegrationTest
+import io.wkrzywiec.fooddelivery.ordering.domain.OrderingEvent
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
-import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated
 import io.wkrzywiec.fooddelivery.ordering.infra.stream.RedisOrdersChannelConsumer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ActiveProfiles
@@ -17,6 +17,7 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
+import static io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade.ORDERS_CHANNEL
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await
 
@@ -39,7 +40,7 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
 
         def body = order.createOrder()
         def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), order.id, Instant.now())
-        def message = new Message(header, body)
+        def message = new IntegrationMessage(header, body)
 
         when: "is published"
         redisStreamsClient.publishMessage(message)
@@ -62,16 +63,16 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
                 }
 
         and: "event is saved in event store"
-        def events = eventStore.getEventsForOrder(order.id)
+        def events = eventStore.fetchEvents(ORDERS_CHANNEL, order.id)
         events.size() == 1
-        events[0].header().type() == "OrderCreated"
+        events[0].type() == "OrderCreated"
 
-        def eventBody = events[0].body()
-        eventBody instanceof OrderCreated
-        eventBody as OrderCreated == new OrderCreated(
-                order.id, 1, order.customerId,
+        def eventBody = events[0].data()
+        eventBody instanceof OrderingEvent.OrderCreated
+        eventBody as OrderingEvent.OrderCreated == new OrderingEvent.OrderCreated(
+                order.id, 0, order.customerId,
                 order.farmId, order.address,
-                order.items.stream().map(i -> i.dto()).toList(),
+                order.items.stream().map(i -> i.entity()).toList(),
                 order.deliveryCharge, order.total())
     }
 }

@@ -1,17 +1,17 @@
 package io.wkrzywiec.fooddelivery.commons.infra.store
 
 import io.wkrzywiec.fooddelivery.commons.CommonsIntegrationTest
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
-import io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
+import io.wkrzywiec.fooddelivery.commons.infra.TestDomainEvent
+import io.wkrzywiec.fooddelivery.commons.infra.store.postgres.PostgresEventStore
 import spock.lang.Subject
 
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-import static io.wkrzywiec.fooddelivery.commons.infra.IntegrationTestEventBody.aSampleEvent
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.firstMessage
+import static io.wkrzywiec.fooddelivery.commons.infra.TestDomainEvent.aSampleEvent
+import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity
 
 @Subject(PostgresEventStore)
 class PostgresEventStoreIT extends CommonsIntegrationTest {
@@ -29,13 +29,13 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
         given:
         def eventBody = aSampleEvent(TEST_TIME)
         def testChannel = "test-channel"
-        def event = firstMessage(testChannel, TEST_CLOCK, eventBody)
+        def event = newEventEntity(eventBody, testChannel, TEST_CLOCK)
 
         when:
         eventStore.store(event)
 
         then:
-        List<Message> storedEvents = eventStore.getEventsForOrder(eventBody.orderId())
+        List<EventEntity> storedEvents = eventStore.fetchEvents(testChannel, eventBody.streamId())
         storedEvents.size() == 1
         def storedEvent = storedEvents.get(0)
         storedEvent == event
@@ -44,8 +44,8 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
     private class IntegrationTestEventTestClassProvider implements EventClassTypeProvider {
 
         @Override
-        Class<? extends DomainMessageBody> getClassType(String type) {
-            return IntegrationTestEventBody.class
+        Class<? extends IntegrationMessageBody> getClassType(String type) {
+            return TestDomainEvent.class
         }
     }
 }

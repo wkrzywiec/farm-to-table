@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS events
     version             BIGINT NOT NULL,
     channel             VARCHAR(256) NOT NULL,
     type                VARCHAR(256) NOT NULL,
-    body                JSONB NOT NULL,
-    created_at          TIMESTAMP WITH TIME ZONE NOT NULL
+    data                JSONB NOT NULL,
+    added_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    UNIQUE (stream_id, version)
 );

@@ -1,15 +1,14 @@
 package io.wkrzywiec.fooddelivery.delivery.domain;
 
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
 import io.wkrzywiec.fooddelivery.delivery.domain.incoming.OrderCreated;
-import io.wkrzywiec.fooddelivery.delivery.domain.outgoing.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,7 @@ import static java.lang.String.format;
 @ToString
 public class Delivery {
     private String orderId;
+    private int version;
     private String customerId;
     private String farmId;
     private String deliveryManId;
@@ -29,13 +29,15 @@ public class Delivery {
     private BigDecimal deliveryCharge = new BigDecimal(0);
     private BigDecimal tip = new BigDecimal(0);
     private BigDecimal total = new BigDecimal(0);
-    private Map<String, String> metadata = new HashMap<>();
+
+    List<DomainEvent> changes = new ArrayList<>();
 
     Delivery() {};
 
-    public static Delivery from(OrderCreated orderCreated, Instant creationTimestamp) {
+    public static Delivery from(OrderCreated orderCreated) {
         var delivery = new Delivery();
 
+        delivery.version = 0;
         delivery.orderId = orderCreated.orderId();
         delivery.customerId = orderCreated.customerId();
         delivery.farmId = orderCreated.farmId();
@@ -45,9 +47,14 @@ public class Delivery {
         delivery.deliveryCharge = orderCreated.deliveryCharge();
         delivery.total = orderCreated.total();
 
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("creationTimestamp", creationTimestamp.toString());
-        delivery.metadata = metadata;
+        delivery.changes.add(
+                new DeliveryEvent.DeliveryCreated(
+                        delivery.orderId, delivery.version,
+                        delivery.customerId, delivery.farmId,
+                        delivery.address, delivery.items,
+                        delivery.deliveryCharge, delivery.total
+                )
+        );
         return delivery;
     }
 
@@ -59,85 +66,74 @@ public class Delivery {
                 .build()).toList();
     }
 
-    public static Delivery from(List<Message> events) {
+    public static Delivery from(List<DeliveryEvent> events) {
         Delivery delivery = null;
-        for (Message event: events) {
-            switch (event.body()) {
-                case DeliveryCreated created -> {
+        for (DeliveryEvent event: events) {
+            switch (event) {
+                case DeliveryEvent.DeliveryCreated created -> {
                     delivery = new Delivery();
 
+                    delivery.version = 0;
                     delivery.orderId = created.orderId();
                     delivery.customerId = created.customerId();
                     delivery.farmId = created.farmId();
                     delivery.status = DeliveryStatus.CREATED;
                     delivery.address = created.address();
-                    delivery.items = mapItems(created.items());
+                    delivery.items = created.items();
                     delivery.deliveryCharge = created.deliveryCharge();
                     delivery.total = created.total();
-
-                    Map<String, String> metadata = new HashMap<>();
-                    metadata.put("creationTimestamp", event.header().createdAt().toString());
-                    delivery.metadata = metadata;
+                    delivery.version = created.version();
                 }
 
-                case TipAddedToDelivery tipAddedToDelivery -> {
+                case DeliveryEvent.TipAddedToDelivery tipAddedToDelivery -> {
                     delivery.tip = tipAddedToDelivery.tip();
                     delivery.total = tipAddedToDelivery.total();
+                    delivery.version = tipAddedToDelivery.version();
                 }
 
-                case DeliveryCanceled canceled -> {
-                    var metadata = delivery.getMetadata();
-                    metadata.put("cancellationReason", canceled.reason());
-                    metadata.put("cancellationTimestamp", event.header().createdAt().toString());
-
-                    delivery.metadata = metadata;
+                case DeliveryEvent.DeliveryCanceled canceled -> {
                     delivery.status = DeliveryStatus.CANCELED;
+                    delivery.version = canceled.version();
                 }
 
-                case FoodInPreparation foodInPreparation -> {
-                    var metadata = delivery.getMetadata();
-                    metadata.put("foodPreparationTimestamp", event.header().createdAt().toString());
-
-                    delivery.metadata = metadata;
+                case DeliveryEvent.FoodInPreparation foodInPreparation -> {
                     delivery.status = DeliveryStatus.FOOD_IN_PREPARATION;
+                    delivery.version = foodInPreparation.version();
                 }
 
-                case DeliveryManAssigned deliveryManAssigned -> {
+                case DeliveryEvent.DeliveryManAssigned deliveryManAssigned -> {
                     delivery.deliveryManId = deliveryManAssigned.deliveryManId();
+                    delivery.version = deliveryManAssigned.version();
                 }
 
-                case DeliveryManUnAssigned deliveryManUnAssigned -> {
+                case DeliveryEvent.DeliveryManUnAssigned deliveryManUnAssigned -> {
                     delivery.deliveryManId = null;
+                    delivery.version = deliveryManUnAssigned.version();
                 }
 
-                case FoodIsReady foodIsReady -> {
-                    var metadata = delivery.getMetadata();
-                    metadata.put("foodReadyTimestamp", event.header().createdAt().toString());
-
-                    delivery.metadata = metadata;
+                case DeliveryEvent.FoodIsReady foodIsReady -> {
                     delivery.status = DeliveryStatus.FOOD_READY;
+                    delivery.version = foodIsReady.version();
                 }
 
-                case FoodWasPickedUp foodWasPickedUp -> {
-                    var metadata = delivery.getMetadata();
-                    metadata.put("foodPickedUpTimestamp", event.header().createdAt().toString());
-
-                    delivery.metadata = metadata;
+                case DeliveryEvent.FoodWasPickedUp foodWasPickedUp -> {
                     delivery.status = DeliveryStatus.FOOD_PICKED;
+                    delivery.version = foodWasPickedUp.version();
                 }
 
-                case FoodDelivered foodDelivered -> {
-                    var metadata = delivery.getMetadata();
-                    metadata.put("foodDeliveredTimestamp", event.header().createdAt().toString());
-
-                    delivery.metadata = metadata;
+                case DeliveryEvent.FoodDelivered foodDelivered -> {
                     delivery.status = DeliveryStatus.FOOD_DELIVERED;
+                    delivery.version = foodDelivered.version();
                 }
 
-                default -> throw new IllegalStateException("Failed to replay events to build delivery object. Unhandled events: " + event.body().getClass());
+                default -> throw new IllegalArgumentException("Failed to replay events to build delivery object. Unhandled events: " + event.getClass());
             }
         }
         return delivery;
+    }
+
+    public List<DomainEvent> uncommittedChanges() {
+        return changes;
     }
 
     public void cancel(String reason, Instant cancellationTimestamp) {
@@ -145,11 +141,9 @@ public class Delivery {
             throw new DeliveryException(format("Failed to cancel a %s delivery. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.CANCELED;
-        metadata.put("cancellationTimestamp", cancellationTimestamp.toString());
 
-        if (reason != null) {
-            metadata.put("cancellationReason", reason);
-        }
+        increaseVersion();
+        changes.add(new DeliveryEvent.DeliveryCanceled(orderId, version, reason));
     }
 
     public void foodInPreparation(Instant foodPreparationTimestamp) {
@@ -157,7 +151,9 @@ public class Delivery {
             throw new DeliveryException(format("Failed to start food preparation for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.FOOD_IN_PREPARATION;
-        metadata.put("foodPreparationTimestamp", foodPreparationTimestamp.toString());
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.FoodInPreparation(orderId, version));
     }
 
     public void foodReady(Instant foodReadyTimestamp) {
@@ -165,7 +161,9 @@ public class Delivery {
             throw new DeliveryException(format("Failed to set food ready for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.FOOD_READY;
-        metadata.put("foodReadyTimestamp", foodReadyTimestamp.toString());
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.FoodIsReady(orderId, version));
     }
 
     public void pickUpFood(Instant foodPickedUpTimestamp) {
@@ -173,7 +171,9 @@ public class Delivery {
             throw new DeliveryException(format("Failed to set food as picked up for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.FOOD_PICKED;
-        metadata.put("foodPickedUpTimestamp", foodPickedUpTimestamp.toString());
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.FoodWasPickedUp(orderId, version));
     }
 
     public void deliverFood(Instant foodDeliveredTimestamp) {
@@ -181,7 +181,9 @@ public class Delivery {
             throw new DeliveryException(format("Failed to set food as delivered for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
         this.status = DeliveryStatus.FOOD_DELIVERED;
-        metadata.put("foodDeliveredTimestamp", foodDeliveredTimestamp.toString());
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.FoodDelivered(orderId, version));
     }
 
     public void assignDeliveryMan(String deliveryManId) {
@@ -194,6 +196,9 @@ public class Delivery {
         }
 
         this.deliveryManId = deliveryManId;
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.DeliveryManAssigned(orderId, version, deliveryManId));
     }
 
     public void unAssignDeliveryMan() {
@@ -205,11 +210,22 @@ public class Delivery {
             throw new DeliveryException(format("Failed to un assign a delivery man from an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
 
+        var unAssignedDeliveryManId = this.deliveryManId;
         this.deliveryManId = null;
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.DeliveryManUnAssigned(orderId, version, unAssignedDeliveryManId));
     }
 
     public void addTip(BigDecimal tip, BigDecimal total) {
         this.tip = tip;
         this.total = total;
+
+        increaseVersion();
+        changes.add(new DeliveryEvent.TipAddedToDelivery(orderId, version, tip, total));
+    }
+
+    private void increaseVersion() {
+        this.version = this.version + 1;
     }
 }

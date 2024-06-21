@@ -1,21 +1,25 @@
 package io.wkrzywiec.fooddelivery.ordering.domain;
 
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
 import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated;
 import lombok.Getter;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.*;
 
+import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity;
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderStatus.CREATED;
+import static io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade.ORDERS_CHANNEL;
 import static java.lang.String.format;
 
 @Getter
  class OrderTestData {
 
     private String id = UUID.randomUUID().toString();
-    private int version = 1;
+    private int version = 0;
     private String customerId = "default-customer-id";
     private String farmId = "default-farm-id";
     private OrderStatus status = CREATED;
@@ -23,7 +27,6 @@ import static java.lang.String.format;
     private List<ItemTestData> items = List.of(ItemTestData.anItem());
     private BigDecimal deliveryCharge = new BigDecimal(5);
     private BigDecimal tip = new BigDecimal(0);
-    private Map<String, String> metadata = new HashMap<>();
 
     private OrderTestData() {};
 
@@ -41,7 +44,6 @@ import static java.lang.String.format;
         setValue(order, "items", items.stream().map(ItemTestData::entity).toList());
         setValue(order, "deliveryCharge", deliveryCharge);
         setValue(order, "tip", tip);
-        setValue(order, "metadata", metadata);
 
         order.calculateTotal();
         return order;
@@ -51,9 +53,18 @@ import static java.lang.String.format;
         return new CreateOrder(id, version, customerId, farmId, items.stream().map(ItemTestData::dto).toList(), address, deliveryCharge);
     }
 
-    public OrderCreated orderCreated() {
+    public OrderCreated orderCreatedIntegrationEvent() {
          var entity = entity();
          return new OrderCreated(id, version, customerId, farmId, address, items.stream().map(ItemTestData::dto).toList(), deliveryCharge, entity.getTotal());
+    }
+
+    public EventEntity orderCreatedEntity(Clock clock) {
+        return newEventEntity(orderCreated(), ORDERS_CHANNEL, clock);
+    }
+
+    public OrderingEvent.OrderCreated orderCreated() {
+        var entity = entity();
+        return new OrderingEvent.OrderCreated(id, version, customerId, farmId, address, items.stream().map(ItemTestData::entity).toList(), deliveryCharge, entity.getTotal());
     }
 
     public BigDecimal total() {
@@ -103,11 +114,6 @@ import static java.lang.String.format;
 
     public OrderTestData withTip(BigDecimal tip) {
         this.tip = tip;
-        return this;
-    }
-
-    public OrderTestData withMetadata(Map<String, String> metadata) {
-        this.metadata = metadata;
         return this;
     }
 
