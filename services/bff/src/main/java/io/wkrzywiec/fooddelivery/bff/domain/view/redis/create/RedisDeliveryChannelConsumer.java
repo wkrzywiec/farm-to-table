@@ -13,14 +13,14 @@ import org.springframework.data.redis.connection.stream.MapRecord;
 
 @Slf4j
 @RequiredArgsConstructor
-public class RedisOrdersChannelConsumer implements RedisStreamListener {
+public class RedisDeliveryChannelConsumer implements RedisStreamListener {
 
     private final RedisDeliveryViewProcessor processor;
     private final ObjectMapper objectMapper;
 
     @Override
     public String streamName() {
-        return "orders";
+        return "delivery";
     }
 
     @Override

@@ -24,8 +24,8 @@ public class RedisStreamConsumerConfiguration extends RedisMessageConsumerConfig
     }
 
     @Bean
-    public RedisStreamListener redisOrdersChannelConsumer(RedisDeliveryViewProcessor processor, ObjectMapper objectMapper) {
-        return new RedisOrdersChannelConsumer(processor, objectMapper);
+    public RedisStreamListener redisDeliveryChannelConsumer(RedisDeliveryViewProcessor processor, ObjectMapper objectMapper) {
+        return new RedisDeliveryChannelConsumer(processor, objectMapper);
     }
 
     @Bean
