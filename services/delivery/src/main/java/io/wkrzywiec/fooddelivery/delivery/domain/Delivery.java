@@ -8,17 +8,15 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import static java.lang.String.format;
 
 @Getter
 @EqualsAndHashCode
 @ToString
 public class Delivery {
-    private String orderId;
+    private UUID orderId;
     private int version;
     private String customerId;
     private String farmId;

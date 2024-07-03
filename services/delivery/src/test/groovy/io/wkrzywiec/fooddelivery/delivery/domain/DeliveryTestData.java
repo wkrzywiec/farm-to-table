@@ -15,7 +15,7 @@ import static java.lang.String.format;
 @Getter
  public class DeliveryTestData {
 
-    private String orderId = UUID.randomUUID().toString();
+    private UUID orderId = UUID.randomUUID();
     private String customerId = "default-customerId";
     private String farmId = "default-farmId";
     private String deliveryManId = null;
@@ -58,7 +58,7 @@ import static java.lang.String.format;
          return new DeliveryEvent.DeliveryCreated(orderId, 0, customerId, farmId, address, items.stream().map(ItemTestData::entity).toList(), deliveryCharge, total);
     }
 
-    public DeliveryTestData withOrderId(String orderId) {
+    public DeliveryTestData withOrderId(UUID orderId) {
         this.orderId = orderId;
         return this;
     }

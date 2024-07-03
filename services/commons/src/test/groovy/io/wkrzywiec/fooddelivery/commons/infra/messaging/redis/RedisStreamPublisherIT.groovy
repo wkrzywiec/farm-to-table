@@ -37,7 +37,7 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
 
     def "Publish JSON message to Redis stream"() {
         given: "A message"
-        String itemId = UUID.randomUUID()
+        UUID itemId = UUID.randomUUID()
         IntegrationMessage message = event(
                 itemId,
                 aSampleEvent(Instant.now())
@@ -49,9 +49,9 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
         then: "Message was published on $testChannel redis stream"
         def publishedMessage = redis.getLatestMessageFromStreamAsJson(testChannel)
 
-        publishedMessage.get("header").get("streamId").asText() == itemId
+        publishedMessage.get("header").get("streamId").asText() == itemId.toString()
         publishedMessage.get("header").get("type").asText() == "IntegrationTestMessageBody"
-        publishedMessage.get("body").get("orderId").asText() == "some test text"
+        publishedMessage.get("body").get("orderId").asText() == message.body().orderId().toString()
     }
 
     private RedisTemplate configRedisTemplate() {
@@ -70,11 +70,11 @@ class RedisStreamPublisherIT extends CommonsIntegrationTest {
         return redisTemplate
     }
 
-    private IntegrationMessage event(String itemId, IntegrationMessageBody eventBody) {
+    private IntegrationMessage event(UUID itemId, IntegrationMessageBody eventBody) {
         return new IntegrationMessage(eventHeader(itemId, eventBody.getClass().getSimpleName()), eventBody)
     }
 
-    private Header eventHeader(String itemId, String messageType) {
-        return new Header(UUID.randomUUID().toString(), 1, testChannel, messageType, itemId, Instant.now())
+    private Header eventHeader(UUID itemId, String messageType) {
+        return new Header(UUID.randomUUID(), 1, testChannel, messageType, itemId, Instant.now())
     }
 }

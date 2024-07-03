@@ -18,7 +18,7 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @ToString
 public class Order {
-    private String id;
+    private UUID id;
     private int version;
     private String customerId;
     private String farmId;
@@ -33,13 +33,13 @@ public class Order {
 
     private Order() {}
 
-    private Order(String id, String customerId, String farmId, List<Item> items, String address, BigDecimal deliveryCharge) {
+    private Order(UUID id, String customerId, String farmId, List<Item> items, String address, BigDecimal deliveryCharge) {
         this(id, customerId, farmId, CREATED, address, items, deliveryCharge, BigDecimal.ZERO);
     }
 
-    private Order(String id, String customerId, String farmId, OrderStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip) {
+    private Order(UUID id, String customerId, String farmId, OrderStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip) {
         if (id == null) {
-            this.id = UUID.randomUUID().toString();
+            this.id = UUID.randomUUID();
         } else {
             this.id = id;
         }

@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class RedisEventStore implements EventStore {
     }
 
     @Override
-    public List<EventEntity> fetchEvents(String channel, String streamId) {
+    public List<EventEntity> fetchEvents(String channel, UUID streamId) {
         var streamReadOptions = StreamReadOptions.empty()
                 .block(Duration.ofMillis(1000))
                 .count(100);
@@ -80,8 +81,8 @@ public class RedisEventStore implements EventStore {
         var eventData =  eventAsJson.get("data");
         Class<? extends DomainEvent> classType = eventClassTypeProvider.getClassType(eventType);
         return new EventEntity(
-                eventAsJson.get("id").asText(),
-                eventAsJson.get("streamId").asText(),
+                UUID.fromString(eventAsJson.get("id").asText()),
+                UUID.fromString(eventAsJson.get("streamId").asText()),
                 eventAsJson.get("version").asInt(),
                 eventAsJson.get("channel").asText(),
                 eventType,

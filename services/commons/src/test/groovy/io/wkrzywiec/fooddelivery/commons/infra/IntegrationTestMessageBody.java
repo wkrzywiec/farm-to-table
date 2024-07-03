@@ -4,13 +4,14 @@ import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
-public record IntegrationTestMessageBody(String orderId, int version, double number, BigDecimal money, boolean truth, Instant time) implements IntegrationMessageBody {
+public record IntegrationTestMessageBody(UUID orderId, int version, double number, BigDecimal money, boolean truth, Instant time, String text) implements IntegrationMessageBody {
 
     public static IntegrationTestMessageBody aSampleEvent(Instant time) {
         return new IntegrationTestMessageBody(
-                "some test text", 1, 88.23,
+                UUID.randomUUID(), 1, 88.23,
                 BigDecimal.valueOf(1.23), true,
-                time);
+                time, "some text");
     }
 }

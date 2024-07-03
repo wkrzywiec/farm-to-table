@@ -39,7 +39,7 @@ public class DeliveryController {
     }
 
     @PatchMapping("/deliveries/{orderId}")
-    ResponseEntity<ResponseDTO> updateADelivery(@PathVariable String orderId, @RequestBody UpdateDeliveryDTO updateDelivery) {
+    ResponseEntity<ResponseDTO> updateADelivery(@PathVariable UUID orderId, @RequestBody UpdateDeliveryDTO updateDelivery) {
         log.info("Received request to update a delivery for an '{}' order, update: {}", orderId, updateDelivery);
         updateDelivery.setOrderId(orderId);
         inbox.storeMessage(DELIVERY_INBOX + ":update", updateDelivery);
@@ -48,7 +48,7 @@ public class DeliveryController {
     }
 
     @PostMapping("/deliveries/{orderId}/delivery-man")
-    ResponseEntity<ResponseDTO> deliveryMan(@PathVariable String orderId, @RequestBody ChangeDeliveryManDTO changeDeliveryMan) {
+    ResponseEntity<ResponseDTO> deliveryMan(@PathVariable UUID orderId, @RequestBody ChangeDeliveryManDTO changeDeliveryMan) {
         log.info("Received request to assign '{}' delivery man to an '{}' order", changeDeliveryMan.getDeliveryManId(), orderId);
         changeDeliveryMan.setOrderId(orderId);
         inbox.storeMessage(DELIVERY_INBOX + ":delivery-man", changeDeliveryMan);

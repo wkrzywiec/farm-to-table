@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -14,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class DeliveryView {
 
-    private String orderId;
+    private UUID orderId;
     private String customerId;
     private String farmId;
     private String deliveryManId;

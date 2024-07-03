@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 public class PostgresEventStore implements EventStore {
@@ -50,12 +51,12 @@ public class PostgresEventStore implements EventStore {
         try {
             return objectMapper.writeValueAsString(domainEvent);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to map DomainMessageBody to JSON before storing event.", e);
+            throw new RuntimeException("Failed to map DomainEvent to JSON before storing event.", e);
         }
     }
 
     @Override
-    public List<EventEntity> fetchEvents(String channel, String streamId) {
+    public List<EventEntity> fetchEvents(String channel, UUID streamId) {
 
         return jdbcTemplate.query("""
                 SELECT id, stream_id, version, channel, type, data, added_at

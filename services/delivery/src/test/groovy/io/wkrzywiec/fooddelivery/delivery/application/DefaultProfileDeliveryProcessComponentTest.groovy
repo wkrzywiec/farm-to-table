@@ -45,7 +45,7 @@ class DefaultProfileDeliveryProcessComponentTest extends IntegrationTest {
                 delivery.getItems().stream().map(i -> new Item(i.getName(), i.getAmount(), i.getPricePerItem())).toList(),
                 delivery.getDeliveryCharge(), delivery.getTotal())
 
-        def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), delivery.orderId, Instant.now())
+        def header = new Header(UUID.randomUUID(), 1, "orders", body.getClass().getSimpleName(), delivery.orderId, Instant.now())
         def message = new IntegrationMessage(header, body)
 
         when:

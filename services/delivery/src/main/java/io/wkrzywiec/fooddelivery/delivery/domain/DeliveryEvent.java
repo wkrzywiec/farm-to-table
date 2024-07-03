@@ -4,18 +4,19 @@ import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public interface DeliveryEvent extends DomainEvent {
 
-    String orderId();
+    UUID orderId();
 
     @Override
-    default String streamId() {
+    default UUID streamId() {
         return orderId();
     }
 
     record DeliveryCreated(
-            String orderId,
+            UUID orderId,
             int version,
             String customerId,
             String farmId,
@@ -26,47 +27,47 @@ public interface DeliveryEvent extends DomainEvent {
     ) implements DeliveryEvent {}
 
     record TipAddedToDelivery(
-            String orderId,
+            UUID orderId,
             int version,
             BigDecimal tip,
             BigDecimal total
     ) implements DeliveryEvent {}
 
     record DeliveryCanceled(
-            String orderId,
+            UUID orderId,
             int version,
             String reason
     ) implements DeliveryEvent {}
 
     record DeliveryManAssigned(
-            String orderId,
+            UUID orderId,
             int version,
             String deliveryManId
     ) implements DeliveryEvent {}
 
     record DeliveryManUnAssigned(
-            String orderId,
+            UUID orderId,
             int version,
             String deliveryManId
     ) implements DeliveryEvent {}
 
     record FoodInPreparation(
-            String orderId,
+            UUID orderId,
             int version
     ) implements DeliveryEvent {}
 
     record FoodIsReady(
-            String orderId,
+            UUID orderId,
             int version
     ) implements DeliveryEvent {}
 
     record FoodWasPickedUp(
-            String orderId,
+            UUID orderId,
             int version
     ) implements DeliveryEvent {}
 
     record FoodDelivered(
-            String orderId,
+            UUID orderId,
             int version
     ) implements DeliveryEvent {}
 }

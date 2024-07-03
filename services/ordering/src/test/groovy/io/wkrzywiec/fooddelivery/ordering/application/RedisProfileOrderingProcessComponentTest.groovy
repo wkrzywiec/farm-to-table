@@ -39,7 +39,7 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
                 .withAddress(faker.address().fullAddress())
 
         def body = order.createOrder()
-        def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), order.id, Instant.now())
+        def header = new Header(UUID.randomUUID(), 1, "orders", body.getClass().getSimpleName(), order.id, Instant.now())
         def message = new IntegrationMessage(header, body)
 
         when: "is published"

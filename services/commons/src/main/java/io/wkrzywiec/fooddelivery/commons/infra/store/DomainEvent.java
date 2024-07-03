@@ -1,7 +1,9 @@
 package io.wkrzywiec.fooddelivery.commons.infra.store;
 
+import java.util.UUID;
+
 public interface DomainEvent {
-    String streamId();
+    UUID streamId();
     int version();
 }
 

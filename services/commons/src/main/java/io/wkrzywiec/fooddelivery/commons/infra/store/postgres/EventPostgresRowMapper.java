@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -26,8 +27,8 @@ class EventPostgresRowMapper implements RowMapper<EventEntity> {
         String eventType = rs.getString("type");
         DomainEvent event = extractData(rs, eventType);
         return new EventEntity(
-                rs.getString("id"),
-                rs.getString("stream_id"),
+                UUID.fromString(rs.getString("id")),
+                UUID.fromString(rs.getString("stream_id")),
                 rs.getInt("version"),
                 rs.getString("channel"),
                 eventType,

@@ -4,9 +4,10 @@ import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public record CreateOrder(
-        String orderId,
+        UUID orderId,
         int version,
         String customerId,
         String farmId,

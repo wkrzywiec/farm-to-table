@@ -10,8 +10,8 @@ import java.util.UUID;
 @Data
 public class EventEntity {
 
-    protected String id;
-    protected String streamId;
+    protected UUID id;
+    protected UUID streamId;
     protected int version;
     protected String channel;
     protected String type;
@@ -20,7 +20,7 @@ public class EventEntity {
 
     private EventEntity() {}
 
-    public EventEntity(String id, String streamId, int version, String channel, String type, DomainEvent data, Instant addedAt) {
+    public EventEntity(UUID id, UUID streamId, int version, String channel, String type, DomainEvent data, Instant addedAt) {
         this.id = id;
         this.streamId = streamId;
         this.version = version;
@@ -38,17 +38,17 @@ public class EventEntity {
 
     public static EventEntity newEventEntity(DomainEvent domainEvent, String channel, Clock clock) {
         return new EventEntity(
-                UUID.randomUUID().toString(), domainEvent.streamId(),
+                UUID.randomUUID(), domainEvent.streamId(),
                 domainEvent.version(), channel,
                 domainEvent.getClass().getSimpleName(), domainEvent,
                 clock.instant());
     }
 
-    public String id() {
+    public UUID id() {
         return id;
     }
 
-    public String streamId() {
+    public UUID streamId() {
         return streamId;
     }
 

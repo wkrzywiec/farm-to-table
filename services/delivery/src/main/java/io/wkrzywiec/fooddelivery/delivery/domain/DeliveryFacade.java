@@ -195,7 +195,7 @@ public class DeliveryFacade {
         log.info("A food was delivered for '{}' order", deliverFood.orderId());
     }
 
-    private Delivery findDelivery(String orderId) {
+    private Delivery findDelivery(UUID orderId) {
         var storedEvents = eventStore.fetchEvents(DELIVERY_CHANNEL, orderId);
         if (storedEvents.isEmpty()) {
             throw new DeliveryException(format("There is no delivery with an orderId '%s'.", orderId));
@@ -203,23 +203,23 @@ public class DeliveryFacade {
         return Delivery.from(storedEvents.stream().map(eventEntity -> (DeliveryEvent) eventEntity.data()).toList());
     }
 
-    private void process(String streamId, CheckedRunnable runProcess, String failureMessage) {
+    private void process(UUID streamId, CheckedRunnable runProcess, String failureMessage) {
         Try.run(runProcess)
                 .onFailure(ex -> publishingFailureEvent(streamId, failureMessage, ex));
     };
 
-    private void publishingFailureEvent(String id, String message, Throwable ex) {
+    private void publishingFailureEvent(UUID id, String message, Throwable ex) {
         log.error(message + " Publishing DeliveryProcessingError event", ex);
         IntegrationMessage event = resultingEvent(id, new DeliveryProcessingError(id, -1, message, ex.getLocalizedMessage()));
         publisher.send(event);
     }
 
-    private IntegrationMessage resultingEvent(String orderId, IntegrationMessageBody eventBody) {
+    private IntegrationMessage resultingEvent(UUID orderId, IntegrationMessageBody eventBody) {
         return new IntegrationMessage(eventHeader(orderId, eventBody.version(), eventBody.getClass().getSimpleName()), eventBody);
     }
 
-    private Header eventHeader(String orderId, int version, String type) {
-        return new Header(UUID.randomUUID().toString(), version, DELIVERY_CHANNEL, type, orderId, clock.instant());
+    private Header eventHeader(UUID orderId, int version, String type) {
+        return new Header(UUID.randomUUID(), version, DELIVERY_CHANNEL, type, orderId, clock.instant());
     }
 
     private void storeAndPublishEvents(Delivery delivery) {

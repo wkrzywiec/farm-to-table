@@ -26,7 +26,7 @@ class RedisInboxIT extends IntegrationTestWithSpring {
 
     def "Store object in inbox and then published"() {
         given:
-        def addTip = new AddTipDTO("any-order-id", 2, BigDecimal.valueOf(10))
+        def addTip = new AddTipDTO(UUID.randomUUID(), 2, BigDecimal.valueOf(10))
 
         when:
         redisInboxPublisher.storeMessage("ordering-inbox:tip", addTip)
@@ -38,9 +38,9 @@ class RedisInboxIT extends IntegrationTestWithSpring {
                     event.get("header").get("id").asText() != null
                     event.get("header").get("channel").asText() == "orders"
                     event.get("header").get("type").asText() == "AddTip"
-                    event.get("header").get("streamId").asText() == "any-order-id"
+                    event.get("header").get("streamId").asText() == addTip.orderId.toString()
                     event.get("header").get("createdAt").asText() != null
-                    event.get("body").get("orderId").asText() == "any-order-id"
+                    event.get("body").get("orderId").asText() == addTip.orderId.toString()
                 }
     }
 

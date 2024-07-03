@@ -127,26 +127,26 @@ public class OrderingFacade {
         log.info("Setting an '{}' order to COMPLETED state has been completed", foodDelivered.orderId());
     }
 
-    private void process(String streamId, CheckedRunnable runProcess, String failureMessage) {
+    private void process(UUID streamId, CheckedRunnable runProcess, String failureMessage) {
         Try.run(runProcess)
                 .onFailure(ex -> publishingFailureEvent(streamId, failureMessage, ex));
     };
 
-    private void publishingFailureEvent(String id, String message, Throwable ex) {
+    private void publishingFailureEvent(UUID id, String message, Throwable ex) {
         log.error(message + " Publishing OrderProcessingError event", ex);
         IntegrationMessage event = resultingEvent(id, new OrderProcessingError(id, -1, message, ex.getLocalizedMessage()));
         publisher.send(event);
     }
 
-    private IntegrationMessage resultingEvent(String orderId, IntegrationMessageBody eventBody) {
+    private IntegrationMessage resultingEvent(UUID orderId, IntegrationMessageBody eventBody) {
         return new IntegrationMessage(eventHeader(orderId, eventBody.getClass().getSimpleName(), eventBody.version()), eventBody);
     }
 
-    private Header eventHeader(String orderId, String type, int version) {
-        return new Header(UUID.randomUUID().toString(), version, ORDERS_CHANNEL, type, orderId, clock.instant());
+    private Header eventHeader(UUID orderId, String type, int version) {
+        return new Header(UUID.randomUUID(), version, ORDERS_CHANNEL, type, orderId, clock.instant());
     }
 
-    private Order findOrder(String orderId) {
+    private Order findOrder(UUID orderId) {
         var storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, orderId);
         if (storedEvents.isEmpty()) {
             throw new OrderingException(format("There is no order with an orderId '%s'.", orderId));

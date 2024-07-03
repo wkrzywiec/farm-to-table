@@ -5,12 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CancelOrderDTO {
 
-    private String orderId;
+    private UUID orderId;
     private int version;
     private String reason;
 }
