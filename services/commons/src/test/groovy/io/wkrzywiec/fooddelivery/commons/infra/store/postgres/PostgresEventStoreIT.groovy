@@ -27,7 +27,7 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
         cleanDb()
     }
 
-    def "Event are saved in event store"() {
+    def "Event is saved in event store"() {
         given:
         def eventBody = aSampleEvent(TEST_TIME)
         def testChannel = "test-channel"
@@ -43,7 +43,7 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
         storedEvent == event
     }
 
-    def "Events are fetched from a store and are ordered by version"() {
+    def "Events are loaded from a store and are ordered by version"() {
         given:
         def testChannel = "test-channel"
         def streamId = UUID.randomUUID()
@@ -52,22 +52,23 @@ class PostgresEventStoreIT extends CommonsIntegrationTest {
         def event1 = newEventEntity(eventBody1, testChannel, TEST_CLOCK)
 
         def eventBody2 = aSampleEvent(streamId, 1, TEST_TIME)
-        def event2 = newEventEntity(eventBody2, testChannel, TEST_CLOCK)
+        def event2 = newEventEntity(eventBody2, testChannel, Clock.fixed(TEST_TIME.plusSeconds(1), ZoneOffset.UTC))
 
         def eventBody3 = aSampleEvent(streamId, 2, TEST_TIME)
-        def event3 = newEventEntity(eventBody3, testChannel, TEST_CLOCK)
+        def event3 = newEventEntity(eventBody3, testChannel, Clock.fixed(TEST_TIME.plusSeconds(2), ZoneOffset.UTC))
 
         eventStore.store(event1)
         eventStore.store(event2)
         eventStore.store(event3)
 
         when:
-        List<EventEntity> storedEvents = eventStore.fetchEvents(testChannel, streamId)
+        List<EventEntity> storedEvents = eventStore.loadEvents(testChannel, streamId)
 
         then:
         storedEvents.size() == 3
-        def storedEvent = storedEvents.get(0)
-        storedEvent == event1
+        storedEvents.get(0) == event1
+        storedEvents.get(1) == event2
+        storedEvents.get(2) == event3
     }
 
     private class EventForTestClassProvider implements EventClassTypeProvider {

@@ -24,7 +24,7 @@ public class InMemoryEventStore implements EventStore {
     }
 
     @Override
-    public List<EventEntity> fetchEvents(String channel, UUID streamId) {
+    public List<EventEntity> loadEvents(String channel, UUID streamId) {
         return store.getOrDefault(streamId, List.of());
     }
 }

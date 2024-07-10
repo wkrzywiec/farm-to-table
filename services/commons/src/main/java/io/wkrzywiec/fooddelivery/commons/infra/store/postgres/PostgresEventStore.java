@@ -56,7 +56,7 @@ public class PostgresEventStore implements EventStore {
     }
 
     @Override
-    public List<EventEntity> fetchEvents(String channel, UUID streamId) {
+    public List<EventEntity> loadEvents(String channel, UUID streamId) {
 
         return jdbcTemplate.query("""
                 SELECT id, stream_id, version, channel, type, data, added_at

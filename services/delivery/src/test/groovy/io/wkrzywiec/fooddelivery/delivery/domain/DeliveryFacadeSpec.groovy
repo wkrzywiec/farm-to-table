@@ -246,7 +246,7 @@ class DeliveryFacadeSpec extends Specification {
 
     private void verifyEventInStore(DeliveryEvent expectedDomainEvent, int expectedStreamSize) {
         def expectedEvent = eventEntity(expectedDomainEvent)
-        def storedEvents = eventStore.fetchEvents(DELIVERY_CHANNEL, expectedDomainEvent.streamId())
+        def storedEvents = eventStore.loadEvents(DELIVERY_CHANNEL, expectedDomainEvent.streamId())
         assert storedEvents.size() == expectedStreamSize
         def actualEvent = storedEvents.last
         assert eventsAreEqualIgnoringId(expectedEvent, actualEvent)

@@ -196,7 +196,7 @@ public class DeliveryFacade {
     }
 
     private Delivery findDelivery(UUID orderId) {
-        var storedEvents = eventStore.fetchEvents(DELIVERY_CHANNEL, orderId);
+        var storedEvents = eventStore.loadEvents(DELIVERY_CHANNEL, orderId);
         if (storedEvents.isEmpty()) {
             throw new DeliveryException(format("There is no delivery with an orderId '%s'.", orderId));
         }

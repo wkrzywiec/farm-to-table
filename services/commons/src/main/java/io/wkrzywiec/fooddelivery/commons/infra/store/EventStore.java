@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public interface EventStore {
 
-    List<EventEntity> fetchEvents(String channel, UUID streamId);
+    List<EventEntity> loadEvents(String channel, UUID streamId);
 
     void store(EventEntity event);
 

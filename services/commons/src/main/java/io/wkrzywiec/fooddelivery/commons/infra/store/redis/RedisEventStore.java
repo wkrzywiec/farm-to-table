@@ -52,7 +52,7 @@ public class RedisEventStore implements EventStore {
     }
 
     @Override
-    public List<EventEntity> fetchEvents(String channel, UUID streamId) {
+    public List<EventEntity> loadEvents(String channel, UUID streamId) {
         var streamReadOptions = StreamReadOptions.empty()
                 .block(Duration.ofMillis(1000))
                 .count(100);

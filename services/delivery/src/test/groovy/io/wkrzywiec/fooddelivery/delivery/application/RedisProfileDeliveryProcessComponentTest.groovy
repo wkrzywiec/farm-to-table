@@ -61,7 +61,7 @@ class RedisProfileDeliveryProcessComponentTest extends IntegrationTest {
                 }
 
         and: "event is saved in event store"
-        def events = eventStore.fetchEvents(DELIVERY_CHANNEL, delivery.orderId)
+        def events = eventStore.loadEvents(DELIVERY_CHANNEL, delivery.orderId)
         events.size() == 1
         events[0].type() == "DeliveryCreated"
 

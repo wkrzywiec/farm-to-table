@@ -8,9 +8,6 @@ import io.wkrzywiec.fooddelivery.commons.model.AddTip
 import io.wkrzywiec.fooddelivery.commons.model.CancelOrder
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
-import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCompleted
-import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderInProgress
-import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.TipAddedToOrder
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Title
@@ -19,7 +16,6 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage.firstMessage
 import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity
 import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
@@ -158,7 +154,7 @@ class OrderingFacadeSpec extends Specification {
 
     private void verifyEventInStore(OrderingEvent expectedDomainEvent, int expectedStreamSize) {
         def expectedEvent = eventEntity(expectedDomainEvent)
-        def storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, expectedDomainEvent.streamId())
+        def storedEvents = eventStore.loadEvents(ORDERS_CHANNEL, expectedDomainEvent.streamId())
         assert storedEvents.size() == expectedStreamSize
         def actualEvent = storedEvents.last
         assert eventsAreEqualIgnoringId(expectedEvent, actualEvent)

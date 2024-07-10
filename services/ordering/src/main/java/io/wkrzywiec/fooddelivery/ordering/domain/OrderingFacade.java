@@ -147,7 +147,7 @@ public class OrderingFacade {
     }
 
     private Order findOrder(UUID orderId) {
-        var storedEvents = eventStore.fetchEvents(ORDERS_CHANNEL, orderId);
+        var storedEvents = eventStore.loadEvents(ORDERS_CHANNEL, orderId);
         if (storedEvents.isEmpty()) {
             throw new OrderingException(format("There is no order with an orderId '%s'.", orderId));
         }
