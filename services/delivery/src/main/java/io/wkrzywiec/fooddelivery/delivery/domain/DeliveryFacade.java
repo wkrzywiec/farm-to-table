@@ -80,7 +80,7 @@ public class DeliveryFacade {
         log.info("'{}' order was canceled. Canceling delivery", orderCanceled.orderId());
 
         var delivery = findDelivery(orderCanceled.orderId());
-        delivery.cancel(orderCanceled.reason(), clock.instant());
+        delivery.cancel(orderCanceled.reason());
         storeAndPublishEvents(delivery);
 
         log.info("Delivery for '{}' order was canceled", orderCanceled.orderId());
@@ -98,7 +98,7 @@ public class DeliveryFacade {
         log.info("Starting food preparation for '{}' delivery", prepareFood.orderId());
 
         var delivery = findDelivery(prepareFood.orderId());
-        delivery.foodInPreparation(clock.instant());
+        delivery.foodInPreparation();
         storeAndPublishEvents(delivery);
 
         log.info("Food in preparation for '{}' delivery", prepareFood.orderId());
@@ -153,7 +153,7 @@ public class DeliveryFacade {
         log.info("Starting food ready for '{}' delivery", foodReady.orderId());
 
         var delivery = findDelivery(foodReady.orderId());
-        delivery.foodReady(clock.instant());
+        delivery.foodReady();
         storeAndPublishEvents(delivery);
 
         log.info("A food is ready for '{}' delivery", foodReady.orderId());
@@ -171,7 +171,7 @@ public class DeliveryFacade {
         log.info("Starting picking up food for '{}' delivery", pickUpFood.orderId());
 
         var delivery = findDelivery(pickUpFood.orderId());
-        delivery.pickUpFood(clock.instant());
+        delivery.pickUpFood();
         storeAndPublishEvents(delivery);
 
         log.info("A food was picked up for '{}' delivery", pickUpFood.orderId());
@@ -189,7 +189,7 @@ public class DeliveryFacade {
         log.info("Starting delivering food for '{}' delivery", deliverFood.orderId());
 
         var delivery = findDelivery(deliverFood.orderId());
-        delivery.deliverFood(clock.instant());
+        delivery.deliverFood();
         storeAndPublishEvents(delivery);
 
         log.info("A food was delivered for '{}' order", deliverFood.orderId());

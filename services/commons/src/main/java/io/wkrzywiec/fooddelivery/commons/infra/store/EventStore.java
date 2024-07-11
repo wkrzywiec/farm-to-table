@@ -7,9 +7,9 @@ public interface EventStore {
 
     List<EventEntity> loadEvents(String channel, UUID streamId);
 
-    void store(EventEntity event);
+    void store(EventEntity event) throws InvalidEventVersionException;
 
-    default void store(List<EventEntity> events) {
+    default void store(List<EventEntity> events) throws InvalidEventVersionException {
         events.forEach(this::store);
     }
 }

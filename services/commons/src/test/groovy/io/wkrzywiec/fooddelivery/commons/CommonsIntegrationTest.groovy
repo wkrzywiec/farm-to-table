@@ -5,6 +5,7 @@ import io.wkrzywiec.fooddelivery.commons.infra.ObjectMapperConfig
 import org.postgresql.ds.PGSimpleDataSource
 import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.util.ResourceUtils
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.PostgreSQLContainer
@@ -31,6 +32,9 @@ abstract class CommonsIntegrationTest extends Specification {
 
     @Shared
     protected JdbcTemplate jdbcTemplate
+
+    @Shared
+    protected NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
     static boolean useLocalInfrastructure() {
         // change it to `true` in order to use it with infra from docker-compose.yaml
@@ -67,6 +71,7 @@ abstract class CommonsIntegrationTest extends Specification {
 
     def setupSpec() {
         jdbcTemplate = configJdbcTemplate()
+        namedParameterJdbcTemplate = configNamedParameterJdbcTemplate()
         insertTablesIntoDb(jdbcTemplate)
     }
 
@@ -75,12 +80,21 @@ abstract class CommonsIntegrationTest extends Specification {
     }
 
     private JdbcTemplate configJdbcTemplate() {
+        PGSimpleDataSource dataSource = postgresDataSource()
+        return new JdbcTemplate(dataSource)
+    }
+
+    private NamedParameterJdbcTemplate configNamedParameterJdbcTemplate() {
+        PGSimpleDataSource dataSource = postgresDataSource()
+        return new NamedParameterJdbcTemplate(dataSource)
+    }
+
+    private static PGSimpleDataSource postgresDataSource() {
         def dataSource = new PGSimpleDataSource()
         dataSource.setUrl(JDBC_URL)
         dataSource.setUser(DB_USERNAME)
         dataSource.setPassword(DB_PASS)
-
-        return new JdbcTemplate(dataSource)
+        return dataSource
     }
 
     private void insertTablesIntoDb(JdbcTemplate jdbcTemplate) {

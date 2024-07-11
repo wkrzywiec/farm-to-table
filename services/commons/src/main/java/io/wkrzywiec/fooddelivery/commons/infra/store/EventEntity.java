@@ -21,6 +21,9 @@ public class EventEntity {
     private EventEntity() {}
 
     public EventEntity(UUID id, UUID streamId, int version, String channel, String type, DomainEvent data, Instant addedAt) {
+        if (version != data.version()) {
+            throw new IllegalStateException("Corrupted data. EventEntity can't be created because field 'version' and 'data.version' are not equal.");
+        }
         this.id = id;
         this.streamId = streamId;
         this.version = version;
