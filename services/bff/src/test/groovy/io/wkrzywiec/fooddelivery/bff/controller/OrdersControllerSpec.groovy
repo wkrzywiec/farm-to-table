@@ -80,7 +80,7 @@ class OrdersControllerSpec extends Specification {
 
     def "Create an order and use provided id"() {
         given:
-        def id = "this-id"
+        def id = UUID.randomUUID()
         def requestBody = """
             {
               "id": "$id",
@@ -108,7 +108,7 @@ class OrdersControllerSpec extends Specification {
 
         then: "OrderId is generated"
         result.andExpect(status().isAccepted())
-                .andExpect(jsonPath("orderId").value(id))
+                .andExpect(jsonPath("orderId").value(id.toString()))
 
         and: "Message was sent to inbox"
         def inbox = inboxPublisher.inboxes.get("ordering-inbox:create")
@@ -119,6 +119,7 @@ class OrdersControllerSpec extends Specification {
 
     def "Cancel an order"() {
         given:
+        def orderId = UUID.randomUUID()
         def requestBody = """
             {
               "reason": "not hungry"
@@ -127,7 +128,7 @@ class OrdersControllerSpec extends Specification {
 
         when: "Cancel an order"
         def result = mockMvc.perform(
-                patch("/orders/any-order-id/status/cancel")
+                patch("/orders/$orderId/status/cancel")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -135,18 +136,19 @@ class OrdersControllerSpec extends Specification {
 
         then:
         result.andExpect(status().isAccepted())
-                .andExpect(jsonPath("orderId").value("any-order-id"))
+                .andExpect(jsonPath("orderId").value(orderId.toString()))
 
         and: "Message was sent to inbox"
         def inbox = inboxPublisher.inboxes.get("ordering-inbox:cancel")
         with(inbox.peek() as CancelOrderDTO) { it ->
-            it.orderId == "any-order-id"
+            it.orderId == orderId
             it.reason == "not hungry"
         }
     }
 
     def "Add tip to an order"() {
         given:
+        def orderId = UUID.randomUUID()
         def requestBody = """
             {
               "tip": 10
@@ -155,7 +157,7 @@ class OrdersControllerSpec extends Specification {
 
         when: "Add tip"
         def result = mockMvc.perform(
-                post("/orders/any-order-id/tip")
+                post("/orders/$orderId/tip")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -163,12 +165,12 @@ class OrdersControllerSpec extends Specification {
 
         then:
         result.andExpect(status().isAccepted())
-                .andExpect(jsonPath("orderId").value("any-order-id"))
+                .andExpect(jsonPath("orderId").value(orderId.toString()))
 
         and: "Message was sent to inbox"
         def inbox = inboxPublisher.inboxes.get("ordering-inbox:tip")
         with(inbox.peek() as AddTipDTO) { it ->
-            it.orderId == "any-order-id"
+            it.orderId == orderId
             it.tip == 10
         }
     }

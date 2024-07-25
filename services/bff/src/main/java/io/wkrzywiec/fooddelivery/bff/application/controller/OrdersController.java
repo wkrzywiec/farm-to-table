@@ -24,7 +24,7 @@ public class OrdersController {
     ResponseEntity<ResponseDTO> createAnOrder(@RequestBody CreateOrderDTO createOrder) {
         log.info("Received request to create an order: {}", createOrder);
         if (createOrder.getId() == null) {
-            var id = UUID.randomUUID().toString();
+            var id = UUID.randomUUID();
             createOrder.setId(id);
             log.info("Generated {} id for a new order", id);
         }
@@ -35,7 +35,7 @@ public class OrdersController {
     }
 
     @PatchMapping("/orders/{orderId}/status/cancel")
-    ResponseEntity<ResponseDTO> cancelAnOrder(@PathVariable String orderId, @RequestBody CancelOrderDTO cancelOrderD) {
+    ResponseEntity<ResponseDTO> cancelAnOrder(@PathVariable UUID orderId, @RequestBody CancelOrderDTO cancelOrderD) {
         log.info("Received request to update an '{}' order, update: {}", orderId, cancelOrderD);
         cancelOrderD.setOrderId(orderId);
         inbox.storeMessage(ORDERING_INBOX + ":cancel", cancelOrderD);
@@ -44,7 +44,7 @@ public class OrdersController {
     }
 
     @PostMapping("/orders/{orderId}/tip")
-    ResponseEntity<ResponseDTO> addTip(@PathVariable String orderId, @RequestBody AddTipDTO addTip) {
+    ResponseEntity<ResponseDTO> addTip(@PathVariable UUID orderId, @RequestBody AddTipDTO addTip) {
         log.info("Received request to add tip to '{}' an order, value: {}", orderId, addTip);
         addTip.setOrderId(orderId);
         inbox.storeMessage(ORDERING_INBOX + ":tip", addTip);

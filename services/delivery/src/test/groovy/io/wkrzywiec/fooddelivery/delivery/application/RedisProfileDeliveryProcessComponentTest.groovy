@@ -45,7 +45,7 @@ class RedisProfileDeliveryProcessComponentTest extends IntegrationTest {
                 delivery.getItems().stream().map(i -> new Item(i.getName(), i.getAmount(), i.getPricePerItem())).toList(),
                 delivery.getDeliveryCharge(), delivery.getTotal())
 
-        def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), delivery.orderId, Instant.now())
+        def header = new Header(UUID.randomUUID(), 1, "orders", body.getClass().getSimpleName(), delivery.orderId, Instant.now())
         def message = new IntegrationMessage(header, body)
 
         when:
@@ -61,7 +61,7 @@ class RedisProfileDeliveryProcessComponentTest extends IntegrationTest {
                 }
 
         and: "event is saved in event store"
-        def events = eventStore.fetchEvents(DELIVERY_CHANNEL, delivery.orderId)
+        def events = eventStore.loadEvents(DELIVERY_CHANNEL, delivery.orderId)
         events.size() == 1
         events[0].type() == "DeliveryCreated"
 

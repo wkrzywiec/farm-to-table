@@ -8,17 +8,15 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import static java.lang.String.format;
 
 @Getter
 @EqualsAndHashCode
 @ToString
 public class Delivery {
-    private String orderId;
+    private UUID orderId;
     private int version;
     private String customerId;
     private String farmId;
@@ -136,7 +134,7 @@ public class Delivery {
         return changes;
     }
 
-    public void cancel(String reason, Instant cancellationTimestamp) {
+    public void cancel(String reason) {
         if (status != DeliveryStatus.CREATED) {
             throw new DeliveryException(format("Failed to cancel a %s delivery. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
@@ -146,7 +144,7 @@ public class Delivery {
         changes.add(new DeliveryEvent.DeliveryCanceled(orderId, version, reason));
     }
 
-    public void foodInPreparation(Instant foodPreparationTimestamp) {
+    public void foodInPreparation() {
         if (status != DeliveryStatus.CREATED) {
             throw new DeliveryException(format("Failed to start food preparation for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
@@ -156,7 +154,7 @@ public class Delivery {
         changes.add(new DeliveryEvent.FoodInPreparation(orderId, version));
     }
 
-    public void foodReady(Instant foodReadyTimestamp) {
+    public void foodReady() {
         if (status != DeliveryStatus.FOOD_IN_PREPARATION) {
             throw new DeliveryException(format("Failed to set food ready for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
@@ -166,7 +164,7 @@ public class Delivery {
         changes.add(new DeliveryEvent.FoodIsReady(orderId, version));
     }
 
-    public void pickUpFood(Instant foodPickedUpTimestamp) {
+    public void pickUpFood() {
         if (status != DeliveryStatus.FOOD_READY) {
             throw new DeliveryException(format("Failed to set food as picked up for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }
@@ -176,7 +174,7 @@ public class Delivery {
         changes.add(new DeliveryEvent.FoodWasPickedUp(orderId, version));
     }
 
-    public void deliverFood(Instant foodDeliveredTimestamp) {
+    public void deliverFood() {
         if (status != DeliveryStatus.FOOD_PICKED) {
             throw new DeliveryException(format("Failed to set food as delivered for an '%s' order. It's not possible do it for a delivery with '%s' status", orderId, status));
         }

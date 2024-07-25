@@ -246,7 +246,7 @@ class DeliveryFacadeSpec extends Specification {
 
     private void verifyEventInStore(DeliveryEvent expectedDomainEvent, int expectedStreamSize) {
         def expectedEvent = eventEntity(expectedDomainEvent)
-        def storedEvents = eventStore.fetchEvents(DELIVERY_CHANNEL, expectedDomainEvent.streamId())
+        def storedEvents = eventStore.loadEvents(DELIVERY_CHANNEL, expectedDomainEvent.streamId())
         assert storedEvents.size() == expectedStreamSize
         def actualEvent = storedEvents.last
         assert eventsAreEqualIgnoringId(expectedEvent, actualEvent)
@@ -260,13 +260,13 @@ class DeliveryFacadeSpec extends Specification {
         expected.properties.findAll { it.key != "id" } == actual.properties.findAll { it.key != "id" }
     }
 
-    private void verifyIntegrationEvent(String orderId, String eventType) {
+    private void verifyIntegrationEvent(UUID orderId, String eventType) {
         with(publisher.messages.get(DELIVERY_CHANNEL).get(0)) { event ->
             verifyEventHeader(event, orderId, eventType)
         }
     }
 
-    private void verifyEventHeader(IntegrationMessage event, String orderId, String eventType) {
+    private void verifyEventHeader(IntegrationMessage event, UUID orderId, String eventType) {
         def header = event.header()
         header.id() != null
         header.channel() == DELIVERY_CHANNEL

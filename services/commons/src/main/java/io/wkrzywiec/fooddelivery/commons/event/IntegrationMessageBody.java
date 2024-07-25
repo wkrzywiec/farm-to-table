@@ -1,6 +1,8 @@
 package io.wkrzywiec.fooddelivery.commons.event;
 
+import java.util.UUID;
+
 public interface IntegrationMessageBody {
-    String orderId();
+    UUID orderId();
     int version();
 }

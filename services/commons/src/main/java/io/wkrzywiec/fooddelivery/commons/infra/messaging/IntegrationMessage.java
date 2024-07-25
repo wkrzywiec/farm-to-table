@@ -16,7 +16,7 @@ public record IntegrationMessage(Header header, IntegrationMessageBody body) {
 
     public static IntegrationMessage message(String channel, Clock clock, IntegrationMessageBody body, int version) {
         return new IntegrationMessage(
-                new Header(UUID.randomUUID().toString(), version, channel, body.getClass().getSimpleName(), body.orderId(), clock.instant()),
+                new Header(UUID.randomUUID(), version, channel, body.getClass().getSimpleName(), body.orderId(), clock.instant()),
                 body
         );
     }

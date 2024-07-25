@@ -39,7 +39,7 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
                 .withAddress(faker.address().fullAddress())
 
         def body = order.createOrder()
-        def header = new Header(UUID.randomUUID().toString(), 1, "orders", body.getClass().getSimpleName(), order.id, Instant.now())
+        def header = new Header(UUID.randomUUID(), 1, "orders", body.getClass().getSimpleName(), order.id, Instant.now())
         def message = new IntegrationMessage(header, body)
 
         when: "is published"
@@ -63,7 +63,7 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
                 }
 
         and: "event is saved in event store"
-        def events = eventStore.fetchEvents(ORDERS_CHANNEL, order.id)
+        def events = eventStore.loadEvents(ORDERS_CHANNEL, order.id)
         events.size() == 1
         events[0].type() == "OrderCreated"
 

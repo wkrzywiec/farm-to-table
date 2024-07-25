@@ -18,7 +18,7 @@ import static java.lang.String.format;
 @Getter
  class OrderTestData {
 
-    private String id = UUID.randomUUID().toString();
+    private UUID id = UUID.randomUUID();
     private int version = 0;
     private String customerId = "default-customer-id";
     private String farmId = "default-farm-id";
@@ -72,7 +72,7 @@ import static java.lang.String.format;
          return entity.getTotal();
     }
 
-     public OrderTestData withId(String id) {
+     public OrderTestData withId(UUID id) {
         this.id = id;
         return this;
     }

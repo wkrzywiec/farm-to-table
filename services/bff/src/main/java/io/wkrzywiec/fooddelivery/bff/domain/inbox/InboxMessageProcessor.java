@@ -71,12 +71,12 @@ public class InboxMessageProcessor {
         messagePublisher.send(command);
     }
 
-    private IntegrationMessage command(String orderId, IntegrationMessageBody commandBody) {
+    private IntegrationMessage command(UUID orderId, IntegrationMessageBody commandBody) {
         return new IntegrationMessage(commandHeader(orderId, commandBody.getClass().getSimpleName()), commandBody);
     }
 
-    private Header commandHeader(String orderId, String type) {
-        return new Header(UUID.randomUUID().toString(), 1, ORDERS_CHANNEL, type, orderId, clock.instant());
+    private Header commandHeader(UUID orderId, String type) {
+        return new Header(UUID.randomUUID(), 1, ORDERS_CHANNEL, type, orderId, clock.instant());
     }
 
     private IntegrationMessageBody commandBody(ChangeDeliveryManDTO changeDeliveryManDTO) {

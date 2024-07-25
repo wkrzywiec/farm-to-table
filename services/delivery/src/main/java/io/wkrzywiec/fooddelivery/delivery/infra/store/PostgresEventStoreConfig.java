@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration
 @Profile("postgres-event-store")
@@ -16,7 +17,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class PostgresEventStoreConfig {
 
     @Bean
-    public EventStore eventStore(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
+    public EventStore eventStore(NamedParameterJdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         return new PostgresEventStore(jdbcTemplate, objectMapper, new DeliveryEventClassTypeProvider());
     }
 }

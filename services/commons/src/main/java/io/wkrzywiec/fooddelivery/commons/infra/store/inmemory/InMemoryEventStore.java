@@ -7,12 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class InMemoryEventStore implements EventStore {
 
-    Map<String, List<EventEntity>> store = new ConcurrentHashMap<>();
+    Map<UUID, List<EventEntity>> store = new ConcurrentHashMap<>();
 
     @Override
     public void store(EventEntity event) {
@@ -23,7 +24,7 @@ public class InMemoryEventStore implements EventStore {
     }
 
     @Override
-    public List<EventEntity> fetchEvents(String channel, String streamId) {
+    public List<EventEntity> loadEvents(String channel, UUID streamId) {
         return store.getOrDefault(streamId, List.of());
     }
 }

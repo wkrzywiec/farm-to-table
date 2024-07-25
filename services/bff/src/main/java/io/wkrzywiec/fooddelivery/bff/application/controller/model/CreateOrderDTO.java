@@ -6,13 +6,14 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderDTO {
 
-    private String id;
+    private UUID id;
     private String customerId;
     private String farmId;
     private List<ItemDTO> items;
