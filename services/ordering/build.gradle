@@ -12,7 +12,7 @@ plugins {
 group = 'io.wkrzywiec'
 version = '0.0.1-SNAPSHOT'
 description = 'food-delivery ordering domain'
-sourceCompatibility = '17'
+sourceCompatibility = '23'
 
 def activeDevProfiles = 'dev,redis'
 

@@ -11,7 +11,7 @@ plugins {
 group = 'io.wkrzywiec'
 version = '0.0.1-SNAPSHOT'
 description = 'food-delivery common libraries'
-sourceCompatibility = '17'
+sourceCompatibility = '23'
 
 bootJar {
     enabled = false
