@@ -1,41 +1,32 @@
-package io.wkrzywiec.fooddelivery.ordering.infra.adapters;
+package io.wkrzywiec.fooddelivery.ordering.infra.adapters
 
-import io.wkrzywiec.fooddelivery.ordering.domain.Order;
-import io.wkrzywiec.fooddelivery.ordering.domain.ports.OrderingRepository;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.Objects.isNull;
-import static java.util.Optional.ofNullable;
+import io.wkrzywiec.fooddelivery.ordering.domain.Order
+import io.wkrzywiec.fooddelivery.ordering.domain.ports.OrderingRepository
+import org.apache.commons.lang3.reflect.FieldUtils
+import org.springframework.stereotype.Component
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
-public class InMemoryOrderingRepository implements OrderingRepository {
+class InMemoryOrderingRepository : OrderingRepository {
+    val database: MutableMap<String, Order> = ConcurrentHashMap()
 
-    final Map<String, Order> database = new ConcurrentHashMap<>();
-
-    @Override
-    public Order save(Order newOrder) {
-        var id = newOrder.getId();
-        if (isNull(id)) {
-            id = UUID.randomUUID().toString();
+    override fun save(newOrder: Order): Order {
+        var id: Unit = newOrder.getId()
+        if (Objects.isNull(id)) {
+            id = UUID.randomUUID().toString()
 
             try {
-                FieldUtils.writeField(newOrder, "id", id, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Class 'Order' does not have 'id' field");
+                FieldUtils.writeField(newOrder, "id", id, true)
+            } catch (e: IllegalAccessException) {
+                throw RuntimeException("Class 'Order' does not have 'id' field")
             }
         }
-        database.put(id, newOrder);
-        return newOrder;
+        database[id] = newOrder
+        return newOrder
     }
 
-    @Override
-    public Optional<Order> findById(String id) {
-        return ofNullable(database.get(id));
+    override fun findById(id: String): Optional<Order> {
+        return Optional.ofNullable(database[id])
     }
 }

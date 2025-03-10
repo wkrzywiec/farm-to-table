@@ -1,8 +1,7 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.outgoing;
+package io.wkrzywiec.fooddelivery.ordering.domain.outgoing
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
+import java.math.BigDecimal
 
-import java.math.BigDecimal;
-
-public record TipAddedToOrder(String orderId, BigDecimal tip, BigDecimal total) implements DomainMessageBody {
-}
+@JvmRecord
+data class TipAddedToOrder(val orderId: String, val tip: BigDecimal, val total: BigDecimal) : DomainMessageBody

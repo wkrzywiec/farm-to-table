@@ -1,5 +1,5 @@
-package io.wkrzywiec.fooddelivery.ordering.domain;
+package io.wkrzywiec.fooddelivery.ordering.domain
 
-enum OrderStatus {
+internal enum class OrderStatus {
     CREATED, IN_PROGRESS, COMPLETED, CANCELED
 }

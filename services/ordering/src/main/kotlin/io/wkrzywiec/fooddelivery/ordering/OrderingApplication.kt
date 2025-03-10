@@ -1,23 +1,24 @@
-package io.wkrzywiec.fooddelivery.ordering;
+package io.wkrzywiec.fooddelivery.ordering
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.context.annotation.Bean
+import java.time.Clock
 
-import java.time.Clock;
+@SpringBootApplication(
+    scanBasePackages = ["io.wkrzywiec.fooddelivery.ordering", "io.wkrzywiec.fooddelivery.commons"
+    ]
+)
+class OrderingApplication {
+    @Bean
+    fun clock(): Clock {
+        return Clock.systemUTC()
+    }
 
-@SpringBootApplication(scanBasePackages = {
-		"io.wkrzywiec.fooddelivery.ordering",
-		"io.wkrzywiec.fooddelivery.commons"
-})
-public class OrderingApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(OrderingApplication.class, args);
-	}
-
-	@Bean
-	public Clock clock() {
-		return Clock.systemUTC();
-	}
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            SpringApplication.run(OrderingApplication::class.java, *args)
+        }
+    }
 }

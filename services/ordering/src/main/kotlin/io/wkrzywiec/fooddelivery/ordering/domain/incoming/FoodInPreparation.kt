@@ -1,4 +1,4 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.incoming;
+package io.wkrzywiec.fooddelivery.ordering.domain.incoming
 
-public record FoodInPreparation(String orderId) {
-}
+@JvmRecord
+data class FoodInPreparation(val orderId: String)

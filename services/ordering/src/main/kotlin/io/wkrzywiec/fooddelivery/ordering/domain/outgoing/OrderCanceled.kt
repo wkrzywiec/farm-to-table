@@ -1,6 +1,6 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.outgoing;
+package io.wkrzywiec.fooddelivery.ordering.domain.outgoing
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
 
-public record OrderCanceled(String orderId, String reason) implements DomainMessageBody {
-}
+@JvmRecord
+data class OrderCanceled(val orderId: String, val reason: String) : DomainMessageBody

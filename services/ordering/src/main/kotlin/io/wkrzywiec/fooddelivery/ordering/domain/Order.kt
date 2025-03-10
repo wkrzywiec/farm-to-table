@@ -1,170 +1,218 @@
-package io.wkrzywiec.fooddelivery.ordering.domain;
+package io.wkrzywiec.fooddelivery.ordering.domain
 
-import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message;
-import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-
-import java.math.BigDecimal;
-import java.util.*;
-
-import static io.wkrzywiec.fooddelivery.ordering.domain.OrderStatus.*;
-import static java.lang.String.format;
+import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
+import lombok.EqualsAndHashCode
+import lombok.Getter
+import lombok.ToString
+import java.math.BigDecimal
+import java.util.*
+import java.util.function.Function
 
 @Getter
 @EqualsAndHashCode
 @ToString
-public class Order {
+class Order {
+    private var id: String? = null
+    private var customerId: String? = null
+    private var restaurantId: String? = null
+    private var status: OrderStatus? = null
+    private var address: String? = null
+    private var items: List<Item>? = null
+    private var deliveryCharge: BigDecimal? = null
+    private var tip = BigDecimal(0)
+    private var total = BigDecimal(0)
+    private var metadata: MutableMap<String, String>? = null
 
-    private String id;
-    private String customerId;
-    private String restaurantId;
-    private OrderStatus status;
-    private String address;
-    private List<Item> items;
-    private BigDecimal deliveryCharge;
-    private BigDecimal tip = new BigDecimal(0);
-    private BigDecimal total = new BigDecimal(0);
-    private Map<String, String> metadata;
+    private constructor()
 
-    private Order() {}
+    private constructor(
+        id: String,
+        customerId: String,
+        restaurantId: String,
+        items: List<Item>,
+        address: String,
+        deliveryCharge: BigDecimal
+    ) : this(
+        id,
+        customerId,
+        restaurantId,
+        OrderStatus.CREATED,
+        address,
+        items,
+        deliveryCharge,
+        BigDecimal.ZERO,
+        HashMap<String, String>()
+    )
 
-    private Order(String id, String customerId, String restaurantId, List<Item> items, String address, BigDecimal deliveryCharge) {
-        this(id, customerId, restaurantId, CREATED, address, items, deliveryCharge, BigDecimal.ZERO, new HashMap<>());
-    }
-
-    private Order(String id, String customerId, String restaurantId, OrderStatus status, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal tip, Map<String, String> metadata) {
+    private constructor(
+        id: String?,
+        customerId: String,
+        restaurantId: String,
+        status: OrderStatus,
+        address: String,
+        items: List<Item>,
+        deliveryCharge: BigDecimal,
+        tip: BigDecimal,
+        metadata: MutableMap<String, String>
+    ) {
         if (id == null) {
-            this.id = UUID.randomUUID().toString();
+            this.id = UUID.randomUUID().toString()
         } else {
-            this.id = id;
+            this.id = id
         }
-        this.customerId = customerId;
-        this.restaurantId = restaurantId;
-        this.status = status;
-        this.address = address;
-        this.items = items;
-        this.deliveryCharge = deliveryCharge;
-        this.tip = tip;
-        this.metadata = metadata;
-        this.calculateTotal();
+        this.customerId = customerId
+        this.restaurantId = restaurantId
+        this.status = status
+        this.address = address
+        this.items = items
+        this.deliveryCharge = deliveryCharge
+        this.tip = tip
+        this.metadata = metadata
+        this.calculateTotal()
     }
 
-    static Order from(CreateOrder createOrder) {
-        var order = new Order(
-                createOrder.orderId(),
-                createOrder.customerId(),
-                createOrder.restaurantId(),
-                mapItems(createOrder.items()),
-                createOrder.address(),
-                createOrder.deliveryCharge());
-
-        return order;
+    fun calculateTotal() {
+        this.total = items!!.stream()
+            .map<Any>(Function<Item, Any> { item: Item ->
+                item.getPricePerItem().multiply(BigDecimal.valueOf(item.getAmount()))
+            })
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .add(deliveryCharge)
+            .add(tip)
     }
 
-    private static List<Item> mapItems(List<io.wkrzywiec.fooddelivery.commons.incoming.Item> items) {
-        return items.stream().map(dto -> Item.builder()
-                .name(dto.name())
-                .amount(dto.amount())
-                .pricePerItem(dto.pricePerItem())
-                .build()).toList();
+    fun cancelOrder(reason: String?) {
+        if (status != OrderStatus.CREATED) {
+            throw OrderingException(
+                String.format(
+                    "Failed to cancel an %s order. It's not possible to cancel an order with '%s' status",
+                    id,
+                    status
+                )
+            )
+        }
+        this.status = OrderStatus.CANCELED
+
+        if (reason != null) {
+            metadata!!["cancellationReason"] = reason
+        }
     }
 
-    static Order from(List<Message> events) {
-        Order order = null;
-        for (Message event: events) {
-            if (event.body() instanceof OrderCreated created) {
-                order = new Order(
-                        created.orderId(), created.customerId(),
-                        created.restaurantId(), mapItems(created.items()),
-                        created.address(), created.deliveryCharge()
-                );
-            }
+    fun setInProgress() {
+        if (status == OrderStatus.CREATED) {
+            this.status = OrderStatus.IN_PROGRESS
+            return
+        }
+        throw OrderingException(
+            String.format(
+                "Failed to set an '%s' order to IN_PROGRESS. It's not allowed to do it for an order with '%s' status",
+                id,
+                status
+            )
+        )
+    }
 
-            if (event.body() instanceof OrderCanceled canceled) {
-                var meta = order.getMetadata();
-                meta.put("cancellationReason", canceled.reason());
-                order = new Order(
+    fun addTip(tip: BigDecimal) {
+        this.tip = tip
+        this.calculateTotal()
+    }
+
+    fun complete() {
+        if (status == OrderStatus.IN_PROGRESS) {
+            this.status = OrderStatus.COMPLETED
+            return
+        }
+        throw OrderingException(
+            String.format(
+                "Failed to set an '%s' order to COMPLETED. It's not allowed to do it for an order with '%s' status",
+                id,
+                status
+            )
+        )
+    }
+
+    companion object {
+        @JvmStatic
+        fun from(createOrder: CreateOrder): Order {
+            val order = Order(
+                createOrder.orderId,
+                createOrder.customerId,
+                createOrder.restaurantId,
+                mapItems(createOrder.items),
+                createOrder.address,
+                createOrder.deliveryCharge
+            )
+
+            return order
+        }
+
+        private fun mapItems(items: List<io.wkrzywiec.fooddelivery.commons.incoming.Item>): List<Item> {
+            return items.stream()
+                .map<Any>(Function<io.wkrzywiec.fooddelivery.commons.incoming.Item, Any> { dto: io.wkrzywiec.fooddelivery.commons.incoming.Item ->
+                    Item.builder()
+                        .name(dto.name)
+                        .amount(dto.amount)
+                        .pricePerItem(dto.pricePerItem)
+                        .build()
+                }).toList()
+        }
+
+        fun from(events: List<Message>): Order? {
+            var order: Order? = null
+            for (event in events) {
+                if (event.body is OrderCreated) {
+                    order = Order(
+                        created.orderId, created.customerId,
+                        created.restaurantId, mapItems(created.items),
+                        created.address, created.deliveryCharge
+                    )
+                }
+
+                if (event.body is OrderCanceled) {
+                    val meta: MutableMap<String, String> = order.getMetadata()
+                    meta["cancellationReason"] = canceled.reason
+                    order = Order(
                         order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), CANCELED,
+                        order.getRestaurantId(), OrderStatus.CANCELED,
                         order.getAddress(), order.getItems(),
                         order.getDeliveryCharge(), order.getTip(),
                         meta
-                );
-            }
+                    )
+                }
 
-            if (event.body() instanceof OrderInProgress) {
-                order = new Order(
+                if (event.body is OrderInProgress) {
+                    order = Order(
                         order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), IN_PROGRESS,
+                        order.getRestaurantId(), OrderStatus.IN_PROGRESS,
                         order.getAddress(), order.getItems(),
                         order.getDeliveryCharge(), order.getTip(),
                         order.getMetadata()
-                );
-            }
+                    )
+                }
 
-            if (event.body() instanceof TipAddedToOrder tipAdded) {
-                order = new Order(
+                if (event.body is TipAddedToOrder) {
+                    order = Order(
                         order.getId(), order.getCustomerId(),
                         order.getRestaurantId(), order.getStatus(),
                         order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), tipAdded.tip(),
+                        order.getDeliveryCharge(), tipAdded.tip,
                         order.getMetadata()
-                );
-            }
+                    )
+                }
 
-            if (event.body() instanceof OrderCompleted) {
-                order = new Order(
+                if (event.body is OrderCompleted) {
+                    order = Order(
                         order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), COMPLETED,
+                        order.getRestaurantId(), OrderStatus.COMPLETED,
                         order.getAddress(), order.getItems(),
                         order.getDeliveryCharge(), order.getTip(),
                         order.getMetadata()
-                );
+                    )
+                }
             }
+            return order
         }
-        return order;
-    }
-
-    void calculateTotal() {
-        this.total = items.stream()
-                .map(item -> item.getPricePerItem().multiply(BigDecimal.valueOf(item.getAmount())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .add(deliveryCharge)
-                .add(tip);
-    }
-
-    void cancelOrder(String reason) {
-        if (status != OrderStatus.CREATED) {
-            throw new OrderingException(format("Failed to cancel an %s order. It's not possible to cancel an order with '%s' status", id, status));
-        }
-        this.status = CANCELED;
-
-        if (reason != null) {
-            metadata.put("cancellationReason", reason);
-        }
-    }
-
-    void setInProgress() {
-        if (status == CREATED) {
-            this.status = IN_PROGRESS;
-            return;
-        }
-        throw new OrderingException(format("Failed to set an '%s' order to IN_PROGRESS. It's not allowed to do it for an order with '%s' status", id, status));
-    }
-
-    public void addTip(BigDecimal tip) {
-        this.tip = tip;
-        this.calculateTotal();
-    }
-
-    public void complete() {
-        if (status == IN_PROGRESS) {
-            this.status = COMPLETED;
-            return;
-        }
-        throw new OrderingException(format("Failed to set an '%s' order to COMPLETED. It's not allowed to do it for an order with '%s' status", id, status));
     }
 }

@@ -1,6 +1,6 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.outgoing;
+package io.wkrzywiec.fooddelivery.ordering.domain.outgoing
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
 
-public record OrderInProgress(String orderId) implements DomainMessageBody {
-}
+@JvmRecord
+data class OrderInProgress(val orderId: String) : DomainMessageBody
