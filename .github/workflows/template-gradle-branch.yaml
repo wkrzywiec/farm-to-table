@@ -5,7 +5,7 @@ on:
     inputs:
       java-version:
         description: Java version that will be used to build an app
-        default: '23'
+        default: '21'
         required: false
         type: string
       jdk-distribution:
@@ -32,7 +32,7 @@ jobs:
           java-version: ${{ inputs.java-version }}
 
       - name: Cache Gradle packages
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}

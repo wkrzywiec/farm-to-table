@@ -78,8 +78,8 @@ abstract class IntegrationTest extends Specification {
         @Override
         void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertyValues values = TestPropertyValues.of(
-                    "spring.redis.host=" + REDIS_HOST,
-                    "spring.redis.port=" + REDIS_PORT
+                    "spring.data.redis.host=" + REDIS_HOST,
+                    "spring.data.redis.port=" + REDIS_PORT
             )
 
             values.applyTo(applicationContext)

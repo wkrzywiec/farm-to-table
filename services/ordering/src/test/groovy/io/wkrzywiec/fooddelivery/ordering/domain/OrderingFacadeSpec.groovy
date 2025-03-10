@@ -19,6 +19,7 @@ import spock.lang.Title
 
 import java.time.Clock
 import java.time.Instant
+import java.time.ZoneOffset
 
 import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.message
 import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
@@ -35,7 +36,7 @@ class OrderingFacadeSpec extends Specification {
     FakeMessagePublisher publisher
 
     var testTime = Instant.parse("2022-08-08T05:30:24.00Z")
-    Clock testClock = Clock.fixed(testTime)
+    Clock testClock = Clock.fixed(testTime, ZoneOffset.UTC)
 
     def setup() {
         eventStore = new InMemoryEventStore()

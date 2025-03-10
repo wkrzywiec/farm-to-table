@@ -13,8 +13,12 @@ server:
   port: 8082
 
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
 
 ---
 spring:
-  profiles: prod
+  config:
+    activate:
+      on-profile: prod
