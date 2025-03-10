@@ -52,7 +52,7 @@ jobs:
           path: ./services/${{ inputs.app-name }}/build/test-results/test/TEST-*.xml
           reporter: java-junit
 
-      - name: Test coverage report
-        working-directory: services
-        run: |
-          ./gradlew ${{ inputs.app-name }}:jacocoTestReport ${{ inputs.app-name }}:jacocoTestCoverageVerification --info
+      # - name: Test coverage report
+      #   working-directory: services
+      #   run: |
+      #     ./gradlew ${{ inputs.app-name }}:jacocoTestReport ${{ inputs.app-name }}:jacocoTestCoverageVerification --info

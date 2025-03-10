@@ -11,7 +11,10 @@ plugins {
 group = 'io.wkrzywiec'
 version = '0.0.1-SNAPSHOT'
 description = 'food-delivery common libraries'
-sourceCompatibility = '21'
+
+java {
+    sourceCompatibility = '21'
+}
 
 bootJar {
     enabled = false
@@ -31,18 +34,6 @@ configurations {
 }
 
 dependencies {
-
-    modules {
-        module("org.codehaus.groovy:groovy") {
-            replacedBy("org.apache.groovy:groovy", "conflicts in current rest-assured version")
-        }
-        module("org.codehaus.groovy:groovy-json") {
-            replacedBy("org.apache.groovy:groovy-json", "conflicts in current rest-assured version")
-        }
-        module("org.codehaus.groovy:groovy-xml") {
-            replacedBy("org.apache.groovy:groovy-xml", "conflicts in current rest-assured version")
-        }
-    }
 
     def springBootVersion = '3.4.3'
     def lombokVersion = '1.18.36'
