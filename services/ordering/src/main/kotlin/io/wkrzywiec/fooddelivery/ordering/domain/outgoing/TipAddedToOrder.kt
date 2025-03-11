@@ -4,4 +4,6 @@ import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
 import java.math.BigDecimal
 
 @JvmRecord
-data class TipAddedToOrder(val orderId: String, val tip: BigDecimal, val total: BigDecimal) : DomainMessageBody
+data class TipAddedToOrder(val id: String, val tip: BigDecimal, val total: BigDecimal) : DomainMessageBody {
+    override fun orderId(): String = id
+}

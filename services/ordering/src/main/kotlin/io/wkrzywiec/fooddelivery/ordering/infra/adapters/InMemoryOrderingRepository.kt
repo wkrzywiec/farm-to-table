@@ -9,10 +9,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class InMemoryOrderingRepository : OrderingRepository {
-    val database: MutableMap<String, Order> = ConcurrentHashMap()
+    private val database: MutableMap<String, Order> = ConcurrentHashMap()
 
     override fun save(newOrder: Order): Order {
-        var id: Unit = newOrder.getId()
+        var id: String = newOrder.id
         if (Objects.isNull(id)) {
             id = UUID.randomUUID().toString()
 

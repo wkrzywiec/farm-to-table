@@ -35,9 +35,9 @@ dependencies {
 	def spockVersion = '2.3-groovy-4.0'
 	def testcontainersVersion = '1.20.6'
 
-	implementation "org.projectlombok:lombok:${lombokVersion}"
-	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-	testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+//	implementation "org.projectlombok:lombok:${lombokVersion}"
+//	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+//	testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
 	implementation project(':commons')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -52,6 +52,7 @@ dependencies {
 	implementation 'org.jetbrains.kotlin:kotlin-stdlib'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+	implementation 'io.github.oshai:kotlin-logging-jvm:7.0.3'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation "org.spockframework:spock-core:${spockVersion}"

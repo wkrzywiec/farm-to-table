@@ -3,6 +3,7 @@ package io.wkrzywiec.fooddelivery.ordering.application
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.wkrzywiec.fooddelivery.commons.incoming.AddTip
 import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder
 import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder
@@ -11,13 +12,11 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListen
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
-import lombok.RequiredArgsConstructor
-import lombok.extern.slf4j.Slf4j
 import org.springframework.data.redis.connection.stream.MapRecord
 
-@Slf4j
-@RequiredArgsConstructor
-class RedisOrdersChannelConsumer : RedisStreamListener {
+private val logger = KotlinLogging.logger {}
+
+class RedisOrdersChannelConsumer(facade: OrderingFacade?, objectMapper: ObjectMapper?) : RedisStreamListener {
     private val facade: OrderingFacade? = null
     private val objectMapper: ObjectMapper? = null
 
@@ -34,7 +33,7 @@ class RedisOrdersChannelConsumer : RedisStreamListener {
     }
 
     override fun onMessage(message: MapRecord<String?, String?, String?>) {
-        RedisOrdersChannelConsumer.log.info("Message received from {} stream: {}", streamName(), message)
+        logger.info {"Message received from ${streamName()} stream: $message"}
 
         val payloadMessage = message.value["payload"]
 
@@ -48,7 +47,7 @@ class RedisOrdersChannelConsumer : RedisStreamListener {
                 "FoodInPreparation" -> facade!!.handle(mapMessageBody(messageAsJson, FoodInPreparation::class.java))
                 "AddTip" -> facade!!.handle(mapMessageBody(messageAsJson, AddTip::class.java))
                 "FoodDelivered" -> facade!!.handle(mapMessageBody(messageAsJson, FoodDelivered::class.java))
-                else -> RedisOrdersChannelConsumer.log.info("There is not logic for handling {} message", header.type)
+                else -> logger.info { "There is not logic for handling ${header.type} message" }
             }
         } catch (e: JsonProcessingException) {
             throw RuntimeException(e)

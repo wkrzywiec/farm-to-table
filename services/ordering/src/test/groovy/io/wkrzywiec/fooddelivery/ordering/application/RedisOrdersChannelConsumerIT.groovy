@@ -15,7 +15,7 @@ import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await
 
 @ActiveProfiles("redis")
-@Subject(RedisOrdersChannelConsumer)
+@Subject(RedisOrdersChannelConsumer.RedisOrdersChannelConsumer)
 class RedisOrdersChannelConsumerIT extends IntegrationTest {
 
     def "Message is consumed correctly"() {

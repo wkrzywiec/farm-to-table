@@ -3,48 +3,24 @@ package io.wkrzywiec.fooddelivery.ordering.domain
 import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
-import lombok.EqualsAndHashCode
-import lombok.Getter
-import lombok.ToString
 import java.math.BigDecimal
 import java.util.*
-import java.util.function.Function
 
-@Getter
-@EqualsAndHashCode
-@ToString
 class Order {
-    private var id: String? = null
-    private var customerId: String? = null
-    private var restaurantId: String? = null
-    private var status: OrderStatus? = null
-    private var address: String? = null
-    private var items: List<Item>? = null
-    private var deliveryCharge: BigDecimal? = null
-    private var tip = BigDecimal(0)
-    private var total = BigDecimal(0)
-    private var metadata: MutableMap<String, String>? = null
 
-    private constructor()
-
-    private constructor(
-        id: String,
-        customerId: String,
-        restaurantId: String,
-        items: List<Item>,
-        address: String,
-        deliveryCharge: BigDecimal
-    ) : this(
-        id,
-        customerId,
-        restaurantId,
-        OrderStatus.CREATED,
-        address,
-        items,
-        deliveryCharge,
-        BigDecimal.ZERO,
-        HashMap<String, String>()
-    )
+    val id: String
+    val customerId: String
+    val restaurantId: String
+    var status: OrderStatus
+        private set
+    val address: String
+    val items: List<Item>
+    val deliveryCharge: BigDecimal
+    var tip: BigDecimal = BigDecimal(0)
+        private set
+    var total: BigDecimal = BigDecimal(0)
+        private set
+    val metadata: MutableMap<String, String>
 
     private constructor(
         id: String?,
@@ -74,11 +50,7 @@ class Order {
     }
 
     fun calculateTotal() {
-        this.total = items!!.stream()
-            .map<Any>(Function<Item, Any> { item: Item ->
-                item.getPricePerItem().multiply(BigDecimal.valueOf(item.getAmount()))
-            })
-            .reduce(BigDecimal.ZERO, BigDecimal::add)
+        total = items!!.sumOf { it.pricePerItem.multiply(BigDecimal(it.amount)) }
             .add(deliveryCharge)
             .add(tip)
     }
@@ -134,81 +106,104 @@ class Order {
     }
 
     companion object {
+
         @JvmStatic
         fun from(createOrder: CreateOrder): Order {
             val order = Order(
-                createOrder.orderId,
-                createOrder.customerId,
-                createOrder.restaurantId,
-                mapItems(createOrder.items),
-                createOrder.address,
-                createOrder.deliveryCharge
+                id = createOrder.orderId,
+                customerId = createOrder.customerId,
+                restaurantId = createOrder.restaurantId,
+                status = OrderStatus.CREATED,
+                address = createOrder.address,
+                items = mapItems(createOrder.items),
+                deliveryCharge = createOrder.deliveryCharge,
+                tip = BigDecimal.ZERO,
+                metadata = mutableMapOf<String, String>()
             )
-
             return order
         }
 
         private fun mapItems(items: List<io.wkrzywiec.fooddelivery.commons.incoming.Item>): List<Item> {
             return items.stream()
-                .map<Any>(Function<io.wkrzywiec.fooddelivery.commons.incoming.Item, Any> { dto: io.wkrzywiec.fooddelivery.commons.incoming.Item ->
-                    Item.builder()
-                        .name(dto.name)
-                        .amount(dto.amount)
-                        .pricePerItem(dto.pricePerItem)
-                        .build()
-                }).toList()
+                .map{
+                    Item(name = it.name, amount = it.amount, pricePerItem = it.pricePerItem)
+                }
+                .toList()
         }
 
-        fun from(events: List<Message>): Order? {
-            var order: Order? = null
+        fun from(events: List<Message>): Order {
+            lateinit var order: Order
             for (event in events) {
-                if (event.body is OrderCreated) {
+                val body = event.body
+                if (body is OrderCreated) {
                     order = Order(
-                        created.orderId, created.customerId,
-                        created.restaurantId, mapItems(created.items),
-                        created.address, created.deliveryCharge
+                        id = body.id,
+                        customerId = body.customerId,
+                        restaurantId = body.restaurantId,
+                        status = OrderStatus.CREATED,
+                        address = body.address,
+                        items = mapItems(body.items),
+                        deliveryCharge = body.deliveryCharge,
+                        tip = BigDecimal.ZERO,
+                        metadata = mutableMapOf<String, String>()
                     )
                 }
 
-                if (event.body is OrderCanceled) {
-                    val meta: MutableMap<String, String> = order.getMetadata()
-                    meta["cancellationReason"] = canceled.reason
+                if (body is OrderCanceled) {
+                    val meta: MutableMap<String, String> = order.metadata
+                    meta["cancellationReason"] = body.reason
                     order = Order(
-                        order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), OrderStatus.CANCELED,
-                        order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), order.getTip(),
-                        meta
+                        id = order.id,
+                        customerId = order.customerId,
+                        restaurantId = order.restaurantId,
+                        status = OrderStatus.CANCELED,
+                        address = order.address,
+                        items = order.items,
+                        deliveryCharge = order.deliveryCharge,
+                        tip = order.tip,
+                        metadata = meta
                     )
                 }
 
-                if (event.body is OrderInProgress) {
+                if (body is OrderInProgress) {
                     order = Order(
-                        order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), OrderStatus.IN_PROGRESS,
-                        order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), order.getTip(),
-                        order.getMetadata()
+                        id = order.id,
+                        customerId = order.customerId,
+                        restaurantId = order.restaurantId,
+                        status = OrderStatus.IN_PROGRESS,
+                        address = order.address,
+                        items = order.items,
+                        deliveryCharge = order.deliveryCharge,
+                        tip = order.tip,
+                        metadata = order.metadata
                     )
                 }
 
-                if (event.body is TipAddedToOrder) {
+                if (body is TipAddedToOrder) {
                     order = Order(
-                        order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), order.getStatus(),
-                        order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), tipAdded.tip,
-                        order.getMetadata()
+                        id = order.id,
+                        customerId = order.customerId,
+                        restaurantId = order.restaurantId,
+                        status = order.status,
+                        address = order.address,
+                        items = order.items,
+                        deliveryCharge = order.deliveryCharge,
+                        tip = body.tip,
+                        metadata = order.metadata
                     )
                 }
 
-                if (event.body is OrderCompleted) {
+                if (body is OrderCompleted) {
                     order = Order(
-                        order.getId(), order.getCustomerId(),
-                        order.getRestaurantId(), OrderStatus.COMPLETED,
-                        order.getAddress(), order.getItems(),
-                        order.getDeliveryCharge(), order.getTip(),
-                        order.getMetadata()
+                        id = order.id,
+                        customerId = order.customerId,
+                        restaurantId = order.restaurantId,
+                        status = OrderStatus.COMPLETED,
+                        address = order.address,
+                        items = order.items,
+                        deliveryCharge = order.deliveryCharge,
+                        tip = order.tip,
+                        metadata = order.metadata
                     )
                 }
             }

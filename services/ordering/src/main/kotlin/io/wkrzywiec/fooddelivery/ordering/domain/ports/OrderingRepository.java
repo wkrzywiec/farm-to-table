@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface OrderingRepository {
 
-    public Order save(Order newOrder);
-    public Optional<Order> findById(String id);
+    Order save(Order newOrder);
+    Optional<Order> findById(String id);
 }

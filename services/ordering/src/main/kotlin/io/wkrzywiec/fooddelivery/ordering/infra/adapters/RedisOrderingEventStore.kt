@@ -1,18 +1,18 @@
 package io.wkrzywiec.fooddelivery.ordering.infra.adapters
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
 import io.wkrzywiec.fooddelivery.commons.infra.repository.RedisEventStore
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
-import lombok.extern.slf4j.Slf4j
 import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 
+private val logger = KotlinLogging.logger {}
 
 @Profile("redis")
 @Component
-@Slf4j
 internal class RedisOrderingEventStore(redisTemplate: RedisTemplate<String?, String?>?, objectMapper: ObjectMapper?) :
     RedisEventStore(redisTemplate, objectMapper) {
     override fun streamPrefix(): String {
@@ -27,9 +27,10 @@ internal class RedisOrderingEventStore(redisTemplate: RedisTemplate<String?, Str
             "TipAddedToOrder" -> TipAddedToOrder::class.java
             "OrderCompleted" -> OrderCompleted::class.java
             else -> {
-                RedisOrderingEventStore.log.error("There is not logic for mapping {} event from a store", type)
-                null
-            }!!
+                val msg = "There is not logic for mapping $type event from a store"
+                logger.error { msg }
+                throw IllegalArgumentException(msg)
+            }
         }
     }
 }

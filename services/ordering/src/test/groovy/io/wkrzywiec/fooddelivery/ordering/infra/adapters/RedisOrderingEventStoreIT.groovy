@@ -22,7 +22,7 @@ class RedisOrderingEventStoreIT extends IntegrationTest {
     def "Store an event in event store"() {
         given:
         def eventBody = new OrderInProgress("any-id")
-        def eventHeader = new Header(UUID.randomUUID().toString(), "orders", eventBody.getClass().getSimpleName(), eventBody.orderId(), Instant.now())
+        def eventHeader = new Header(UUID.randomUUID().toString(), "orders", eventBody.getClass().getSimpleName(), eventBody.id(), Instant.now())
 
         when:
         eventStore.store(new Message(eventHeader, eventBody))
@@ -39,12 +39,12 @@ class RedisOrderingEventStoreIT extends IntegrationTest {
 
         and: "First Event"
         def firstEventBody = new OrderInProgress("any-id")
-        def firstEventHeader = new Header(UUID.randomUUID().toString(), "orders", firstEventBody.getClass().getSimpleName(), firstEventBody.orderId(), Instant.now())
+        def firstEventHeader = new Header(UUID.randomUUID().toString(), "orders", firstEventBody.getClass().getSimpleName(), firstEventBody.id(), Instant.now())
         def firstEvent = new Message(firstEventHeader, firstEventBody)
 
         and: "Second Event"
         def secondEventBody = new OrderCompleted("any-id")
-        def secondEventHeader = new Header(UUID.randomUUID().toString(), "orders", secondEventBody.getClass().getSimpleName(), secondEventBody.orderId(), Instant.now())
+        def secondEventHeader = new Header(UUID.randomUUID().toString(), "orders", secondEventBody.getClass().getSimpleName(), secondEventBody.id(), Instant.now())
         def secondEvent = new Message(secondEventHeader, secondEventBody)
 
         and: "Both events are stored"

@@ -1,5 +1,6 @@
 package io.wkrzywiec.fooddelivery.ordering.domain
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.vavr.control.Try
 import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
 import io.wkrzywiec.fooddelivery.commons.incoming.AddTip
@@ -13,45 +14,47 @@ import io.wkrzywiec.fooddelivery.ordering.domain.Order.Companion.from
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
-import lombok.RequiredArgsConstructor
-import lombok.extern.slf4j.Slf4j
 import org.springframework.stereotype.Component
 import java.time.Clock
 import java.util.*
 
-@RequiredArgsConstructor
-@Slf4j
+private val logger = KotlinLogging.logger {}
+
 @Component
 class OrderingFacade {
     private val eventStore: EventStore? = null
     private val publisher: MessagePublisher? = null
     private val clock: Clock? = null
 
+    companion object {
+        private const val ORDERS_CHANNEL = "orders"
+    }
+
     fun handle(createOrder: CreateOrder) {
-        OrderingFacade.log.info("Creating a new order: {}", createOrder)
+        logger.info {"Creating a new order: $createOrder"}
         val newOrder = from(createOrder)
         val orderCreated = OrderCreated(
-            newOrder.getId(),
-            newOrder.getCustomerId(),
-            newOrder.getRestaurantId(),
-            newOrder.getAddress(),
-            createOrder.items,
-            newOrder.getDeliveryCharge(),
-            newOrder.getTotal()
+            id = newOrder.id,
+            customerId = newOrder.customerId,
+            restaurantId = newOrder.restaurantId,
+            address = newOrder.address,
+            items = createOrder.items,
+            deliveryCharge = newOrder.deliveryCharge,
+            total = newOrder.total
         )
 
         val event = resultingEvent(
-            newOrder.getId(),
+            newOrder.id,
             orderCreated
         )
 
         eventStore!!.store(event)
         publisher!!.send(event)
-        OrderingFacade.log.info("New order with an id: '{}' was created", newOrder.getId())
+        logger.info {"New order with an id: '${newOrder.id}' was created"}
     }
 
     fun handle(cancelOrder: CancelOrder) {
-        OrderingFacade.log.info("Cancelling an order: {}", cancelOrder.orderId)
+        logger.info { "Cancelling an order: ${cancelOrder.orderId}" }
 
         val storedEvents = eventStore!!.getEventsForOrder(cancelOrder.orderId)
         if (storedEvents.size == 0) {
@@ -62,21 +65,23 @@ class OrderingFacade {
                 )
             )
         }
-        val order = from(storedEvents)!!
+        val order = from(storedEvents)
 
         Try.run { order.cancelOrder(cancelOrder.reason) }
             .onSuccess { v: Void? ->
                 publishSuccessEvent(
-                    order.getId(),
+                    order.id,
                     OrderCanceled(cancelOrder.orderId, cancelOrder.reason)
                 )
             }
-            .onFailure { ex: Throwable -> publishingFailureEvent(order.getId(), "Failed to cancel an order.", ex) }
-            .andFinally { OrderingFacade.log.info("Cancellation of an order '{}' has been completed", order.getId()) }
+            .onFailure { ex: Throwable -> publishingFailureEvent(order.id, "Failed to cancel an order.", ex) }
+            .andFinally {
+                logger.info { "Cancellation of an order '${order.id}' has been completed" }
+            }
     }
 
     fun handle(foodInPreparation: FoodInPreparation) {
-        OrderingFacade.log.info("Setting '{}' order to IN_PROGRESS state", foodInPreparation.orderId)
+        logger.info {"Setting '${foodInPreparation.orderId}' order to IN_PROGRESS state" }
 
         val storedEvents = eventStore!!.getEventsForOrder(foodInPreparation.orderId)
         if (storedEvents.size == 0) {
@@ -87,27 +92,24 @@ class OrderingFacade {
                 )
             )
         }
-        val order = from(storedEvents)!!
+        val order = from(storedEvents)
 
-        Try.run { order.setInProgress() }
-            .onSuccess { v: Void? -> publishSuccessEvent(order.getId(), OrderInProgress(foodInPreparation.orderId)) }
+        Try.run ({ order.setInProgress() })
+            .onSuccess { v: Void? -> publishSuccessEvent(order.id, OrderInProgress(foodInPreparation.orderId)) }
             .onFailure { ex: Throwable ->
                 publishingFailureEvent(
-                    order.getId(),
+                    order.id,
                     "Failed to set an order to IN_PROGRESS state.",
                     ex
                 )
             }
             .andFinally {
-                OrderingFacade.log.info(
-                    "Setting an '{}' order to IN_PROGRESS state has been completed",
-                    foodInPreparation.orderId
-                )
+                logger.info { "Setting an '${foodInPreparation.orderId}' order to IN_PROGRESS state has been completed"}
             }
     }
 
     fun handle(addTip: AddTip) {
-        OrderingFacade.log.info("Adding {} tip to '{}' order.", addTip.tip, addTip.orderId)
+        logger.info { "Adding ${addTip.tip} tip to '${addTip.orderId}' order." }
 
         val storedEvents = eventStore!!.getEventsForOrder(addTip.orderId)
         if (storedEvents.size == 0) {
@@ -123,16 +125,18 @@ class OrderingFacade {
         Try.run { order.addTip(addTip.tip) }
             .onSuccess { v: Void? ->
                 publishSuccessEvent(
-                    order.getId(),
-                    TipAddedToOrder(order.getId(), order.getTip(), order.getTotal())
+                    order.id,
+                    TipAddedToOrder(order.id, order.tip, order.total)
                 )
             }
-            .onFailure { ex: Throwable -> publishingFailureEvent(order.getId(), "Failed to add tip to an order.", ex) }
-            .andFinally { OrderingFacade.log.info("Adding a tip to '{}' order has been completed", addTip.orderId) }
+            .onFailure { ex: Throwable -> publishingFailureEvent(order.id, "Failed to add tip to an order.", ex) }
+            .andFinally {
+                logger.info { "Adding a tip to '${addTip.orderId}' order has been completed" }
+            }
     }
 
     fun handle(foodDelivered: FoodDelivered) {
-        OrderingFacade.log.info("Setting '{}' order to COMPLETED state", foodDelivered.orderId)
+        logger.info { "Setting '${foodDelivered.orderId}' order to COMPLETED state" }
 
         val storedEvents = eventStore!!.getEventsForOrder(foodDelivered.orderId)
         if (storedEvents.size == 0) {
@@ -146,25 +150,24 @@ class OrderingFacade {
         val order = from(storedEvents)!!
 
         Try.run { order.complete() }
-            .onSuccess { v: Void? -> publishSuccessEvent(order.getId(), OrderCompleted(foodDelivered.orderId)) }
-            .onFailure { ex: Throwable -> publishingFailureEvent(order.getId(), "Failed to complete an order.", ex) }
+            .onSuccess { v: Void? -> publishSuccessEvent(order.id, OrderCompleted(foodDelivered.orderId)) }
+            .onFailure { ex: Throwable -> publishingFailureEvent(order.id, "Failed to complete an order.", ex) }
             .andFinally {
-                OrderingFacade.log.info(
-                    "Setting an '{}' order to COMPLETED state has been completed",
-                    foodDelivered.orderId
-                )
+                logger.info {
+                    "Setting an '${foodDelivered.orderId}' order to COMPLETED state has been completed"
+                }
             }
     }
 
     private fun publishSuccessEvent(orderId: String, eventObject: DomainMessageBody) {
-        OrderingFacade.log.info("Publishing success event: {}", eventObject)
+        logger.info {"Publishing success event: $eventObject" }
         val event = resultingEvent(orderId, eventObject)
         eventStore!!.store(event)
         publisher!!.send(event)
     }
 
     private fun publishingFailureEvent(id: String, message: String, ex: Throwable) {
-        OrderingFacade.log.error("$message Publishing OrderProcessingError event", ex)
+        logger.error(ex) { "$message Publishing OrderProcessingError event" }
         val event = resultingEvent(id, OrderProcessingError(id, message, ex.localizedMessage))
         publisher!!.send(event)
     }
@@ -176,8 +179,6 @@ class OrderingFacade {
     private fun eventHeader(orderId: String, type: String): Header {
         return Header(UUID.randomUUID().toString(), ORDERS_CHANNEL, type, orderId, clock!!.instant())
     }
-
-    companion object {
-        private const val ORDERS_CHANNEL = "orders"
-    }
 }
+
+

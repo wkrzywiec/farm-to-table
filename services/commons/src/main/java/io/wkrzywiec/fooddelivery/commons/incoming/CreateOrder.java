@@ -11,5 +11,5 @@ public record CreateOrder(
         String restaurantId,
         List<Item> items,
         String address,
-        BigDecimal deliveryCharge) implements DomainMessageBody {
+        BigDecimal deliveryCharge ) implements DomainMessageBody {
 }

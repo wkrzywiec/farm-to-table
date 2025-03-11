@@ -6,11 +6,14 @@ import java.math.BigDecimal
 
 @JvmRecord
 data class OrderCreated(
-    val orderId: String,
+    val id: String,
     val customerId: String,
     val restaurantId: String,
     val address: String,
     val items: List<Item>,
     val deliveryCharge: BigDecimal,
     val total: BigDecimal
-) : DomainMessageBody
+) : DomainMessageBody {
+
+    override fun orderId(): String = id
+}
