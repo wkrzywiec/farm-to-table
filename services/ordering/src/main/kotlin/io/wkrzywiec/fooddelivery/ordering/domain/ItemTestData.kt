@@ -1,46 +1,43 @@
-package io.wkrzywiec.fooddelivery.ordering.domain;
+package io.wkrzywiec.fooddelivery.ordering.domain
 
-import lombok.Getter;
+import java.math.BigDecimal
 
-import java.math.BigDecimal;
+internal class ItemTestData private constructor() {
+    private var name = "Pizza Margherita"
+    private var amount = 1
+    private var pricePerItem = BigDecimal(10)
 
-@Getter
-class ItemTestData {
-
-    private String name = "Pizza Margherita";
-    private int amount = 1;
-    private BigDecimal pricePerItem = new BigDecimal(10);
-
-    private ItemTestData() {};
-
-    Item entity() {
-        return Item.builder()
-                .name(name)
-                .amount(amount)
-                .pricePerItem(pricePerItem)
-                .build();
+    companion object {
+        @JvmStatic
+        fun anItem(): ItemTestData {
+            return ItemTestData()
+        }
     }
 
-    io.wkrzywiec.fooddelivery.commons.incoming.Item dto() {
-        return new io.wkrzywiec.fooddelivery.commons.incoming.Item(name, amount, pricePerItem);
+    fun entity(): Item {
+        return Item(
+            name = name,
+            amount = amount,
+            pricePerItem = pricePerItem
+        )
     }
 
-    public static ItemTestData anItem() {
-        return new ItemTestData();
+    fun dto(): io.wkrzywiec.fooddelivery.commons.incoming.Item {
+        return io.wkrzywiec.fooddelivery.commons.incoming.Item(name, amount, pricePerItem)
     }
 
-    public ItemTestData withName(String name) {
-        this.name = name;
-        return this;
+    fun withName(name: String): ItemTestData {
+        this.name = name
+        return this
     }
 
-    public ItemTestData withPricePerItem(double price) {
-        this.pricePerItem = new BigDecimal(price);
-        return this;
+    fun withPricePerItem(price: Double): ItemTestData {
+        this.pricePerItem = BigDecimal(price)
+        return this
     }
 
-    ItemTestData withAmount(int amount) {
-        this.amount = amount;
-        return this;
+    fun withAmount(amount: Int): ItemTestData {
+        this.amount = amount
+        return this
     }
 }

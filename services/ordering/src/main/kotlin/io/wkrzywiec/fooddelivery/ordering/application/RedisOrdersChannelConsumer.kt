@@ -16,9 +16,7 @@ import org.springframework.data.redis.connection.stream.MapRecord
 
 private val logger = KotlinLogging.logger {}
 
-class RedisOrdersChannelConsumer(facade: OrderingFacade?, objectMapper: ObjectMapper?) : RedisStreamListener {
-    private val facade: OrderingFacade? = null
-    private val objectMapper: ObjectMapper? = null
+class RedisOrdersChannelConsumer(private val facade: OrderingFacade?, private val objectMapper: ObjectMapper?) : RedisStreamListener {
 
     override fun streamName(): String {
         return "orders"

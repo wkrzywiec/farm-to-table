@@ -22,8 +22,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 import static io.wkrzywiec.fooddelivery.commons.infra.messaging.Message.message
-import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
-import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 
 @Subject(OrderingFacade)
 @Title("Specification for ordering process")
@@ -46,10 +44,10 @@ class OrderingFacadeSpec extends Specification {
 
     def "Create an order"() {
         given:
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
                 .withItems(
-                        anItem().withName("Pizza").withPricePerItem(2.5),
-                        anItem().withName("Spaghetti").withPricePerItem(3.0)
+                        ItemTestData.anItem().withName("Pizza").withPricePerItem(2.5),
+                        ItemTestData.anItem().withName("Spaghetti").withPricePerItem(3.0)
                 )
 
         when:
@@ -57,7 +55,7 @@ class OrderingFacadeSpec extends Specification {
 
         then: "Event is saved in a store"
         def expectedEvent = order.orderCreated()
-        def storedEvents = eventStore.getEventsForOrder(order.getId())
+        def storedEvents = eventStore.getEventsForOrder(order.it)
         storedEvents.size() == 1
         storedEvents[0].body() == expectedEvent
 
@@ -76,7 +74,7 @@ class OrderingFacadeSpec extends Specification {
 
     def "Cancel an order"() {
         given:
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
         eventStore.store(message("orders", testClock, order.orderCreated()))
 
         and:
@@ -106,7 +104,7 @@ class OrderingFacadeSpec extends Specification {
 
     def "Set order to IN_PROGRESS"() {
         given:
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
         eventStore.store(message("orders", testClock, order.orderCreated()))
 
         and:
@@ -139,7 +137,7 @@ class OrderingFacadeSpec extends Specification {
         double itemCost = 10
         double deliveryCharge = 5
 
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
                 .withItems(anItem().withPricePerItem(itemCost))
                 .withDeliveryCharge(deliveryCharge)
         eventStore.store(message("orders", testClock, order.orderCreated()))
@@ -176,7 +174,7 @@ class OrderingFacadeSpec extends Specification {
 
     def "Complete an order"() {
         given:
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
         eventStore.store(message("orders", testClock, order.orderCreated()))
         eventStore.store(message("orders", testClock, new OrderInProgress(order.getId())))
 
