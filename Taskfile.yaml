@@ -58,7 +58,6 @@ tasks:
     cmds:
       - task: infra
       - gradlew food:bootRun --info
-      -
 
   dev:ordering:
     desc: Run 'ordering' service
@@ -71,7 +70,7 @@ tasks:
     desc: Spin up dockerized infrastructure
     cmds:
       - docker compose up -d redis
-      - docker run --rm -it --network food-delivery-app_default redis redis-cli -h redis FT.CREATE food-idx ON JSON PREFIX 1 "food:" SCHEMA $.name AS name TEXT
+      - docker run --rm -it --network farm-to-table_default redis redis-cli -h redis FT.CREATE food-idx ON JSON PREFIX 1 "food:" SCHEMA $.name AS name TEXT
 
   infra:down:
     desc: Stop infrastructure
@@ -83,5 +82,5 @@ tasks:
     desc: Stop and clean all persisted data
     cmds:
       - task: infra:down
-      - docker volume rm food-delivery-app_redis-data
+      - docker volume rm farm-to-table_redis-data
       - echo "Docker volumes cleaned."
