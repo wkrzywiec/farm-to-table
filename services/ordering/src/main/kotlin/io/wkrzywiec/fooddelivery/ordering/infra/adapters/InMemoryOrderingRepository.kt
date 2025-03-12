@@ -26,7 +26,7 @@ class InMemoryOrderingRepository : OrderingRepository {
         return newOrder
     }
 
-    override fun findById(id: String): Optional<Order> {
-        return Optional.ofNullable(database[id])
+    override fun findById(id: String): Order? {
+        return database[id]
     }
 }

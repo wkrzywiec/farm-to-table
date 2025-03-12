@@ -2,10 +2,11 @@ package io.wkrzywiec.fooddelivery.ordering.domain
 
 import java.math.BigDecimal
 
-internal class ItemTestData private constructor() {
-    private var name = "Pizza Margherita"
-    private var amount = 1
-    private var pricePerItem = BigDecimal(10)
+internal data class ItemTestData private constructor(
+    val name: String = "Pizza Margherita",
+    val amount: Int = 1,
+    val pricePerItem: BigDecimal = BigDecimal(10)
+) {
 
     companion object {
         @JvmStatic
@@ -27,17 +28,14 @@ internal class ItemTestData private constructor() {
     }
 
     fun withName(name: String): ItemTestData {
-        this.name = name
-        return this
+        return this.copy(name = name)
     }
 
     fun withPricePerItem(price: Double): ItemTestData {
-        this.pricePerItem = BigDecimal(price)
-        return this
+        return this.copy(pricePerItem = BigDecimal(price))
     }
 
     fun withAmount(amount: Int): ItemTestData {
-        this.amount = amount
-        return this
+        return this.copy(amount = amount)
     }
 }

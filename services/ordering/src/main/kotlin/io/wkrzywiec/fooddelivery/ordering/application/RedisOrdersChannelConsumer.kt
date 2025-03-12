@@ -16,7 +16,7 @@ import org.springframework.data.redis.connection.stream.MapRecord
 
 private val logger = KotlinLogging.logger {}
 
-class RedisOrdersChannelConsumer(private val facade: OrderingFacade?, private val objectMapper: ObjectMapper?) : RedisStreamListener {
+class RedisOrdersChannelConsumer(private val facade: OrderingFacade, private val objectMapper: ObjectMapper) : RedisStreamListener {
 
     override fun streamName(): String {
         return "orders"
@@ -36,15 +36,15 @@ class RedisOrdersChannelConsumer(private val facade: OrderingFacade?, private va
         val payloadMessage = message.value["payload"]
 
         try {
-            val messageAsJson = objectMapper!!.readTree(payloadMessage)
+            val messageAsJson = objectMapper.readTree(payloadMessage)
             val header = map(messageAsJson["header"], Header::class.java)
 
             when (header.type) {
-                "CreateOrder" -> facade!!.handle(mapMessageBody(messageAsJson, CreateOrder::class.java))
-                "CancelOrder" -> facade!!.handle(mapMessageBody(messageAsJson, CancelOrder::class.java))
-                "FoodInPreparation" -> facade!!.handle(mapMessageBody(messageAsJson, FoodInPreparation::class.java))
-                "AddTip" -> facade!!.handle(mapMessageBody(messageAsJson, AddTip::class.java))
-                "FoodDelivered" -> facade!!.handle(mapMessageBody(messageAsJson, FoodDelivered::class.java))
+                "CreateOrder" -> facade.handle(mapMessageBody(messageAsJson, CreateOrder::class.java))
+                "CancelOrder" -> facade.handle(mapMessageBody(messageAsJson, CancelOrder::class.java))
+                "FoodInPreparation" -> facade.handle(mapMessageBody(messageAsJson, FoodInPreparation::class.java))
+                "AddTip" -> facade.handle(mapMessageBody(messageAsJson, AddTip::class.java))
+                "FoodDelivered" -> facade.handle(mapMessageBody(messageAsJson, FoodDelivered::class.java))
                 else -> logger.info { "There is not logic for handling ${header.type} message" }
             }
         } catch (e: JsonProcessingException) {
@@ -54,11 +54,11 @@ class RedisOrdersChannelConsumer(private val facade: OrderingFacade?, private va
 
     @Throws(JsonProcessingException::class)
     private fun <T> mapMessageBody(fullMessage: JsonNode, valueType: Class<T>): T {
-        return objectMapper!!.treeToValue(fullMessage["body"], valueType)
+        return objectMapper.treeToValue(fullMessage["body"], valueType)
     }
 
     @Throws(JsonProcessingException::class)
     private fun <T> map(fullMessage: JsonNode, valueType: Class<T>): T {
-        return objectMapper!!.treeToValue(fullMessage, valueType)
+        return objectMapper.treeToValue(fullMessage, valueType)
     }
 }

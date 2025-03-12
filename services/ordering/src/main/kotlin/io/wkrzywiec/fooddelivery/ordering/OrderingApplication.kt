@@ -10,6 +10,7 @@ import java.time.Clock
     ]
 )
 class OrderingApplication {
+
     @Bean
     fun clock(): Clock {
         return Clock.systemUTC()

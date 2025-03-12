@@ -15,17 +15,18 @@ import org.springframework.data.redis.stream.Subscription
 @Configuration
 @Profile("redis")
 class RedisConfiguration : RedisMessageConsumerConfig() {
+
     @Bean
     fun ordersChannelSubscription(
-        factory: RedisConnectionFactory?,
-        redisTemplate: RedisTemplate<String?, String?>?,
-        streamListener: RedisStreamListener?
+        factory: RedisConnectionFactory,
+        redisTemplate: RedisTemplate<String, String>,
+        streamListener: RedisStreamListener
     ): Subscription {
         return createSubscription(redisTemplate, factory, streamListener)
     }
 
     @Bean
-    fun redisOrdersChannelConsumer(facade: OrderingFacade?, objectMapper: ObjectMapper?): RedisStreamListener {
+    fun redisOrdersChannelConsumer(facade: OrderingFacade, objectMapper: ObjectMapper): RedisStreamListener {
         return RedisOrdersChannelConsumer(facade, objectMapper)
     }
 }

@@ -44,7 +44,7 @@ internal class OrderTestData private constructor() {
         var params: List<KParameter>
         try {
             constructor = Order::class.primaryConstructor ?: throw RuntimeException()
-            constructor!!.isAccessible = true
+            constructor.isAccessible = true
             params = constructor.parameters
         } catch (e: Exception) {
             throw RuntimeException("Failed to construct Order entity class for tests", e)
@@ -119,16 +119,5 @@ internal class OrderTestData private constructor() {
     fun withMetadata(metadata: Map<String, String>): OrderTestData {
         this.metadata = metadata
         return this
-    }
-
-    private fun setValue(order: Order, fieldName: String, value: Any) {
-        try {
-            FieldUtils.writeField(order, fieldName, value, true)
-        } catch (e: IllegalAccessException) {
-            throw RuntimeException(
-                String.format("Failed to set a %s field in Order entity class for tests", fieldName),
-                e
-            )
-        }
     }
 }

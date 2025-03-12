@@ -1,11 +1,9 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.ports;
+package io.wkrzywiec.fooddelivery.ordering.domain.ports
 
-import io.wkrzywiec.fooddelivery.ordering.domain.Order;
+import io.wkrzywiec.fooddelivery.ordering.domain.Order
+import java.util.*
 
-import java.util.Optional;
-
-public interface OrderingRepository {
-
-    Order save(Order newOrder);
-    Optional<Order> findById(String id);
+interface OrderingRepository {
+    fun save(newOrder: Order): Order
+    fun findById(id: String): Order?
 }
