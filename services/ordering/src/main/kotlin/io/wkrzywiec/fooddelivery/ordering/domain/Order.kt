@@ -6,46 +6,32 @@ import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
 import java.math.BigDecimal
 import java.util.*
 
-class Order {
+class Order  private constructor(
+    id: String?,
+    val customerId: String,
+    val restaurantId: String,
+    status: OrderStatus,
+    val address: String,
+    val items: List<Item>,
+    val deliveryCharge: BigDecimal,
+    tip: BigDecimal,
+    val metadata: MutableMap<String, String>
+) {
 
     val id: String
-    val customerId: String
-    val restaurantId: String
-    var status: OrderStatus
+    var status: OrderStatus = status
         private set
-    val address: String
-    val items: List<Item>
-    val deliveryCharge: BigDecimal
-    var tip: BigDecimal = BigDecimal(0)
+    var tip: BigDecimal = tip
         private set
     var total: BigDecimal = BigDecimal(0)
         private set
-    val metadata: MutableMap<String, String>
 
-    private constructor(
-        id: String?,
-        customerId: String,
-        restaurantId: String,
-        status: OrderStatus,
-        address: String,
-        items: List<Item>,
-        deliveryCharge: BigDecimal,
-        tip: BigDecimal,
-        metadata: MutableMap<String, String>
-    ) {
+    init {
         if (id == null) {
             this.id = UUID.randomUUID().toString()
         } else {
             this.id = id
         }
-        this.customerId = customerId
-        this.restaurantId = restaurantId
-        this.status = status
-        this.address = address
-        this.items = items
-        this.deliveryCharge = deliveryCharge
-        this.tip = tip
-        this.metadata = metadata
         this.calculateTotal()
     }
 
@@ -131,6 +117,7 @@ class Order {
                 .toList()
         }
 
+        @JvmStatic
         fun from(events: List<Message>): Order {
             lateinit var order: Order
             for (event in events) {

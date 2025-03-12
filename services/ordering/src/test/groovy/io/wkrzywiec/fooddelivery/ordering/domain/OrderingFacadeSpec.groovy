@@ -55,7 +55,7 @@ class OrderingFacadeSpec extends Specification {
 
         then: "Event is saved in a store"
         def expectedEvent = order.orderCreated()
-        def storedEvents = eventStore.getEventsForOrder(order.it)
+        def storedEvents = eventStore.getEventsForOrder(order.id)
         storedEvents.size() == 1
         storedEvents[0].body() == expectedEvent
 
@@ -138,7 +138,7 @@ class OrderingFacadeSpec extends Specification {
         double deliveryCharge = 5
 
         var order = OrderTestData.anOrder()
-                .withItems(anItem().withPricePerItem(itemCost))
+                .withItems(ItemTestData.anItem().withPricePerItem(itemCost))
                 .withDeliveryCharge(deliveryCharge)
         eventStore.store(message("orders", testClock, order.orderCreated()))
 

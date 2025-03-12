@@ -6,6 +6,10 @@ import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated
 import org.apache.commons.lang3.reflect.FieldUtils
 import java.math.BigDecimal
 import java.util.*
+import kotlin.reflect.KFunction
+import kotlin.reflect.KParameter
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.isAccessible
 
 
 internal class OrderTestData private constructor() {
@@ -36,17 +40,26 @@ internal class OrderTestData private constructor() {
     }
 
     fun entity(): Order {
-        val order = createAnEmptyOrder()
-        setValue(order, "id", id)
-        setValue(order, "customerId", customerId)
-        setValue(order, "restaurantId", restaurantId)
-        setValue(order, "status", status)
-        setValue(order, "address", address)
-        setValue(order, "items", items.stream().map { obj: ItemTestData -> obj.entity() }
-            .toList())
-        setValue(order, "deliveryCharge", deliveryCharge)
-        setValue(order, "tip", tip)
-        setValue(order, "metadata", metadata)
+        var constructor: KFunction<Order>
+        var params: List<KParameter>
+        try {
+            constructor = Order::class.primaryConstructor ?: throw RuntimeException()
+            constructor!!.isAccessible = true
+            params = constructor.parameters
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to construct Order entity class for tests", e)
+        }
+        val order = constructor.callBy(mapOf(
+            params[0] to id,
+            params[1] to customerId,
+            params[2] to restaurantId,
+            params[3] to status,
+            params[4] to address,
+            params[5] to items.stream().map { obj: ItemTestData -> obj.entity() }.toList(),
+            params[6] to deliveryCharge,
+            params[7] to tip,
+            params[8] to metadata,)
+        )
 
         order.calculateTotal()
         return order
@@ -106,16 +119,6 @@ internal class OrderTestData private constructor() {
     fun withMetadata(metadata: Map<String, String>): OrderTestData {
         this.metadata = metadata
         return this
-    }
-
-    private fun createAnEmptyOrder(): Order {
-        try {
-            val constructor = Order::class.java.getDeclaredConstructor()
-            constructor.isAccessible = true
-            return constructor.newInstance()
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to construct Order entity class for tests", e)
-        }
     }
 
     private fun setValue(order: Order, fieldName: String, value: Any) {

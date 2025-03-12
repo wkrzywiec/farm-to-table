@@ -30,7 +30,7 @@ class RedisOrderingEventStoreIT extends IntegrationTest {
         then:
         var savedEvents = redisStreamsClient.getLatestMessageFromStreamAsJson("ordering::any-id")
         savedEvents.get("header").get("type").asText() == "OrderInProgress"
-        savedEvents.get("body").get("orderId").asText() == "any-id"
+        savedEvents.get("body").get("id").asText() == "any-id"
     }
 
     def "Get all events from event store"() {

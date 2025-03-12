@@ -21,10 +21,7 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 @Component
-class OrderingFacade {
-    private val eventStore: EventStore? = null
-    private val publisher: MessagePublisher? = null
-    private val clock: Clock? = null
+class OrderingFacade(val eventStore: EventStore, val publisher: MessagePublisher, val clock: Clock) {
 
     companion object {
         private const val ORDERS_CHANNEL = "orders"
