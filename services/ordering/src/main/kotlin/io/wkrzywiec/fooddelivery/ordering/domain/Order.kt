@@ -7,7 +7,7 @@ import java.math.BigDecimal
 import java.util.*
 
 class Order  private constructor(
-    id: String?,
+    val id: String,
     val customerId: String,
     val restaurantId: String,
     status: OrderStatus,
@@ -18,7 +18,6 @@ class Order  private constructor(
     val metadata: MutableMap<String, String>
 ) {
 
-    val id: String
     var status: OrderStatus = status
         private set
     var tip: BigDecimal = tip
@@ -27,16 +26,11 @@ class Order  private constructor(
         private set
 
     init {
-        if (id == null) {
-            this.id = UUID.randomUUID().toString()
-        } else {
-            this.id = id
-        }
         this.calculateTotal()
     }
 
     fun calculateTotal() {
-        total = items!!.sumOf { it.pricePerItem.multiply(BigDecimal(it.amount)) }
+        total = items.sumOf { it.pricePerItem.multiply(BigDecimal(it.amount)) }
             .add(deliveryCharge)
             .add(tip)
     }
@@ -54,7 +48,7 @@ class Order  private constructor(
         this.status = OrderStatus.CANCELED
 
         if (reason != null) {
-            metadata!!["cancellationReason"] = reason
+            metadata["cancellationReason"] = reason
         }
     }
 

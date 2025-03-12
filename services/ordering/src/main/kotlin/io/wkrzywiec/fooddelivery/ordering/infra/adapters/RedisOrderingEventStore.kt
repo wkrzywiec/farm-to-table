@@ -13,8 +13,8 @@ private val logger = KotlinLogging.logger {}
 
 @Profile("redis")
 @Component
-internal class RedisOrderingEventStore(redisTemplate: RedisTemplate<String?, String?>?, objectMapper: ObjectMapper?) :
-    RedisEventStore(redisTemplate, objectMapper) {
+internal class RedisOrderingEventStore(redisTemplate: RedisTemplate<String, String>, objectMapper: ObjectMapper) : RedisEventStore(redisTemplate, objectMapper) {
+
     override fun streamPrefix(): String {
         return "ordering::"
     }

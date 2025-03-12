@@ -45,27 +45,24 @@ class OrderingFacade(val eventStore: EventStore, val publisher: MessagePublisher
             orderCreated
         )
 
-        eventStore!!.store(event)
-        publisher!!.send(event)
+        eventStore.store(event)
+        publisher.send(event)
         logger.info {"New order with an id: '${newOrder.id}' was created"}
     }
 
     fun handle(cancelOrder: CancelOrder) {
         logger.info { "Cancelling an order: ${cancelOrder.orderId}" }
 
-        val storedEvents = eventStore!!.getEventsForOrder(cancelOrder.orderId)
+        val storedEvents = eventStore.getEventsForOrder(cancelOrder.orderId)
         if (storedEvents.size == 0) {
             throw OrderingException(
-                String.format(
-                    "Failed to cancel an %s order. There is no such order with provided id.",
-                    cancelOrder.orderId
-                )
+                "Failed to cancel an '${cancelOrder.orderId}' order. There is no such order with provided id.",
             )
         }
         val order = from(storedEvents)
 
         Try.run { order.cancelOrder(cancelOrder.reason) }
-            .onSuccess { v: Void? ->
+            .onSuccess {
                 publishSuccessEvent(
                     order.id,
                     OrderCanceled(cancelOrder.orderId, cancelOrder.reason)
@@ -80,19 +77,16 @@ class OrderingFacade(val eventStore: EventStore, val publisher: MessagePublisher
     fun handle(foodInPreparation: FoodInPreparation) {
         logger.info {"Setting '${foodInPreparation.orderId}' order to IN_PROGRESS state" }
 
-        val storedEvents = eventStore!!.getEventsForOrder(foodInPreparation.orderId)
+        val storedEvents = eventStore.getEventsForOrder(foodInPreparation.orderId)
         if (storedEvents.size == 0) {
             throw OrderingException(
-                String.format(
-                    "Failed to set an '%s' order to IN_PROGRESS state. There is no such order with provided id.",
-                    foodInPreparation.orderId
-                )
+                "Failed to set an '${foodInPreparation.orderId}' order to IN_PROGRESS state. There is no such order with provided id."
             )
         }
         val order = from(storedEvents)
 
-        Try.run ({ order.setInProgress() })
-            .onSuccess { v: Void? -> publishSuccessEvent(order.id, OrderInProgress(foodInPreparation.orderId)) }
+        Try.run { order.setInProgress() }
+            .onSuccess { publishSuccessEvent(order.id, OrderInProgress(foodInPreparation.orderId)) }
             .onFailure { ex: Throwable ->
                 publishingFailureEvent(
                     order.id,
@@ -108,19 +102,16 @@ class OrderingFacade(val eventStore: EventStore, val publisher: MessagePublisher
     fun handle(addTip: AddTip) {
         logger.info { "Adding ${addTip.tip} tip to '${addTip.orderId}' order." }
 
-        val storedEvents = eventStore!!.getEventsForOrder(addTip.orderId)
+        val storedEvents = eventStore.getEventsForOrder(addTip.orderId)
         if (storedEvents.size == 0) {
             throw OrderingException(
-                String.format(
-                    "Failed add tip an '%s' order. There is no such order with provided id.",
-                    addTip.orderId
-                )
+                    "Failed add tip an '${addTip.orderId}' order. There is no such order with provided id.",
             )
         }
-        val order = from(storedEvents)!!
+        val order = from(storedEvents)
 
         Try.run { order.addTip(addTip.tip) }
-            .onSuccess { v: Void? ->
+            .onSuccess {
                 publishSuccessEvent(
                     order.id,
                     TipAddedToOrder(order.id, order.tip, order.total)
@@ -135,19 +126,16 @@ class OrderingFacade(val eventStore: EventStore, val publisher: MessagePublisher
     fun handle(foodDelivered: FoodDelivered) {
         logger.info { "Setting '${foodDelivered.orderId}' order to COMPLETED state" }
 
-        val storedEvents = eventStore!!.getEventsForOrder(foodDelivered.orderId)
+        val storedEvents = eventStore.getEventsForOrder(foodDelivered.orderId)
         if (storedEvents.size == 0) {
             throw OrderingException(
-                String.format(
-                    "Failed to complete an '%s' order. There is no such order with provided id.",
-                    foodDelivered.orderId
-                )
+                "Failed to complete an '${foodDelivered.orderId}' order. There is no such order with provided id."
             )
         }
-        val order = from(storedEvents)!!
+        val order = from(storedEvents)
 
         Try.run { order.complete() }
-            .onSuccess { v: Void? -> publishSuccessEvent(order.id, OrderCompleted(foodDelivered.orderId)) }
+            .onSuccess { publishSuccessEvent(order.id, OrderCompleted(foodDelivered.orderId)) }
             .onFailure { ex: Throwable -> publishingFailureEvent(order.id, "Failed to complete an order.", ex) }
             .andFinally {
                 logger.info {
@@ -159,14 +147,14 @@ class OrderingFacade(val eventStore: EventStore, val publisher: MessagePublisher
     private fun publishSuccessEvent(orderId: String, eventObject: DomainMessageBody) {
         logger.info {"Publishing success event: $eventObject" }
         val event = resultingEvent(orderId, eventObject)
-        eventStore!!.store(event)
-        publisher!!.send(event)
+        eventStore.store(event)
+        publisher.send(event)
     }
 
     private fun publishingFailureEvent(id: String, message: String, ex: Throwable) {
         logger.error(ex) { "$message Publishing OrderProcessingError event" }
         val event = resultingEvent(id, OrderProcessingError(id, message, ex.localizedMessage))
-        publisher!!.send(event)
+        publisher.send(event)
     }
 
     private fun resultingEvent(orderId: String, eventBody: DomainMessageBody): Message {
@@ -174,7 +162,7 @@ class OrderingFacade(val eventStore: EventStore, val publisher: MessagePublisher
     }
 
     private fun eventHeader(orderId: String, type: String): Header {
-        return Header(UUID.randomUUID().toString(), ORDERS_CHANNEL, type, orderId, clock!!.instant())
+        return Header(UUID.randomUUID().toString(), ORDERS_CHANNEL, type, orderId, clock.instant())
     }
 }
 

@@ -3,7 +3,6 @@ package io.wkrzywiec.fooddelivery.ordering.domain
 import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder
 import io.wkrzywiec.fooddelivery.commons.incoming.Item
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderCreated
-import org.apache.commons.lang3.reflect.FieldUtils
 import java.math.BigDecimal
 import java.util.*
 import kotlin.reflect.KFunction
@@ -12,25 +11,17 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 
-internal class OrderTestData private constructor() {
-    var id = UUID.randomUUID().toString()
-        private set
-    var customerId = "default-customer-id"
-        private set
-    var restaurantId = "default-restaurant-id"
-        private set
-    var status = OrderStatus.CREATED
-        private set
-    var address = "Pizza street, Naples, Italy"
-        private set
-    var items: List<ItemTestData> = mutableListOf(ItemTestData.anItem())
-        private set
-    var deliveryCharge: BigDecimal = BigDecimal(5)
-        private set
-    var tip: BigDecimal = BigDecimal(0)
-        private set
-    var metadata: Map<String, String> = HashMap()
-        private set
+internal data class OrderTestData private constructor(
+    val id: String = UUID.randomUUID().toString(),
+    val customerId: String = "default-customer-id",
+    val restaurantId: String = "default-restaurant-id",
+    val status: OrderStatus = OrderStatus.CREATED,
+    val address: String = "Pizza street, Naples, Italy",
+    val items: List<ItemTestData> = mutableListOf(ItemTestData.anItem()),
+    val deliveryCharge: BigDecimal = BigDecimal(5),
+    val tip: BigDecimal = BigDecimal(0),
+    val metadata: Map<String, String> = HashMap(),
+) {
 
     companion object {
         @JvmStatic
@@ -61,7 +52,6 @@ internal class OrderTestData private constructor() {
             params[8] to metadata,)
         )
 
-        order.calculateTotal()
         return order
     }
 
@@ -77,47 +67,38 @@ internal class OrderTestData private constructor() {
     }
 
     fun withId(id: String): OrderTestData {
-        this.id = id
-        return this
+        return this.copy(id = id)
     }
 
     fun withCustomerId(customerId: String): OrderTestData {
-        this.customerId = customerId
-        return this
+        return this.copy(customerId = customerId)
     }
 
     fun withRestaurantId(restaurantId: String): OrderTestData {
-        this.restaurantId = restaurantId
-        return this
+        return this.copy(restaurantId = restaurantId)
     }
 
     fun withStatus(status: OrderStatus): OrderTestData {
-        this.status = status
-        return this
+        return this.copy(status = status)
     }
 
     fun withAddress(address: String): OrderTestData {
-        this.address = address
-        return this
+        return this.copy(address = address)
     }
 
     fun withItems(vararg items: ItemTestData): OrderTestData {
-        this.items = items.asList()
-        return this
+        return this.copy(items = items.toList())
     }
 
     fun withDeliveryCharge(deliveryCharge: Double): OrderTestData {
-        this.deliveryCharge = BigDecimal(deliveryCharge)
-        return this
+        return this.copy(deliveryCharge = deliveryCharge.toBigDecimal())
     }
 
     fun withTip(tip: BigDecimal): OrderTestData {
-        this.tip = tip
-        return this
+        return this.copy(tip = tip)
     }
 
     fun withMetadata(metadata: Map<String, String>): OrderTestData {
-        this.metadata = metadata
-        return this
+        return this.copy(metadata = metadata)
     }
 }
