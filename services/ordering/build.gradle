@@ -31,13 +31,8 @@ configurations {
 
 dependencies {
 
-	def lombokVersion = '1.18.36'
 	def spockVersion = '2.3-groovy-4.0'
 	def testcontainersVersion = '1.20.6'
-
-//	implementation "org.projectlombok:lombok:${lombokVersion}"
-//	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-//	testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
 	implementation project(':commons')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -54,16 +49,14 @@ dependencies {
 	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
 	implementation 'io.github.oshai:kotlin-logging-jvm:7.0.3'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation "org.spockframework:spock-core:${spockVersion}"
-	implementation "org.spockframework:spock-spring:${spockVersion}"
+	testImplementation ('org.springframework.boot:spring-boot-starter-test') { exclude module: 'junit-vintage-engine' }
+	testImplementation "org.jetbrains.kotlin:kotlin-test"
+	testImplementation "org.testcontainers:junit-jupiter"
+	testImplementation ('io.rest-assured:spring-mock-mvc:5.5.1')
+
+	testImplementation 'org.awaitility:awaitility:4.3.0'
 	implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
 	implementation 'org.yaml:snakeyaml:2.4'
-	testImplementation 'org.apache.groovy:groovy-all:4.0.26'
-	testImplementation ('io.rest-assured:spring-mock-mvc:5.5.1') { exclude group: 'org.codehaus.groovy' }
-
-	testImplementation "org.testcontainers:spock:${testcontainersVersion}"
-	testImplementation 'org.awaitility:awaitility:4.3.0'
 }
 
 // Configure source sets to include both Java and Kotlin

@@ -29,7 +29,7 @@ class Order  private constructor(
         this.calculateTotal()
     }
 
-    fun calculateTotal() {
+    private fun calculateTotal() {
         total = items.sumOf { it.pricePerItem.multiply(BigDecimal(it.amount)) }
             .add(deliveryCharge)
             .add(tip)
