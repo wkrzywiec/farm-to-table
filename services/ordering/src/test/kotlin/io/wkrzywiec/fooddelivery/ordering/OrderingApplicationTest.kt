@@ -1,4 +1,12 @@
 package io.wkrzywiec.fooddelivery.ordering
 
-class OrderingApplicationTest {
+import org.junit.jupiter.api.Test
+import org.springframework.test.context.ActiveProfiles
+
+@ActiveProfiles("redis")
+class OrderingApplicationTest: IntegrationTest() {
+
+    @Test
+    fun `Spring Context is loaded`() {
+    }
 }
