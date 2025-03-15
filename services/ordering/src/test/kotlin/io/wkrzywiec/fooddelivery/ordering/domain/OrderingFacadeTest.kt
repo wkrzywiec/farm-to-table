@@ -133,7 +133,7 @@ class OrderingFacadeTest {
 
         //then: "Tip was added"
         val total = itemCost + deliveryCharge + tip
-        val expectedEvent = TipAddedToOrder(order.id, BigDecimal(tip), BigDecimal(total))
+        val expectedEvent = TipAddedToOrder(order.id, BigDecimal(tip), BigDecimal(total.toDouble()))
         val storedEvents = eventStore.getEventsForOrder(order.id)
         assertEquals(storedEvents.size, 2)
         val tipAdded = storedEvents[1].body() as TipAddedToOrder
@@ -143,7 +143,17 @@ class OrderingFacadeTest {
         assertEquals( Order.from(storedEvents).total.toDouble(), total)
 
         //and: "TipAddedToOrder event is published on 'orders' channel"
-        verifyThatEventWasPublished(order, expectedEvent)
+        val event = publisher.messages[ordersChannel]?.get(0)
+            ?: throw IllegalStateException("No messages were published!")
+
+        verifyEventHeader(
+            event,
+            expectedOrderId = order.id,
+            expectedEventClass = expectedEvent::class)
+        val body = event.body as TipAddedToOrder
+        assertEquals(expectedEvent.id, body.orderId())
+        assertEquals(expectedEvent.tip, body.tip )
+        assertEquals(expectedEvent.total.toDouble(), body.total.toDouble())
     }
 
     @Test
