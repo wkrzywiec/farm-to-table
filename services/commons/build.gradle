@@ -1,19 +1,50 @@
-plugins {
-    id 'idea'
-    id 'org.springframework.boot' version '3.4.3'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'java'
-    id 'groovy'
-    id 'jacoco'
-    id "org.barfuin.gradle.jacocolog" version "3.0.0-RC2"
-}
 
-group = 'io.wkrzywiec'
-version = '0.0.1-SNAPSHOT'
-description = 'food-delivery common libraries'
+description = 'farm-to-table common libraries'
 
-java {
-    sourceCompatibility = '21'
+dependencies {
+
+    def lombokVersion = '1.18.32'
+    def spockVersion = '2.4-M4-groovy-4.0'
+    def testcontainersVersion = '1.19.7'
+
+    implementation "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.springframework.boot:spring-boot-starter-test"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+
+    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.12.5'
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.2'
+
+
+    implementation 'org.apache.groovy:groovy-all:4.0.21'
+    testImplementation "org.spockframework:spock-core:${spockVersion}"
+    testImplementation "org.spockframework:spock-spring:${spockVersion}"
+    testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
+
+    testImplementation "org.testcontainers:spock:${testcontainersVersion}"
+    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
+
+    //this part is needed, because io.rest-assured:spring-mock-mvc depends on old lib for groovy - org.codehaus.groovy:groovy
+    modules {
+        module("org.codehaus.groovy:groovy") {
+            replacedBy("org.apache.groovy:groovy", "conflicts in current rest-assured version")
+        }
+
+        module("org.codehaus.groovy:groovy-xml") {
+            replacedBy("org.apache.groovy:groovy-xml", "conflicts in current rest-assured version")
+        }
+
+        module("org.codehaus.groovy:groovy-json") {
+            replacedBy("org.apache.groovy:groovy-json", "conflicts in current rest-assured version")
+        }
+    }
 }
 
 bootJar {
@@ -25,74 +56,16 @@ jar {
 }
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
 
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntime.extendsFrom testRuntime
 }
 
-dependencies {
-
-    def springBootVersion = '3.4.3'
-    def lombokVersion = '1.18.36'
-    def spockVersion = '2.4-M5-groovy-4.0'
-    def testcontainersVersion = '1.20.6'
-
-    implementation "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    implementation 'com.google.code.gson:gson:2.12.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.3'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3'
-    implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
-
-    implementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
-    implementation "org.spockframework:spock-core:${spockVersion}"
-    implementation "org.spockframework:spock-spring:${spockVersion}"
-    implementation 'org.apache.groovy:groovy-all:4.0.26'
-    implementation ('io.rest-assured:spring-mock-mvc:5.5.1') { exclude group: 'org.codehaus.groovy' }
-    implementation "org.testcontainers:spock:${testcontainersVersion}"
-}
-
-test {
-    useJUnitPlatform()
-}
-
-sourceSets {
-    integrationTest {
-        groovy.srcDir "$projectDir/src/integration-test/groovy"
-        resources.srcDir "$projectDir/src/integration-test/resources"
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-    }
-}
-
-task integrationTest(type: Test) {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-
-    useJUnitPlatform()
-}
-
-check.dependsOn integrationTest
-
-jacocoTestReport {
-    reports {
-        xml.required = true
-    }
-    dependsOn = [
-            'test',
-            'integrationTest'
-    ]
-}
-
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.0
-            }
-        }
+sonarqube {
+    properties {
+        property 'sonar.projectName', 'commons'
+        property "sonar.projectKey", "farm-to-table-app_food"
+        property "sonar.organization", "farm-to-table-app"
+        property "sonar.host.url", "https://sonarcloud.io"
     }
 }

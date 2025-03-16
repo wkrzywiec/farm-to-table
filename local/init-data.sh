@@ -1,4 +1,5 @@
 #!/bin/bash
+
 function create_order() {
   request_body=$1
   curl -d "$(cat "$request_body")" -H "Content-Type: application/json" -X POST http://localhost:8081/orders
@@ -50,9 +51,9 @@ do
   status_code=$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:8084/actuator/health)
 
   if [[ $status_code -eq "200" ]] ; then
-    printf "'food' service is up. Inserting meals data..."
+    printf "'food' service is up. Inserting food data..."
     curl -d "$(cat food-data.json)" -H "Content-Type: application/json" -X POST http://localhost:8084/foods
-    printf "\n\nMeals data has been inserted\n"
+    printf "\n\nFood data has been inserted\n"
     break
   else
     printf "'food' service is not ready yet"

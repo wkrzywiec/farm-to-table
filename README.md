@@ -1,5 +1,5 @@
 # Food Delivery
-[![Build](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/build.yaml) ![GitHub](https://img.shields.io/github/license/wkrzywiec/food-delivery-app) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=wkrzywiec_food-delivery-app&metric=coverage)](https://sonarcloud.io/summary/new_code?id=wkrzywiec_food-delivery-app) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=wkrzywiec_food-delivery-app&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=wkrzywiec_food-delivery-app) ![GitHub issues](https://img.shields.io/github/issues/wkrzywiec/food-delivery-app)
+[![master](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/master.yaml/badge.svg)](https://github.com/wkrzywiec/food-delivery-app/actions/workflows/master.yaml) ![GitHub](https://img.shields.io/github/license/wkrzywiec/food-delivery-app) ![GitHub issues](https://img.shields.io/github/issues/wkrzywiec/food-delivery-app)
 
 This application is a simplified food delivery platform, similar to Uber Eats or Glovo. It serves as a sandbox environment for experimenting with novel concepts and technologies.
 
@@ -71,6 +71,17 @@ The entire system is made of 5 microservices (1 React, 4 Java/Spring):
 * *ordering* - core service for managing orders,
 * *delivery* - core service for managing deliveries.
 
+
+| service  | technology        | Code coverage                                                                                                                                                                            | Lines of code                                                                                                                                                                              |
+| -------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ui       | Node, React       | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_ui&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_ui)             | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_ui&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_ui)             |
+| bff      | Java, Spring Boot | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_bff&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_bff)           | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_bff&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_bff)           |
+| ordering | Java, Spring Boot | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_ordering&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_ordering) | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_ordering&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_ordering)                                                                                                                                                                                           |
+| delivery | Java, Spring Boot | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_delivery&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_delivery) | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_delivery&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_delivery) |
+| food     | Java, Spring Boot | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_food&metric=coverage)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_food)         | [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=farm-to-table-app_food&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=farm-to-table-app_food)         |
+
+There is an additional module - *commons* - for Java classes that are reused in most modules. 
+
 ### C4 diagrams
 
 #### C4 container diagram
@@ -86,6 +97,23 @@ The majority of the backend application is designed to be configurable, allowing
 Currently, there is only one available profile called `redis`. However, there are plans to introduce additional profiles in the near future.
 
 ### Default configuration (`SOON`)
+
+#### How to access data
+
+##### postgres
+
+In order to check the content of postgres db use the pgAdmin4 bundled in docker-compose.yaml. 
+
+Link: http://localhost:5050
+
+Credentials:
+* username: admin@admin.com
+* password: admin
+
+During first login you may also be asked to provide a password to `postgres` server. It is plain and simple - `postgres`.
+
+After logging all available databases will be listed.
+
 
 ### `redis` configuration
 
@@ -146,7 +174,7 @@ There are several Redis modules that are used to store data:
 {
    "orderId":"order-2",
    "customerId":"Pam Beesly",
-   "restaurantId":"Ristorante Da Aldo",
+   "farmId":"Garden's Finest",
    "deliveryManId":"nicest-guy",
    "status":"FOOD_DELIVERED",
    "address":"Cottage Avenue 11",

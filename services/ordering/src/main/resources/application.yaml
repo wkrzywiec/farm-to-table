@@ -1,12 +1,59 @@
 spring:
   application:
-    name: 'food-delivery_ordering'
+    name: 'farm-to-table_ordering'
+  profiles:
+    default: prod
+    group:
+      dev:
+        - redis-stream
+        - postgres-event-store
+        - dev-local
+      prod:
+        - redis-stream
+        - postgres-event-store
+      redis:
+        - redis-event-store
+        - redis-stream
+  liquibase:
+    enabled: false
+    change-log: db/changelog/changelog-master.xml
+  autoconfigure:
+    exclude: >
+      org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 management:
+  endpoint:
+    metrics:  
+      enabled: true
+    prometheus:
+      enabled: true
   endpoints:
     web:
       exposure:
         include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: postgres-event-store
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:ordering}
+    username: ${POSTGRES_USERNAME:ordering}
+    password: ${POSTGRES_PASSWORD:ordering}
+  liquibase:
+    enabled: true
 
 ---
 server:

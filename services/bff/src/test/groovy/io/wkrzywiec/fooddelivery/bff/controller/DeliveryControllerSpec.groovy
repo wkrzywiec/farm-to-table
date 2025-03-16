@@ -1,10 +1,11 @@
 package io.wkrzywiec.fooddelivery.bff.controller
 
-import io.wkrzywiec.fooddelivery.bff.controller.model.ChangeDeliveryManDTO
-import io.wkrzywiec.fooddelivery.bff.controller.model.UpdateDeliveryDTO
-import io.wkrzywiec.fooddelivery.bff.inbox.InMemoryInboxPublisher
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher
-import io.wkrzywiec.fooddelivery.bff.repository.DeliveryViewRepository
+import io.wkrzywiec.fooddelivery.bff.application.controller.DeliveryController
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.ChangeDeliveryManDTO
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.UpdateDeliveryDTO
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.inmemory.InMemoryInbox
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.Inbox
+import io.wkrzywiec.fooddelivery.bff.domain.view.DeliveryViewRepository
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class DeliveryControllerSpec extends Specification {
 
     @SpringBean
-    private InboxPublisher inboxPublisher = new InMemoryInboxPublisher()
+    private Inbox inboxPublisher = new InMemoryInbox()
 
     @SpringBean
     private DeliveryViewRepository repository = Mock(DeliveryViewRepository)
@@ -40,6 +41,7 @@ class DeliveryControllerSpec extends Specification {
 
     def "Change status of an order"() {
         given:
+        def orderId = UUID.randomUUID()
         def requestBody = """
             {
               "status": "prepareFood"
@@ -48,7 +50,7 @@ class DeliveryControllerSpec extends Specification {
 
         when: "Change status of an order"
         def result = mockMvc.perform(
-                patch("/deliveries/any-order-id")
+                patch("/deliveries/$orderId")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -56,18 +58,19 @@ class DeliveryControllerSpec extends Specification {
 
         then:
         result.andExpect(status().isAccepted())
-                .andExpect(jsonPath("orderId").value("any-order-id"))
+                .andExpect(jsonPath("orderId").value(orderId.toString()))
 
         and: "Message was sent to inbox"
         def inbox = inboxPublisher.inboxes.get("delivery-inbox:update")
         with(inbox.peek() as UpdateDeliveryDTO) { it ->
-            it.orderId == "any-order-id"
+            it.orderId == orderId
             it.status == "prepareFood"
         }
     }
 
     def "Assign delivery man"() {
         given:
+        def orderId = UUID.randomUUID()
         def requestBody = """
             {
               "deliveryManId": "any-delivery-man"
@@ -76,7 +79,7 @@ class DeliveryControllerSpec extends Specification {
 
         when: "Assign delivery man"
         def result = mockMvc.perform(
-                post("/deliveries/any-order-id/delivery-man")
+                post("/deliveries/$orderId/delivery-man")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -84,12 +87,12 @@ class DeliveryControllerSpec extends Specification {
 
         then:
         result.andExpect(status().isAccepted())
-                .andExpect(jsonPath("orderId").value("any-order-id"))
+                .andExpect(jsonPath("orderId").value(orderId.toString()))
 
         and: "Message was sent to inbox"
         def inbox = inboxPublisher.inboxes.get("delivery-inbox:delivery-man")
         with(inbox.peek() as ChangeDeliveryManDTO) { it ->
-            it.orderId == "any-order-id"
+            it.orderId == orderId
             it.deliveryManId == "any-delivery-man"
         }
     }

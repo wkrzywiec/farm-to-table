@@ -1,6 +1,8 @@
 package io.wkrzywiec.fooddelivery.delivery.domain.outgoing;
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 
-public record DeliveryManUnAssigned(String orderId, String deliveryManId) implements DomainMessageBody {
+import java.util.UUID;
+
+public record DeliveryManUnAssigned(UUID orderId, int version, String deliveryManId) implements IntegrationMessageBody {
 }

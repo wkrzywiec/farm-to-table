@@ -1,6 +1,8 @@
 package io.wkrzywiec.fooddelivery.delivery.domain.outgoing;
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 
-public record DeliveryProcessingError(String orderId, String message, String details) implements DomainMessageBody {
+import java.util.UUID;
+
+public record DeliveryProcessingError(UUID orderId, int version, String message, String details) implements IntegrationMessageBody {
 }

@@ -1,8 +1,9 @@
 package io.wkrzywiec.fooddelivery.delivery.domain.incoming;
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
-public record TipAddedToOrder(String orderId, BigDecimal tip, BigDecimal total) implements DomainMessageBody {
+public record TipAddedToOrder(UUID orderId, int version, BigDecimal tip, BigDecimal total) implements IntegrationMessageBody {
 }

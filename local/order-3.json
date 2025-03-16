@@ -1,22 +1,22 @@
 {
   "id": "order-3",
   "customerId": "Dwight Kurt Schrute III",
-  "restaurantId": "Pizza by Alfredo",
+  "farmId": "Dairy Haven",
   "items": [
     {
-      "name": "Farmer Pizza",
+      "name": "Potato",
       "amount": 10,
-      "pricePerItem": 15.99
-    },
-    {
-      "name": "Tiramisu",
-      "amount": 2,
       "pricePerItem": 4.49
     },
     {
-      "name": "Orange juice",
-      "amount": 10,
-      "pricePerItem": 1.99
+      "name": "Leek",
+      "amount": 2,
+      "pricePerItem": 4
+    },
+    {
+      "name": "Spinach",
+      "amount": 2,
+      "pricePerItem": 6.78
     }
   ],
   "address": "Schrute Farm",

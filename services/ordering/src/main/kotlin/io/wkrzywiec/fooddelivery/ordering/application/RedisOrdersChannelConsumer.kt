@@ -4,9 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.wkrzywiec.fooddelivery.commons.incoming.AddTip
-import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder
-import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade

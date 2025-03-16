@@ -1,27 +1,66 @@
 spring:
+  application:
+    name: 'farm-to-table_bff'
+  profiles:
+    default: prod
+    group:
+      dev:
+        - postgres-inbox
+        - redis-search
+        - dev-local
+      prod:
+        - postgres-inbox
+        - redis-search
+      redis:
+        - redis-inbox
+        - redis-search
+        - dev-local
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  application:
-    name: 'food-delivery_bff'
+  liquibase:
+    enabled: false
+    change-log: db/changelog/changelog-master.xml
+  autoconfigure:
+    exclude: >
+      org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 management:
   endpoints:
     web:
       exposure:
         include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 ---
+
+spring:
+  config:
+    activate:
+      on-profile: postgres-inbox
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:bff}
+    username: ${POSTGRES_USERNAME:bff}
+    password: ${POSTGRES_PASSWORD:bff}
+  liquibase:
+    enabled: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev-local
+
 server:
   port: 8081
 
-spring:
-  config:
-    activate:
-      on-profile: dev
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
+logging:
+  level:
+    io.wkrzywiec.fooddelivery: info

@@ -1,4 +1,4 @@
-name: Java Gradle - test app
+name: Java Gradle - build & test
 
 on:
   workflow_call:

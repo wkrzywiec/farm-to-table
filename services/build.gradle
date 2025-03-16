@@ -1,6 +1,10 @@
 plugins {
     id 'java'
     id 'jacoco'
+    id 'org.springframework.boot' version '3.4.3' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'org.barfuin.gradle.jacocolog' version '3.1.0' apply false
+    id 'org.sonarqube' version '6.0.0.5145' apply false
 }
 
 allprojects {
@@ -10,11 +14,74 @@ allprojects {
     }
 }
 
-task startBootStack(type: GradleBuild) {
-    tasks = [
-            ':bff:bootRun',
+subprojects {
+    group = 'io.wkrzywiec'
+    version = '0.0.1-SNAPSHOT'
+    java.sourceCompatibility = '21'
+
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'jacoco'
+    apply plugin: 'org.barfuin.gradle.jacocolog'
+    apply plugin: 'org.sonarqube'
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.required = true
+        }
+        dependsOn = [
+                'test'
+        ]
+    }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+//                todo: work on test coverage
+                    minimum = 0.1
+                }
+            }
+        }
+    }
+}
+
+task runAllApps {
+    doFirst {
+        println "Running all Gradle apps..."
+    }
+
+    dependsOn ':bff:bootRun',
             ':food:bootRun',
             ':ordering:bootRun',
             ':delivery:bootRun'
-    ]
+}
+
+task runBff {
+    dependsOn ':bff:bootRun'
+}
+
+task runFood {
+    dependsOn ':food:bootRun'
+}
+
+task runOrdering {
+    dependsOn ':ordering:bootRun'
+}
+
+task runDelivery {
+    dependsOn ':delivery:bootRun'
 }

@@ -137,15 +137,15 @@ function App() {
     e.preventDefault();
     console.log('Creating an order...')
 
-    const restaurants = ['Pizza place', 'Kebab bar', 'Fast food chain', 'Meals like at home', 'Sushi bar', 'British pub']
+    const farms = ['Always fresh fruits and veggies', 'Old McDonald', 'Farmstead Fare', 'Garden\'s Finest', 'Fresh-Picked Goods', 'Ranch-Raised']
 
     var requestBody = {}
     requestBody.customerId = customerId.current.value
     requestBody.address = address.current.value
     requestBody.items = basketData
 
-    const random = Math.floor(Math.random() * restaurants.length);
-    requestBody.restaurantId = restaurants[random]
+    const random = Math.floor(Math.random() * farms.length);
+    requestBody.farmId = farms[random]
 
     requestBody.deliveryCharge = Math.round(((1 + 9 * Math.random()) + Number.EPSILON) * 100) / 100;
 
@@ -305,17 +305,17 @@ function App() {
     <div className="App">
       <Container>
         <Row className="header">
-          <Col><h1>Food Delivery 🥦🍗🍰</h1></Col>
+          <Col><h1>Farm-To-Table 🍒🥦🍓🍈🧀🥚</h1></Col>
         </Row>
 
         <Row>
-          <Col><h3>Find meals 🔎</h3></Col>
+          <Col><h3>Find products 🔎</h3></Col>
         </Row>
         <Form>
           <Row>
             <Col className="searchFood">
               <Form.Group className="mb-3" controlId="formBasicFood">
-                <Form.Control placeholder="Enter food name" className="searchFoodContent" ref={foodSearch} />
+                <Form.Control placeholder="Enter product name" className="searchFoodContent" ref={foodSearch} />
               </Form.Group>
             </Col>
 
@@ -349,10 +349,10 @@ function App() {
         </Row>
 
         <Row>
-          <Col><h3>Current order 🍔</h3></Col>
+          <Col><h3>Current order 🧺</h3></Col>
         </Row>
         <Row>
-          <h5>Meals</h5>
+          <h5>Products</h5>
           <Table striped bordered hover>
             <thead>
               <tr>
@@ -392,15 +392,15 @@ function App() {
         </Row>
 
         <Row>
-          <Col><h3>Active deliveries 🛵</h3></Col>
+          <Col><h3>Active deliveries 🚚</h3></Col>
         </Row>
         <Row className="foodSearchResults">
-          <h5>Meals</h5>
+          <h5>Products</h5>
           <Table striped bordered hover>
             <thead>
               <tr>
                 <th>Customer</th>
-                <th>Restaurant</th>
+                <th>Farm</th>
                 <th>Delivery Man</th>
                 <th>Status</th>
                 <th>Address</th>
@@ -415,7 +415,7 @@ function App() {
               {activeDeliveriesData.map((delivery, i) => (
                     <tr key={i}>
                         <td>{delivery.customerId}</td>
-                        <td>{delivery.restaurantId}</td>
+                        <td>{delivery.farmId}</td>
                         <td>
                           <Form.Select aria-label="Default select example" onChange={updateDeliveryMan}>
                             <option>{delivery.deliveryManId}</option>
@@ -462,7 +462,7 @@ function App() {
             <thead>
               <tr>
                 <th>Customer</th>
-                <th>Restaurant</th>
+                <th>Farm</th>
                 <th>Delivery Man</th>
                 <th>Status</th>
                 <th>Address</th>
@@ -476,7 +476,7 @@ function App() {
               {completedDeliveriesData.map((delivery, i) => (
                     <tr key={i}>
                         <td>{delivery.customerId}</td>
-                        <td>{delivery.restaurantId}</td>
+                        <td>{delivery.farmId}</td>
                         <td>{delivery.deliveryManId}</td>
                         <td>{delivery.status}</td>
                         <td>{delivery.address}</td>

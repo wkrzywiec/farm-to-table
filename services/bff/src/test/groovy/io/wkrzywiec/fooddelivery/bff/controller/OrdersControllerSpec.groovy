@@ -1,16 +1,16 @@
 package io.wkrzywiec.fooddelivery.bff.controller
 
-import io.wkrzywiec.fooddelivery.bff.controller.model.AddTipDTO
-import io.wkrzywiec.fooddelivery.bff.controller.model.CancelOrderDTO
-import io.wkrzywiec.fooddelivery.bff.controller.model.CreateOrderDTO
-import io.wkrzywiec.fooddelivery.bff.controller.model.ItemDTO
-import io.wkrzywiec.fooddelivery.bff.inbox.InMemoryInboxPublisher
-import io.wkrzywiec.fooddelivery.bff.inbox.InboxPublisher
+import io.wkrzywiec.fooddelivery.bff.application.controller.OrdersController
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.AddTipDTO
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.CancelOrderDTO
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.CreateOrderDTO
+import io.wkrzywiec.fooddelivery.bff.application.controller.model.ItemDTO
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.inmemory.InMemoryInbox
+import io.wkrzywiec.fooddelivery.bff.domain.inbox.Inbox
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 class OrdersControllerSpec extends Specification {
 
     @SpringBean
-    private InboxPublisher inboxPublisher = new InMemoryInboxPublisher()
+    private Inbox inboxPublisher = new InMemoryInbox()
 
     @Autowired
     private MockMvc mockMvc
@@ -42,7 +42,7 @@ class OrdersControllerSpec extends Specification {
         def requestBody = """
             {
               "customerId": "any-customer",
-              "restaurantId": "good-restaurant",
+              "farmId": "good-farm",
               "items": [
                 {
                   "name": "pizza",
@@ -71,7 +71,7 @@ class OrdersControllerSpec extends Specification {
         def inbox = inboxPublisher.inboxes.get("ordering-inbox:create")
         with(inbox.peek() as CreateOrderDTO) { it ->
             it.customerId == "any-customer"
-            it.restaurantId == "good-restaurant"
+            it.farmId == "good-farm"
             it.address == "main road"
             it.deliveryCharge == 5.25
             it.items == [ new ItemDTO("pizza", 2, 7.99)]
@@ -80,12 +80,12 @@ class OrdersControllerSpec extends Specification {
 
     def "Create an order and use provided id"() {
         given:
-        def id = "this-id"
+        def id = UUID.randomUUID()
         def requestBody = """
             {
               "id": "$id",
               "customerId": "any-customer",
-              "restaurantId": "good-restaurant",
+              "farmId": "good-farm",
               "items": [
                 {
                   "name": "pizza",
@@ -108,7 +108,7 @@ class OrdersControllerSpec extends Specification {
 
         then: "OrderId is generated"
         result.andExpect(status().isAccepted())
-                .andExpect(jsonPath("orderId").value(id))
+                .andExpect(jsonPath("orderId").value(id.toString()))
 
         and: "Message was sent to inbox"
         def inbox = inboxPublisher.inboxes.get("ordering-inbox:create")
@@ -119,6 +119,7 @@ class OrdersControllerSpec extends Specification {
 
     def "Cancel an order"() {
         given:
+        def orderId = UUID.randomUUID()
         def requestBody = """
             {
               "reason": "not hungry"
@@ -127,7 +128,7 @@ class OrdersControllerSpec extends Specification {
 
         when: "Cancel an order"
         def result = mockMvc.perform(
-                patch("/orders/any-order-id/status/cancel")
+                patch("/orders/$orderId/status/cancel")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -135,18 +136,19 @@ class OrdersControllerSpec extends Specification {
 
         then:
         result.andExpect(status().isAccepted())
-                .andExpect(jsonPath("orderId").value("any-order-id"))
+                .andExpect(jsonPath("orderId").value(orderId.toString()))
 
         and: "Message was sent to inbox"
         def inbox = inboxPublisher.inboxes.get("ordering-inbox:cancel")
         with(inbox.peek() as CancelOrderDTO) { it ->
-            it.orderId == "any-order-id"
+            it.orderId == orderId
             it.reason == "not hungry"
         }
     }
 
     def "Add tip to an order"() {
         given:
+        def orderId = UUID.randomUUID()
         def requestBody = """
             {
               "tip": 10
@@ -155,7 +157,7 @@ class OrdersControllerSpec extends Specification {
 
         when: "Add tip"
         def result = mockMvc.perform(
-                post("/orders/any-order-id/tip")
+                post("/orders/$orderId/tip")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -163,12 +165,12 @@ class OrdersControllerSpec extends Specification {
 
         then:
         result.andExpect(status().isAccepted())
-                .andExpect(jsonPath("orderId").value("any-order-id"))
+                .andExpect(jsonPath("orderId").value(orderId.toString()))
 
         and: "Message was sent to inbox"
         def inbox = inboxPublisher.inboxes.get("ordering-inbox:tip")
         with(inbox.peek() as AddTipDTO) { it ->
-            it.orderId == "any-order-id"
+            it.orderId == orderId
             it.tip == 10
         }
     }

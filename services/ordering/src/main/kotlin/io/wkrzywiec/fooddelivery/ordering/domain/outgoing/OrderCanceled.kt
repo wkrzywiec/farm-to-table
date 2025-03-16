@@ -1,8 +1,10 @@
 package io.wkrzywiec.fooddelivery.ordering.domain.outgoing
 
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
+import java.util.*
 
 @JvmRecord
-data class OrderCanceled(val id: String, val reason: String) : DomainMessageBody {
-    override fun orderId(): String = id
+data class OrderCanceled(val id: UUID, val version : Int, val reason: String) : IntegrationMessageBody {
+    override fun orderId(): UUID = id
+    override fun version(): Int = version
 }

@@ -3,13 +3,23 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   application:
-    name: 'food-delivery_food'
+    name: 'farm-to-table_food'
+  profiles:
+    default: prod
+    group:
+      dev:
+        - redis
+      prod:
+        - redis
 
 management:
   endpoints:
     web:
       exposure:
         include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 ---
 server:
@@ -19,12 +29,14 @@ spring:
   config:
     activate:
       on-profile: dev
-  data:
-    redis:
-      host: localhost
-      port: 6379
+
 ---
+
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}

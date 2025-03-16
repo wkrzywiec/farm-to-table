@@ -1,0 +1,131 @@
+services:
+
+  ui:
+    container_name: ui
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    ports:
+      - 80:80
+    depends_on:
+      - bff
+
+  bff:
+    container_name: bff
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        app_name: bff
+    env_file: .env
+    ports:
+      - 8081:8080
+    depends_on:
+      - redis
+
+  food:
+    container_name: food
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        app_name: food
+    env_file: .env
+    ports:
+      - 8084:8080
+    depends_on:
+      - redis
+
+  ordering:
+    container_name: ordering
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        app_name: ordering
+    env_file: .env
+    ports:
+      - 8082:8080
+    depends_on:
+      - redis
+
+  delivery:
+    container_name: delivery
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        app_name: delivery
+    env_file: .env
+    ports:
+      - 8083:8080
+    depends_on:
+      - redis
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    command: [ "postgres", "-c", "log_statement=all" ]
+    volumes:
+      - postgres:/var/lib/postgres/data
+      - ./infra/postgres:/docker-entrypoint-initdb.d
+
+  pgadmin:
+    image: dpage/pgadmin4:8.8
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 5050:80
+    depends_on:
+      - postgres
+    volumes:
+      - ./infra/pgadmin/server.json:/pgadmin4/servers.json
+
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+      - 8181:8001
+    volumes:
+      - redis-data:/data
+
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    container_name: prometheus
+    ports:
+      - 1000:9090
+    volumes:
+      - prometheus:/prometheus
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:10.1.5
+    container_name: grafana
+    ports:
+      - 1001:3000
+    environment:
+      - PROMETHEUS_URL=http://prometheus:9090
+      - DS_PROMETHEUS=prometheus
+    volumes:
+      - ./infra/grafana/config.ini:/etc/grafana/config.ini
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres:
+  redis-data:
+  prometheus:

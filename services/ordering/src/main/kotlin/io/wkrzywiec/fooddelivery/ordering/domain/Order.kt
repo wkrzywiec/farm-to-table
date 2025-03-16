@@ -1,12 +1,10 @@
 package io.wkrzywiec.fooddelivery.ordering.domain
 
-import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
 import java.math.BigDecimal
 import java.util.*
 
-class Order  private constructor(
+class Order private constructor(
     val id: String,
     val customerId: String,
     val restaurantId: String,

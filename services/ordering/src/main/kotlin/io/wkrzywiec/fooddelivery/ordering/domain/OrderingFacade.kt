@@ -2,14 +2,10 @@ package io.wkrzywiec.fooddelivery.ordering.domain
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.vavr.control.Try
-import io.wkrzywiec.fooddelivery.commons.event.DomainMessageBody
-import io.wkrzywiec.fooddelivery.commons.incoming.AddTip
-import io.wkrzywiec.fooddelivery.commons.incoming.CancelOrder
-import io.wkrzywiec.fooddelivery.commons.incoming.CreateOrder
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Message
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
-import io.wkrzywiec.fooddelivery.commons.infra.repository.EventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
+import io.wkrzywiec.fooddelivery.commons.model.CreateOrder
 import io.wkrzywiec.fooddelivery.ordering.domain.Order.Companion.from
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
