@@ -1,70 +1,67 @@
-package io.wkrzywiec.fooddelivery.ordering.infra.stream;
+package io.wkrzywiec.fooddelivery.ordering.infra.stream
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.commons.model.AddTip;
-import io.wkrzywiec.fooddelivery.commons.model.CancelOrder;
-import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener;
-import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade;
-import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered;
-import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.MapRecord;
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener
+import io.wkrzywiec.fooddelivery.commons.model.AddTip
+import io.wkrzywiec.fooddelivery.commons.model.CancelOrder
+import io.wkrzywiec.fooddelivery.commons.model.CreateOrder
+import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
+import lombok.RequiredArgsConstructor
+import lombok.extern.slf4j.Slf4j
+import org.springframework.data.redis.connection.stream.MapRecord
 
 @Slf4j
 @RequiredArgsConstructor
-public class RedisOrdersChannelConsumer implements RedisStreamListener {
+class RedisOrdersChannelConsumer : RedisStreamListener {
+    private val facade: OrderingFacade? = null
+    private val objectMapper: ObjectMapper? = null
 
-    private final OrderingFacade facade;
-    private final ObjectMapper objectMapper;
-
-    @Override
-    public String streamName() {
-        return "orders";
+    override fun streamName(): String {
+        return "orders"
     }
 
-    @Override
-    public String group() {
-        return "ordering";
+    override fun group(): String {
+        return "ordering"
     }
 
-    @Override
-    public String consumer() {
-        return "1";
+    override fun consumer(): String {
+        return "1"
     }
 
-    @Override
-    public void onMessage(MapRecord<String, String, String> message) {
-        log.info("Message received from {} stream: {}", streamName(), message);
+    override fun onMessage(message: MapRecord<String?, String?, String?>) {
+        RedisOrdersChannelConsumer.log.info("Message received from {} stream: {}", streamName(), message)
 
-        var payloadMessage = message.getValue().get("payload");
+        val payloadMessage = message.value["payload"]
 
         try {
-            var messageAsJson = objectMapper.readTree(payloadMessage);
-            Header header = map(messageAsJson.get("header"), Header.class);
+            val messageAsJson = objectMapper!!.readTree(payloadMessage)
+            val header = map(messageAsJson["header"], Header::class.java)
 
-            switch (header.type()) {
-                case "CreateOrder" -> facade.handle(mapMessageBody(messageAsJson, CreateOrder.class));
-                case "CancelOrder" -> facade.handle(mapMessageBody(messageAsJson, CancelOrder.class));
-                case "FoodInPreparation" -> facade.handle(mapMessageBody(messageAsJson, FoodInPreparation.class));
-                case "AddTip" -> facade.handle(mapMessageBody(messageAsJson, AddTip.class));
-                case "FoodDelivered" -> facade.handle(mapMessageBody(messageAsJson, FoodDelivered.class));
-                default -> log.info("There is no logic for handling {} message", header.type());
+            when (header.type) {
+                "CreateOrder" -> facade!!.handle(mapMessageBody(messageAsJson, CreateOrder::class.java))
+                "CancelOrder" -> facade!!.handle(mapMessageBody(messageAsJson, CancelOrder::class.java))
+                "FoodInPreparation" -> facade!!.handle(mapMessageBody(messageAsJson, FoodInPreparation::class.java))
+                "AddTip" -> facade!!.handle(mapMessageBody(messageAsJson, AddTip::class.java))
+                "FoodDelivered" -> facade!!.handle(mapMessageBody(messageAsJson, FoodDelivered::class.java))
+                else -> RedisOrdersChannelConsumer.log.info("There is no logic for handling {} message", header.type)
             }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (e: JsonProcessingException) {
+            throw RuntimeException(e)
         }
     }
 
-    private <T> T mapMessageBody(JsonNode fullMessage, Class<T> valueType) throws JsonProcessingException {
-        return objectMapper.treeToValue(fullMessage.get("body"), valueType);
+    @Throws(JsonProcessingException::class)
+    private fun <T> mapMessageBody(fullMessage: JsonNode, valueType: Class<T>): T {
+        return objectMapper!!.treeToValue(fullMessage["body"], valueType)
     }
 
-    private <T> T map(JsonNode fullMessage, Class<T> valueType) throws JsonProcessingException {
-        return objectMapper.treeToValue(fullMessage, valueType);
+    @Throws(JsonProcessingException::class)
+    private fun <T> map(fullMessage: JsonNode, valueType: Class<T>): T {
+        return objectMapper!!.treeToValue(fullMessage, valueType)
     }
 }

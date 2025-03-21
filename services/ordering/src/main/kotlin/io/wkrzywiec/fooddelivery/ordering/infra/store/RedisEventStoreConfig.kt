@@ -1,19 +1,18 @@
-package io.wkrzywiec.fooddelivery.ordering.infra.store;
+package io.wkrzywiec.fooddelivery.ordering.infra.store
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
-import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.core.RedisTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
+import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
+import org.springframework.data.redis.core.RedisTemplate
 
 @Configuration
 @Profile("redis-event-store")
-public class RedisEventStoreConfig {
-
+class RedisEventStoreConfig {
     @Bean
-    public EventStore eventStore(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
-        return new RedisEventStore(redisTemplate, objectMapper, new OrderingEventClassTypeProvider(), "ordering::");
+    fun eventStore(redisTemplate: RedisTemplate<String?, String?>?, objectMapper: ObjectMapper?): EventStore {
+        return RedisEventStore(redisTemplate, objectMapper, OrderingEventClassTypeProvider(), "ordering::")
     }
 }

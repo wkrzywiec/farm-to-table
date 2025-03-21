@@ -1,173 +1,171 @@
-package io.wkrzywiec.fooddelivery.ordering.domain;
+package io.wkrzywiec.fooddelivery.ordering.domain
 
-import io.vavr.CheckedRunnable;
-import io.vavr.control.Try;
-import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
-import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
-import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity;
-import io.wkrzywiec.fooddelivery.commons.model.AddTip;
-import io.wkrzywiec.fooddelivery.commons.model.CancelOrder;
-import io.wkrzywiec.fooddelivery.commons.model.CreateOrder;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage;
-import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher;
-import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore;
-import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered;
-import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation;
-import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import java.time.Clock;
-import java.util.List;
-import java.util.UUID;
-
-import static io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage.integrationEvents;
-import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntities;
-import static java.lang.String.format;
+import io.vavr.CheckedRunnable
+import io.vavr.control.Try
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
+import io.wkrzywiec.fooddelivery.commons.infra.messaging.MessagePublisher
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity
+import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
+import io.wkrzywiec.fooddelivery.commons.model.AddTip
+import io.wkrzywiec.fooddelivery.commons.model.CancelOrder
+import io.wkrzywiec.fooddelivery.commons.model.CreateOrder
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
+import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
+import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderProcessingError
+import lombok.RequiredArgsConstructor
+import lombok.extern.slf4j.Slf4j
+import org.springframework.stereotype.Component
+import java.time.Clock
+import java.util.*
 
 @RequiredArgsConstructor
 @Slf4j
 @Component
-public class OrderingFacade {
+class OrderingFacade {
+    private val eventStore: EventStore? = null
+    private val publisher: MessagePublisher? = null
+    private val clock: Clock? = null
 
-    public static final String ORDERS_CHANNEL =  "orders";
-
-    private final EventStore eventStore;
-    private final MessagePublisher publisher;
-    private final Clock clock;
-
-    public void handle(CreateOrder createOrder) {
+    fun handle(createOrder: CreateOrder) {
         process(
-                createOrder.orderId(),
-                () -> createOrder(createOrder),
-                "Failed to create an order."
-        );
-
+            createOrder.orderId,
+            { createOrder(createOrder) },
+            "Failed to create an order."
+        )
     }
 
-    private void createOrder(CreateOrder createOrder) {
-        log.info("Creating a new order: {}", createOrder);
+    private fun createOrder(createOrder: CreateOrder) {
+        OrderingFacade.log.info("Creating a new order: {}", createOrder)
 
-        Order newOrder = Order.from(createOrder);
-        storeAndPublishEvents(newOrder);
-        log.info("New order with an id: '{}' was created", newOrder.getId());
+        val newOrder = Order.from(createOrder)
+        storeAndPublishEvents(newOrder)
+        OrderingFacade.log.info("New order with an id: '{}' was created", newOrder.id)
     }
 
-    public void handle(CancelOrder cancelOrder) {
+    fun handle(cancelOrder: CancelOrder) {
         process(
-                cancelOrder.orderId(),
-                () -> cancelOrder(cancelOrder),
-                "Failed to cancel an order."
-        );
+            cancelOrder.orderId,
+            { cancelOrder(cancelOrder) },
+            "Failed to cancel an order."
+        )
     }
 
-    private void cancelOrder(CancelOrder cancelOrder) {
-        log.info("Cancelling an order: {}", cancelOrder.orderId());
+    private fun cancelOrder(cancelOrder: CancelOrder) {
+        OrderingFacade.log.info("Cancelling an order: {}", cancelOrder.orderId)
 
-        var order = findOrder(cancelOrder.orderId());
-        order.cancelOrder(cancelOrder.reason());
-        storeAndPublishEvents(order);
+        val order = findOrder(cancelOrder.orderId)
+        order.cancelOrder(cancelOrder.reason)
+        storeAndPublishEvents(order)
 
-        log.info("Cancellation of an order '{}' has been completed", order.getId());
+        OrderingFacade.log.info("Cancellation of an order '{}' has been completed", order.id)
     }
 
-    public void handle(FoodInPreparation foodInPreparation) {
+    fun handle(foodInPreparation: FoodInPreparation) {
         process(
-                foodInPreparation.orderId(),
-                () -> foodInPreparation(foodInPreparation),
-                "Failed to set an order to IN_PROGRESS state."
-        );
+            foodInPreparation.orderId,
+            { foodInPreparation(foodInPreparation) },
+            "Failed to set an order to IN_PROGRESS state."
+        )
     }
 
-    private void foodInPreparation(FoodInPreparation foodInPreparation) {
-        log.info("Setting '{}' order to IN_PROGRESS state", foodInPreparation.orderId());
+    private fun foodInPreparation(foodInPreparation: FoodInPreparation) {
+        OrderingFacade.log.info("Setting '{}' order to IN_PROGRESS state", foodInPreparation.orderId)
 
-        var order = findOrder(foodInPreparation.orderId());
-        order.setInProgress();
-        storeAndPublishEvents(order);
+        val order = findOrder(foodInPreparation.orderId)
+        order.setInProgress()
+        storeAndPublishEvents(order)
 
-        log.info("Setting an '{}' order to IN_PROGRESS state has been completed", foodInPreparation.orderId());
+        OrderingFacade.log.info(
+            "Setting an '{}' order to IN_PROGRESS state has been completed",
+            foodInPreparation.orderId
+        )
     }
 
-    public void handle(AddTip addTip) {
+    fun handle(addTip: AddTip) {
         process(
-                addTip.orderId(),
-                () -> addTip(addTip),
-                "Failed to add tip to an order."
-        );
+            addTip.orderId,
+            { addTip(addTip) },
+            "Failed to add tip to an order."
+        )
     }
 
-    private void addTip(AddTip addTip) {
-        log.info("Adding {} tip to '{}' order.", addTip.tip(), addTip.orderId());
+    private fun addTip(addTip: AddTip) {
+        OrderingFacade.log.info("Adding {} tip to '{}' order.", addTip.tip, addTip.orderId)
 
-        var order = findOrder(addTip.orderId());
-        order.addTip(addTip.tip());
-        storeAndPublishEvents(order);
+        val order = findOrder(addTip.orderId)
+        order.addTip(addTip.tip)
+        storeAndPublishEvents(order)
 
-        log.info("Adding a tip to '{}' order has been completed", addTip.orderId());
+        OrderingFacade.log.info("Adding a tip to '{}' order has been completed", addTip.orderId)
     }
 
-    public void handle(FoodDelivered foodDelivered) {
+    fun handle(foodDelivered: FoodDelivered) {
         process(
-                foodDelivered.orderId(),
-                () -> foodDelivered(foodDelivered),
-                "Failed to complete an order."
-        );
+            foodDelivered.orderId,
+            { foodDelivered(foodDelivered) },
+            "Failed to complete an order."
+        )
     }
 
-    private void foodDelivered(FoodDelivered foodDelivered) {
-        log.info("Setting '{}' order to COMPLETED state", foodDelivered.orderId());
+    private fun foodDelivered(foodDelivered: FoodDelivered) {
+        OrderingFacade.log.info("Setting '{}' order to COMPLETED state", foodDelivered.orderId)
 
-        var order = findOrder(foodDelivered.orderId());
-        order.complete();
-        storeAndPublishEvents(order);
+        val order = findOrder(foodDelivered.orderId)
+        order.complete()
+        storeAndPublishEvents(order)
 
-        log.info("Setting an '{}' order to COMPLETED state has been completed", foodDelivered.orderId());
+        OrderingFacade.log.info("Setting an '{}' order to COMPLETED state has been completed", foodDelivered.orderId)
     }
 
-    private void process(UUID streamId, CheckedRunnable runProcess, String failureMessage) {
+    private fun process(streamId: UUID, runProcess: CheckedRunnable, failureMessage: String) {
         Try.run(runProcess)
-                .onFailure(ex -> publishingFailureEvent(streamId, failureMessage, ex));
-    };
-
-    private void publishingFailureEvent(UUID id, String message, Throwable ex) {
-        log.error(message + " Publishing OrderProcessingError event", ex);
-        IntegrationMessage event = resultingEvent(id, new OrderProcessingError(id, -1, message, ex.getLocalizedMessage()));
-        publisher.send(event);
+            .onFailure { ex: Throwable -> publishingFailureEvent(streamId, failureMessage, ex) }
     }
 
-    private IntegrationMessage resultingEvent(UUID orderId, IntegrationMessageBody eventBody) {
-        return new IntegrationMessage(eventHeader(orderId, eventBody.getClass().getSimpleName(), eventBody.version()), eventBody);
+    private fun publishingFailureEvent(id: UUID, message: String, ex: Throwable) {
+        OrderingFacade.log.error("$message Publishing OrderProcessingError event", ex)
+        val event = resultingEvent(id, OrderProcessingError(id, -1, message, ex.localizedMessage))
+        publisher!!.send(event)
     }
 
-    private Header eventHeader(UUID orderId, String type, int version) {
-        return new Header(UUID.randomUUID(), version, ORDERS_CHANNEL, type, orderId, clock.instant());
+    private fun resultingEvent(orderId: UUID, eventBody: IntegrationMessageBody): IntegrationMessage {
+        return IntegrationMessage(eventHeader(orderId, eventBody.javaClass.simpleName, eventBody.version()), eventBody)
     }
 
-    private Order findOrder(UUID orderId) {
-        var storedEvents = eventStore.loadEvents(ORDERS_CHANNEL, orderId);
+    private fun eventHeader(orderId: UUID, type: String, version: Int): Header {
+        return Header(UUID.randomUUID(), version, ORDERS_CHANNEL, type, orderId, clock!!.instant())
+    }
+
+    private fun findOrder(orderId: UUID): Order {
+        val storedEvents = eventStore!!.loadEvents(ORDERS_CHANNEL, orderId)
         if (storedEvents.isEmpty()) {
-            throw new OrderingException(format("There is no order with an orderId '%s'.", orderId));
+            throw OrderingException(String.format("There is no order with an orderId '%s'.", orderId))
         }
-        return Order.from(storedEvents.stream().map(eventEntity -> (OrderingEvent) eventEntity.data()).toList());
+        return Order.from(storedEvents.stream().map { eventEntity: EventEntity -> eventEntity.data() as OrderingEvent }
+            .toList())
     }
 
-    private void storeAndPublishEvents(Order order) {
-        List<EventEntity> eventEntities = storeUncommittedEvents(order);
-        prepareAndPublishIntegrationEvents(eventEntities);
+    private fun storeAndPublishEvents(order: Order) {
+        val eventEntities = storeUncommittedEvents(order)
+        prepareAndPublishIntegrationEvents(eventEntities)
     }
 
-    private List<EventEntity> storeUncommittedEvents(Order order) {
-        List<DomainEvent> domainEvents = order.uncommittedChanges();
-        List<EventEntity> eventEntities = newEventEntities(domainEvents, ORDERS_CHANNEL, clock);
-        eventStore.store(eventEntities);
-        return eventEntities;
+    private fun storeUncommittedEvents(order: Order): List<EventEntity> {
+        val domainEvents: List<DomainEvent> = order.uncommittedChanges()
+        val eventEntities = EventEntity.newEventEntities(domainEvents, ORDERS_CHANNEL, clock)
+        eventStore!!.store(eventEntities)
+        return eventEntities
     }
 
-    private void prepareAndPublishIntegrationEvents(List<EventEntity> eventEntities) {
-        List<IntegrationMessage> integrationEvents = integrationEvents(eventEntities, OrderingEventMapper.INSTANCE);
-        publisher.send(integrationEvents);
+    private fun prepareAndPublishIntegrationEvents(eventEntities: List<EventEntity>) {
+        val integrationEvents = IntegrationMessage.integrationEvents(eventEntities, OrderingEventMapper.INSTANCE)
+        publisher!!.send(integrationEvents)
+    }
+
+    companion object {
+        const val ORDERS_CHANNEL: String = "orders"
     }
 }

@@ -1,9 +1,9 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.outgoing;
+package io.wkrzywiec.fooddelivery.ordering.domain.outgoing
 
-import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
+import java.math.BigDecimal
+import java.util.*
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
-public record TipAddedToOrder(UUID orderId, int version, BigDecimal tip, BigDecimal total) implements IntegrationMessageBody {
-}
+@JvmRecord
+data class TipAddedToOrder(val orderId: UUID, val version: Int, val tip: BigDecimal, val total: BigDecimal) :
+    IntegrationMessageBody

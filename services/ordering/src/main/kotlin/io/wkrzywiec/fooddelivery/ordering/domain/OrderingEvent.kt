@@ -1,51 +1,52 @@
-package io.wkrzywiec.fooddelivery.ordering.domain;
+package io.wkrzywiec.fooddelivery.ordering.domain
 
-import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent;
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent
+import java.math.BigDecimal
+import java.util.*
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
+interface OrderingEvent : DomainEvent {
+    fun orderId(): UUID
 
-public interface OrderingEvent extends DomainEvent {
-
-    UUID orderId();
-
-    @Override
-    default UUID streamId() {
-        return orderId();
+    override fun streamId(): UUID {
+        return orderId()
     }
 
-    record OrderCreated(
-            UUID orderId,
-            int version,
-            String customerId,
-            String farmId,
-            String address,
-            List<Item> items,
-            BigDecimal deliveryCharge,
-            BigDecimal total
-    ) implements OrderingEvent {}
+    @JvmRecord
+    data class OrderCreated(
+        @JvmField val orderId: UUID,
+        @JvmField val version: Int,
+        @JvmField val customerId: String,
+        @JvmField val farmId: String,
+        @JvmField val address: String,
+        @JvmField val items: List<Item>,
+        @JvmField val deliveryCharge: BigDecimal,
+        @JvmField val total: BigDecimal
+    ) : OrderingEvent
 
-    record OrderCanceled(
-            UUID orderId,
-            int version,
-            String reason
-    ) implements OrderingEvent {}
+    @JvmRecord
+    data class OrderCanceled(
+        @JvmField val orderId: UUID,
+        @JvmField val version: Int,
+        @JvmField val reason: String
+    ) : OrderingEvent
 
-    record OrderInProgress(
-            UUID orderId,
-            int version
-    ) implements OrderingEvent {}
+    @JvmRecord
+    data class OrderInProgress(
+        @JvmField val orderId: UUID,
+        @JvmField val version: Int
+    ) : OrderingEvent
 
-    record TipAddedToOrder(
-            UUID orderId,
-            int version,
-            BigDecimal tip,
-            BigDecimal total
-    ) implements OrderingEvent {}
+    @JvmRecord
+    data class TipAddedToOrder(
+        @JvmField val orderId: UUID,
+        @JvmField val version: Int,
+        @JvmField val tip: BigDecimal,
+        @JvmField val total: BigDecimal
+    ) : OrderingEvent
 
-    record OrderCompleted(
-            UUID orderId,
-            int version
-    ) implements OrderingEvent {}
+    @JvmRecord
+    data class OrderCompleted(
+        @JvmField val orderId: UUID,
+        @JvmField val version: Int
+    ) : OrderingEvent
 }

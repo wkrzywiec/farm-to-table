@@ -1,8 +1,7 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.incoming;
+package io.wkrzywiec.fooddelivery.ordering.domain.incoming
 
-import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
+import java.util.*
 
-import java.util.UUID;
-
-public record FoodInPreparation(UUID orderId, int version) implements IntegrationMessageBody {
-}
+@JvmRecord
+data class FoodInPreparation(val orderId: UUID, val version: Int) : IntegrationMessageBody

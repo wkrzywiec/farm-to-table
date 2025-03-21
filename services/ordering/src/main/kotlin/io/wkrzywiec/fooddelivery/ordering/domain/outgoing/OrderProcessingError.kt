@@ -1,8 +1,8 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.outgoing;
+package io.wkrzywiec.fooddelivery.ordering.domain.outgoing
 
-import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
+import java.util.*
 
-import java.util.UUID;
-
-public record OrderProcessingError(UUID orderId, int version, String message, String details) implements IntegrationMessageBody {
-}
+@JvmRecord
+data class OrderProcessingError(val orderId: UUID, val version: Int, val message: String, val details: String) :
+    IntegrationMessageBody

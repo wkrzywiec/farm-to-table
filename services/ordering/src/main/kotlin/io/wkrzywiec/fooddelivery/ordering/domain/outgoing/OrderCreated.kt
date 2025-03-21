@@ -1,11 +1,18 @@
-package io.wkrzywiec.fooddelivery.ordering.domain.outgoing;
+package io.wkrzywiec.fooddelivery.ordering.domain.outgoing
 
-import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody;
-import io.wkrzywiec.fooddelivery.commons.model.Item;
+import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
+import io.wkrzywiec.fooddelivery.commons.model.Item
+import java.math.BigDecimal
+import java.util.*
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
-
-public record OrderCreated(UUID orderId, int version, String customerId, String farmId, String address, List<Item> items, BigDecimal deliveryCharge, BigDecimal total) implements IntegrationMessageBody {
-}
+@JvmRecord
+data class OrderCreated(
+    val orderId: UUID,
+    val version: Int,
+    val customerId: String,
+    val farmId: String,
+    val address: String,
+    val items: List<Item>,
+    val deliveryCharge: BigDecimal,
+    val total: BigDecimal
+) : IntegrationMessageBody
