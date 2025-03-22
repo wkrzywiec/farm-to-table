@@ -5,5 +5,7 @@ import java.math.BigDecimal
 import java.util.*
 
 @JvmRecord
-data class TipAddedToOrder(val orderId: UUID, val version: Int, val tip: BigDecimal, val total: BigDecimal) :
-    IntegrationMessageBody
+data class TipAddedToOrder(val id: UUID, val deliveryVersion: Int, val tip: BigDecimal, val total: BigDecimal) : IntegrationMessageBody {
+    override fun orderId(): UUID = id
+    override fun version(): Int = deliveryVersion
+}

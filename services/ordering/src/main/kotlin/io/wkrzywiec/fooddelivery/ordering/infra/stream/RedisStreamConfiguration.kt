@@ -29,7 +29,7 @@ class RedisStreamConfiguration : RedisMessageConsumerConfig() {
     }
 
     @Bean
-    fun redisOrdersChannelConsumer(facade: OrderingFacade?, objectMapper: ObjectMapper?): RedisStreamListener {
+    fun redisOrdersChannelConsumer(facade: OrderingFacade, objectMapper: ObjectMapper): RedisStreamListener {
         return RedisOrdersChannelConsumer(facade, objectMapper)
     }
 

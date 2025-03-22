@@ -1,12 +1,17 @@
 package io.wkrzywiec.fooddelivery.ordering.domain
 
+import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent
+import io.wkrzywiec.fooddelivery.commons.model.CreateOrder
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
 import java.math.BigDecimal
+import java.util.*
+
 
 class Order private constructor(
-    val id: String,
+    val id: UUID,
+    version: Int,
     val customerId: String,
-    val restaurantId: String,
+    val farmId: String,
     status: OrderStatus,
     val address: String,
     val items: List<Item>,
@@ -15,6 +20,8 @@ class Order private constructor(
     val metadata: MutableMap<String, String>
 ) {
 
+    var version: Int = version
+        private set
     var status: OrderStatus = status
         private set
     var tip: BigDecimal = tip
@@ -22,8 +29,14 @@ class Order private constructor(
     var total: BigDecimal = BigDecimal(0)
         private set
 
+    private val changes: List<DomainEvent> = mutableListOf()
+
     init {
         this.calculateTotal()
+    }
+
+    fun uncommittedChanges(): List<DomainEvent> {
+        return changes
     }
 
     private fun calculateTotal() {
@@ -88,19 +101,20 @@ class Order private constructor(
         fun from(createOrder: CreateOrder): Order {
             val order = Order(
                 id = createOrder.orderId,
+                version = 0,
                 customerId = createOrder.customerId,
-                restaurantId = createOrder.restaurantId,
+                farmId = createOrder.farmId,
                 status = OrderStatus.CREATED,
                 address = createOrder.address,
                 items = mapItems(createOrder.items),
                 deliveryCharge = createOrder.deliveryCharge,
                 tip = BigDecimal.ZERO,
-                metadata = mutableMapOf<String, String>()
+                metadata = mutableMapOf()
             )
             return order
         }
 
-        private fun mapItems(items: List<io.wkrzywiec.fooddelivery.commons.incoming.Item>): List<Item> {
+        private fun mapItems(items: List<io.wkrzywiec.fooddelivery.commons.model.Item>): List<Item> {
             return items.stream()
                 .map{
                     Item(name = it.name, amount = it.amount, pricePerItem = it.pricePerItem)
@@ -109,83 +123,49 @@ class Order private constructor(
         }
 
         @JvmStatic
-        fun from(events: List<Message>): Order {
+        fun from(events: List<OrderingEvent>): Order {
             lateinit var order: Order
             for (event in events) {
-                val body = event.body
-                if (body is OrderCreated) {
-                    order = Order(
-                        id = body.id,
-                        customerId = body.customerId,
-                        restaurantId = body.restaurantId,
-                        status = OrderStatus.CREATED,
-                        address = body.address,
-                        items = mapItems(body.items),
-                        deliveryCharge = body.deliveryCharge,
-                        tip = BigDecimal.ZERO,
-                        metadata = mutableMapOf<String, String>()
-                    )
-                }
+                when (event) {
+                    is OrderingEvent.OrderCreated -> {
+                        order = Order(
+                            id = event.orderId,
+                            version = 0,
+                            customerId = event.customerId,
+                            farmId = event.farmId,
+                            status = OrderStatus.CREATED,
+                            address = event.address,
+                            items = event.items,
+                            deliveryCharge = event.deliveryCharge,
+                            tip = BigDecimal.ZERO,
+                            metadata = mutableMapOf()
+                        )
+                    }
 
-                if (body is OrderCanceled) {
-                    val meta: MutableMap<String, String> = order.metadata
-                    meta["cancellationReason"] = body.reason
-                    order = Order(
-                        id = order.id,
-                        customerId = order.customerId,
-                        restaurantId = order.restaurantId,
-                        status = OrderStatus.CANCELED,
-                        address = order.address,
-                        items = order.items,
-                        deliveryCharge = order.deliveryCharge,
-                        tip = order.tip,
-                        metadata = meta
-                    )
-                }
+                    is OrderingEvent.OrderCanceled -> {
+                        order.status = OrderStatus.CANCELED
+                        order.version = event.version
+                    }
 
-                if (body is OrderInProgress) {
-                    order = Order(
-                        id = order.id,
-                        customerId = order.customerId,
-                        restaurantId = order.restaurantId,
-                        status = OrderStatus.IN_PROGRESS,
-                        address = order.address,
-                        items = order.items,
-                        deliveryCharge = order.deliveryCharge,
-                        tip = order.tip,
-                        metadata = order.metadata
-                    )
-                }
+                    is OrderingEvent.OrderInProgress -> {
+                        order.status = OrderStatus.IN_PROGRESS
+                        order.version = event.version
+                    }
 
-                if (body is TipAddedToOrder) {
-                    order = Order(
-                        id = order.id,
-                        customerId = order.customerId,
-                        restaurantId = order.restaurantId,
-                        status = order.status,
-                        address = order.address,
-                        items = order.items,
-                        deliveryCharge = order.deliveryCharge,
-                        tip = body.tip,
-                        metadata = order.metadata
-                    )
-                }
+                    is OrderingEvent.TipAddedToOrder -> {
+                        order.tip = event.tip
+                        order.version = event.version
+                    }
 
-                if (body is OrderCompleted) {
-                    order = Order(
-                        id = order.id,
-                        customerId = order.customerId,
-                        restaurantId = order.restaurantId,
-                        status = OrderStatus.COMPLETED,
-                        address = order.address,
-                        items = order.items,
-                        deliveryCharge = order.deliveryCharge,
-                        tip = order.tip,
-                        metadata = order.metadata
-                    )
+                    is OrderingEvent.OrderCompleted -> {
+                        order.status = OrderStatus.COMPLETED
+                        order.version = event.version
+                    }
+
+                    else -> throw IllegalArgumentException("Failed to replay events to build order object. Unhandled events: ${event::class.simpleName}")
                 }
             }
             return order
-        }
+            }
     }
 }

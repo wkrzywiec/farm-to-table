@@ -31,6 +31,7 @@ dependencies {
 	implementation 'org.postgresql:postgresql:42.7.3'
 	implementation 'org.liquibase:liquibase-core:4.27.0'
 
+	implementation 'io.github.oshai:kotlin-logging-jvm:7.0.3'
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	implementation 'io.vavr:vavr:0.10.4'
 	implementation 'org.apache.commons:commons-lang3:3.14.0'
@@ -60,6 +61,25 @@ dependencies {
 
 		module("org.codehaus.groovy:groovy-json") {
 			replacedBy("org.apache.groovy:groovy-json", "conflicts in current rest-assured version")
+		}
+	}
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/kotlin']
+		}
+		kotlin {
+			srcDirs = ['src/main/kotlin']
+		}
+	}
+	test {
+		java {
+			srcDirs = ['src/test/java', 'src/test/kotlin']
+		}
+		kotlin {
+			srcDirs = ['src/test/kotlin']
 		}
 	}
 }

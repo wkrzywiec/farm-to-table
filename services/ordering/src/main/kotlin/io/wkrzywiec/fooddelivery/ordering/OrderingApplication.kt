@@ -12,8 +12,8 @@ class OrderingApplication {
     fun clock(): Clock {
         return Clock.systemUTC()
     }
+}
 
-    fun main(args: Array<String>) {
-        runApplication<OrderingApplication>(*args)
-    }
+fun main(args: Array<String>) {
+    runApplication<OrderingApplication>(*args)
 }

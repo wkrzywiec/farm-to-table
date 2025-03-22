@@ -21,20 +21,29 @@ interface OrderingEvent : DomainEvent {
         @JvmField val items: List<Item>,
         @JvmField val deliveryCharge: BigDecimal,
         @JvmField val total: BigDecimal
-    ) : OrderingEvent
+    ) : OrderingEvent {
+        override fun orderId(): UUID = orderId
+        override fun version(): Int = version
+    }
 
     @JvmRecord
     data class OrderCanceled(
         @JvmField val orderId: UUID,
         @JvmField val version: Int,
         @JvmField val reason: String
-    ) : OrderingEvent
+    ) : OrderingEvent {
+        override fun orderId(): UUID = orderId
+        override fun version(): Int = version
+    }
 
     @JvmRecord
     data class OrderInProgress(
         @JvmField val orderId: UUID,
         @JvmField val version: Int
-    ) : OrderingEvent
+    ) : OrderingEvent {
+        override fun orderId(): UUID = orderId
+        override fun version(): Int = version
+    }
 
     @JvmRecord
     data class TipAddedToOrder(
@@ -42,11 +51,17 @@ interface OrderingEvent : DomainEvent {
         @JvmField val version: Int,
         @JvmField val tip: BigDecimal,
         @JvmField val total: BigDecimal
-    ) : OrderingEvent
+    ) : OrderingEvent {
+        override fun orderId(): UUID = orderId
+        override fun version(): Int = version
+    }
 
     @JvmRecord
     data class OrderCompleted(
         @JvmField val orderId: UUID,
         @JvmField val version: Int
-    ) : OrderingEvent
+    ) : OrderingEvent {
+        override fun orderId(): UUID = orderId
+        override fun version(): Int = version
+    }
 }

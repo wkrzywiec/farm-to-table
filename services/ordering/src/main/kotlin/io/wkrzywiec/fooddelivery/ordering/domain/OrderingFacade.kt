@@ -1,5 +1,6 @@
 package io.wkrzywiec.fooddelivery.ordering.domain
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.vavr.CheckedRunnable
 import io.vavr.control.Try
 import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
@@ -17,9 +18,12 @@ import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderProcessingError
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
+import org.mapstruct.factory.Mappers
 import org.springframework.stereotype.Component
 import java.time.Clock
 import java.util.*
+
+private val logger = KotlinLogging.logger {}
 
 @RequiredArgsConstructor
 @Slf4j
@@ -38,11 +42,11 @@ class OrderingFacade {
     }
 
     private fun createOrder(createOrder: CreateOrder) {
-        OrderingFacade.log.info("Creating a new order: {}", createOrder)
+        logger.info { "Creating a new order: $createOrder" }
 
         val newOrder = Order.from(createOrder)
         storeAndPublishEvents(newOrder)
-        OrderingFacade.log.info("New order with an id: '{}' was created", newOrder.id)
+        logger.info { "New order with an id: '${newOrder.id}' was created" }
     }
 
     fun handle(cancelOrder: CancelOrder) {
@@ -54,34 +58,33 @@ class OrderingFacade {
     }
 
     private fun cancelOrder(cancelOrder: CancelOrder) {
-        OrderingFacade.log.info("Cancelling an order: {}", cancelOrder.orderId)
+        logger.info { "Cancelling an order: ${cancelOrder.orderId}" }
 
         val order = findOrder(cancelOrder.orderId)
         order.cancelOrder(cancelOrder.reason)
         storeAndPublishEvents(order)
 
-        OrderingFacade.log.info("Cancellation of an order '{}' has been completed", order.id)
+        logger.info { "Cancellation of an order '${order.id}' has been completed" }
     }
 
     fun handle(foodInPreparation: FoodInPreparation) {
         process(
-            foodInPreparation.orderId,
+            foodInPreparation.orderId(),
             { foodInPreparation(foodInPreparation) },
             "Failed to set an order to IN_PROGRESS state."
         )
     }
 
     private fun foodInPreparation(foodInPreparation: FoodInPreparation) {
-        OrderingFacade.log.info("Setting '{}' order to IN_PROGRESS state", foodInPreparation.orderId)
+        logger.info("Setting '{}' order to IN_PROGRESS state", foodInPreparation.orderId())
 
-        val order = findOrder(foodInPreparation.orderId)
+        val order = findOrder(foodInPreparation.orderId())
         order.setInProgress()
         storeAndPublishEvents(order)
 
-        OrderingFacade.log.info(
-            "Setting an '{}' order to IN_PROGRESS state has been completed",
-            foodInPreparation.orderId
-        )
+        logger.info {
+            "Setting an '${foodInPreparation.orderId()}' order to IN_PROGRESS state has been completed"
+        }
     }
 
     fun handle(addTip: AddTip) {
@@ -93,31 +96,31 @@ class OrderingFacade {
     }
 
     private fun addTip(addTip: AddTip) {
-        OrderingFacade.log.info("Adding {} tip to '{}' order.", addTip.tip, addTip.orderId)
+        logger.info { "Adding ${addTip.tip} tip to '${addTip.orderId}' order." }
 
         val order = findOrder(addTip.orderId)
         order.addTip(addTip.tip)
         storeAndPublishEvents(order)
 
-        OrderingFacade.log.info("Adding a tip to '{}' order has been completed", addTip.orderId)
+        logger.info { "Adding a tip to '${addTip.orderId}' order has been completed" }
     }
 
     fun handle(foodDelivered: FoodDelivered) {
         process(
-            foodDelivered.orderId,
+            foodDelivered.id,
             { foodDelivered(foodDelivered) },
             "Failed to complete an order."
         )
     }
 
     private fun foodDelivered(foodDelivered: FoodDelivered) {
-        OrderingFacade.log.info("Setting '{}' order to COMPLETED state", foodDelivered.orderId)
+        logger.info { "Setting '${foodDelivered.id}' order to COMPLETED state" }
 
-        val order = findOrder(foodDelivered.orderId)
+        val order = findOrder(foodDelivered.id)
         order.complete()
         storeAndPublishEvents(order)
 
-        OrderingFacade.log.info("Setting an '{}' order to COMPLETED state has been completed", foodDelivered.orderId)
+        logger.info { "Setting an '${foodDelivered.id}' order to COMPLETED state has been completed" }
     }
 
     private fun process(streamId: UUID, runProcess: CheckedRunnable, failureMessage: String) {
@@ -126,7 +129,7 @@ class OrderingFacade {
     }
 
     private fun publishingFailureEvent(id: UUID, message: String, ex: Throwable) {
-        OrderingFacade.log.error("$message Publishing OrderProcessingError event", ex)
+        logger.error(ex) { "$message Publishing OrderProcessingError event" }
         val event = resultingEvent(id, OrderProcessingError(id, -1, message, ex.localizedMessage))
         publisher!!.send(event)
     }
@@ -161,7 +164,7 @@ class OrderingFacade {
     }
 
     private fun prepareAndPublishIntegrationEvents(eventEntities: List<EventEntity>) {
-        val integrationEvents = IntegrationMessage.integrationEvents(eventEntities, OrderingEventMapper.INSTANCE)
+        val integrationEvents = IntegrationMessage.integrationEvents(eventEntities, Mappers.getMapper(OrderingEventMapper::class.java))
         publisher!!.send(integrationEvents)
     }
 

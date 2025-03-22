@@ -4,4 +4,7 @@ import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
 import java.util.*
 
 @JvmRecord
-data class OrderInProgress(val orderId: UUID, val version: Int) : IntegrationMessageBody
+data class OrderInProgress(val id: UUID, val deliveryVersion: Int) : IntegrationMessageBody {
+    override fun orderId(): UUID = id
+    override fun version(): Int = deliveryVersion
+}

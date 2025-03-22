@@ -3,6 +3,7 @@ package io.wkrzywiec.fooddelivery.ordering.infra.stream
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.Header
 import io.wkrzywiec.fooddelivery.commons.infra.messaging.redis.RedisStreamListener
 import io.wkrzywiec.fooddelivery.commons.model.AddTip
@@ -15,11 +16,15 @@ import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.springframework.data.redis.connection.stream.MapRecord
 
+private val logger = KotlinLogging.logger {}
+
 @Slf4j
 @RequiredArgsConstructor
-class RedisOrdersChannelConsumer : RedisStreamListener {
-    private val facade: OrderingFacade? = null
-    private val objectMapper: ObjectMapper? = null
+class RedisOrdersChannelConsumer(
+    private val facade: OrderingFacade,
+    private val objectMapper: ObjectMapper
+) : RedisStreamListener {
+
 
     override fun streamName(): String {
         return "orders"
@@ -34,7 +39,7 @@ class RedisOrdersChannelConsumer : RedisStreamListener {
     }
 
     override fun onMessage(message: MapRecord<String?, String?, String?>) {
-        RedisOrdersChannelConsumer.log.info("Message received from {} stream: {}", streamName(), message)
+        logger.info { "Message received from ${streamName()} stream: $message" }
 
         val payloadMessage = message.value["payload"]
 
@@ -48,7 +53,7 @@ class RedisOrdersChannelConsumer : RedisStreamListener {
                 "FoodInPreparation" -> facade!!.handle(mapMessageBody(messageAsJson, FoodInPreparation::class.java))
                 "AddTip" -> facade!!.handle(mapMessageBody(messageAsJson, AddTip::class.java))
                 "FoodDelivered" -> facade!!.handle(mapMessageBody(messageAsJson, FoodDelivered::class.java))
-                else -> RedisOrdersChannelConsumer.log.info("There is no logic for handling {} message", header.type)
+                else -> logger.info { "There is no logic for handling ${header.type} message" }
             }
         } catch (e: JsonProcessingException) {
             throw RuntimeException(e)
