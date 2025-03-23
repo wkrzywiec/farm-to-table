@@ -6,6 +6,7 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
 import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore
 import io.wkrzywiec.fooddelivery.ordering.IntegrationTest
+import io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingEvent
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
 import io.wkrzywiec.fooddelivery.ordering.infra.stream.RedisOrdersChannelConsumer
@@ -16,9 +17,7 @@ import spock.lang.Subject
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade.ORDERS_CHANNEL
-import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await
 
 @ActiveProfiles(["redis-stream", "redis-event-store"])
@@ -31,10 +30,10 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
     def "Message is consumed and processed correctly"() {
         given: "CreateOrder command"
         Faker faker = new Faker()
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
                 .withItems(
-                        anItem().withName(faker.food().dish()).withPricePerItem(2.5),
-                        anItem().withName(faker.food().dish()).withPricePerItem(3.0)
+                        ItemTestData.anItem().withName(faker.food().dish()).withPricePerItem(2.5),
+                        ItemTestData.anItem().withName(faker.food().dish()).withPricePerItem(3.0)
                 )
                 .withAddress(faker.address().fullAddress())
 

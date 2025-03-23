@@ -1,46 +1,41 @@
-package io.wkrzywiec.fooddelivery.ordering.domain;
+package io.wkrzywiec.fooddelivery.ordering.domain
 
-import lombok.Getter;
+import java.math.BigDecimal
 
-import java.math.BigDecimal;
+data class ItemTestData private constructor(
+    val name: String = "Pizza Margherita",
+    val amount: Int = 1,
+    val pricePerItem: BigDecimal = BigDecimal(10)
+) {
 
-@Getter
-class ItemTestData {
-
-    private String name = "Pizza Margherita";
-    private int amount = 1;
-    private BigDecimal pricePerItem = new BigDecimal(10);
-
-    private ItemTestData() {};
-
-    public Item entity() {
-        return Item.builder()
-                .name(name)
-                .amount(amount)
-                .pricePerItem(pricePerItem)
-                .build();
+    companion object {
+        @JvmStatic
+        fun anItem(): ItemTestData {
+            return ItemTestData()
+        }
     }
 
-    public io.wkrzywiec.fooddelivery.commons.model.Item dto() {
-        return new io.wkrzywiec.fooddelivery.commons.model.Item(name, amount, pricePerItem);
+    fun entity(): Item {
+        return Item(
+            name = name,
+            amount = amount,
+            pricePerItem = pricePerItem
+        )
     }
 
-    public static ItemTestData anItem() {
-        return new ItemTestData();
+    fun dto(): io.wkrzywiec.fooddelivery.commons.model.Item {
+        return io.wkrzywiec.fooddelivery.commons.model.Item(name, amount, pricePerItem)
     }
 
-    public ItemTestData withName(String name) {
-        this.name = name;
-        return this;
+    fun withName(name: String): ItemTestData {
+        return this.copy(name = name)
     }
 
-    public ItemTestData withPricePerItem(double price) {
-        this.pricePerItem = new BigDecimal(price);
-        return this;
+    fun withPricePerItem(price: Double): ItemTestData {
+        return this.copy(pricePerItem = BigDecimal(price))
     }
 
-    ItemTestData withAmount(int amount) {
-        this.amount = amount;
-        return this;
+    fun withAmount(amount: Int): ItemTestData {
+        return this.copy(amount = amount)
     }
 }

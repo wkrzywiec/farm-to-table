@@ -31,7 +31,11 @@ dependencies {
 	implementation 'org.postgresql:postgresql:42.7.3'
 	implementation 'org.liquibase:liquibase-core:4.27.0'
 
+	implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.10'
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
 	implementation 'io.github.oshai:kotlin-logging-jvm:7.0.3'
+
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	implementation 'io.vavr:vavr:0.10.4'
 	implementation 'org.apache.commons:commons-lang3:3.14.0'

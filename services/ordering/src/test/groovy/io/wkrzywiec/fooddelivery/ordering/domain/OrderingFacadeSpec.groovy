@@ -17,8 +17,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 import static io.wkrzywiec.fooddelivery.commons.infra.store.EventEntity.newEventEntity
-import static io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData.anItem
-import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade.ORDERS_CHANNEL
 
 @Subject(OrderingFacade)
@@ -40,10 +38,10 @@ class OrderingFacadeSpec extends Specification {
 
     def "Create an order"() {
         given:
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
                 .withItems(
-                        anItem().withName("Pizza").withPricePerItem(2.5),
-                        anItem().withName("Spaghetti").withPricePerItem(3.0)
+                        ItemTestData.anItem().withName("Pizza").withPricePerItem(2.5),
+                        ItemTestData.anItem().withName("Spaghetti").withPricePerItem(3.0)
                 )
 
         when:
@@ -61,7 +59,7 @@ class OrderingFacadeSpec extends Specification {
 
     def "Cancel an order"() {
         given:
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
         eventStore.store(order.orderCreatedEntity(testClock))
 
         and:
@@ -83,7 +81,7 @@ class OrderingFacadeSpec extends Specification {
 
     def "Set order to IN_PROGRESS"() {
         given:
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
         eventStore.store(order.orderCreatedEntity(testClock))
 
         and:
@@ -107,8 +105,8 @@ class OrderingFacadeSpec extends Specification {
         double itemCost = 10
         double deliveryCharge = 5
 
-        var order = anOrder()
-                .withItems(anItem().withPricePerItem(itemCost))
+        var order = OrderTestData.anOrder()
+                .withItems(ItemTestData.anItem().withPricePerItem(itemCost))
                 .withDeliveryCharge(deliveryCharge)
         eventStore.store(order.orderCreatedEntity(testClock))
 
@@ -132,7 +130,7 @@ class OrderingFacadeSpec extends Specification {
 
     def "Complete an order"() {
         given:
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
         eventStore.store(order.orderCreatedEntity(testClock))
         eventStore.store(eventEntity(new OrderingEvent.OrderInProgress(order.getId(), 1)))
 
