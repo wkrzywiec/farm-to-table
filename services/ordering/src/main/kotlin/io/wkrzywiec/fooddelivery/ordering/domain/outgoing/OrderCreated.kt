@@ -5,10 +5,9 @@ import io.wkrzywiec.fooddelivery.commons.model.Item
 import java.math.BigDecimal
 import java.util.*
 
-@JvmRecord
 data class OrderCreated(
     val id: UUID,
-    val deliveryVersion: Int,
+    val aggregateVersion: Int,
     val customerId: String,
     val farmId: String,
     val address: String,
@@ -17,5 +16,5 @@ data class OrderCreated(
     val total: BigDecimal
 ) : IntegrationMessageBody {
     override fun orderId(): UUID = id
-    override fun version(): Int = deliveryVersion
+    override fun version(): Int = aggregateVersion
 }

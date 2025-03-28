@@ -5,8 +5,10 @@ import io.wkrzywiec.fooddelivery.commons.event.IntegrationMessageBody
 import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 
 @Mapper
+@JvmDefaultWithCompatibility
 interface OrderingEventMapper : IntegrationEventMapper {
 
     override fun map(domainEvent: DomainEvent): IntegrationMessageBody {
@@ -21,9 +23,23 @@ interface OrderingEventMapper : IntegrationEventMapper {
         }
     }
 
+    @Mapping(source = "orderId", target = "id")
+    @Mapping(source = "version", target = "aggregateVersion")
     fun map(created: OrderingEvent.OrderCreated): OrderCreated
+
+    @Mapping(source = "orderId", target = "id")
+    @Mapping(source = "version", target = "aggregateVersion")
     fun map(canceled: OrderingEvent.OrderCanceled): OrderCanceled
+
+    @Mapping(source = "orderId", target = "id")
+    @Mapping(source = "version", target = "aggregateVersion")
     fun map(inProgress: OrderingEvent.OrderInProgress): OrderInProgress
+
+    @Mapping(source = "orderId", target = "id")
+    @Mapping(source = "version", target = "aggregateVersion")
     fun map(tipAdded: OrderingEvent.TipAddedToOrder): TipAddedToOrder
+
+    @Mapping(source = "orderId", target = "id")
+    @Mapping(source = "version", target = "aggregateVersion")
     fun map(completed: OrderingEvent.OrderCompleted): OrderCompleted
 }

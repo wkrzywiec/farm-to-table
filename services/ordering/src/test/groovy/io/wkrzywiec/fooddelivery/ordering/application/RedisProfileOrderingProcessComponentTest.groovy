@@ -6,6 +6,7 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
 import io.wkrzywiec.fooddelivery.commons.infra.store.redis.RedisEventStore
 import io.wkrzywiec.fooddelivery.ordering.IntegrationTest
+import io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingEvent
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
@@ -49,7 +50,7 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
                 .until {
                     def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
 
-                    event.get("header").get("streamId").asText() == order.id
+                    event.get("header").get("streamId").asText() == order.id.toString()
                     event.get("header").get("type").asText() == "OrderCreated"
                 }
 
@@ -57,7 +58,7 @@ class RedisProfileOrderingProcessComponentTest extends IntegrationTest {
         await().atMost(5, TimeUnit.SECONDS)
                 .until {
                     def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
-                    event.get("header").get("streamId").asText() == order.id
+                    event.get("header").get("streamId").asText() == order.id.toString()
                     event.get("header").get("type").asText() == "OrderCreated"
                 }
 

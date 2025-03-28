@@ -11,7 +11,6 @@ interface OrderingEvent : DomainEvent {
         return orderId()
     }
 
-    @JvmRecord
     data class OrderCreated(
         @JvmField val orderId: UUID,
         @JvmField val version: Int,
@@ -26,7 +25,6 @@ interface OrderingEvent : DomainEvent {
         override fun version(): Int = version
     }
 
-    @JvmRecord
     data class OrderCanceled(
         @JvmField val orderId: UUID,
         @JvmField val version: Int,
@@ -36,7 +34,6 @@ interface OrderingEvent : DomainEvent {
         override fun version(): Int = version
     }
 
-    @JvmRecord
     data class OrderInProgress(
         @JvmField val orderId: UUID,
         @JvmField val version: Int
@@ -45,7 +42,6 @@ interface OrderingEvent : DomainEvent {
         override fun version(): Int = version
     }
 
-    @JvmRecord
     data class TipAddedToOrder(
         @JvmField val orderId: UUID,
         @JvmField val version: Int,
@@ -55,8 +51,7 @@ interface OrderingEvent : DomainEvent {
         override fun orderId(): UUID = orderId
         override fun version(): Int = version
     }
-
-    @JvmRecord
+    
     data class OrderCompleted(
         @JvmField val orderId: UUID,
         @JvmField val version: Int

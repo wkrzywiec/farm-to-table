@@ -25,13 +25,12 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-@RequiredArgsConstructor
-@Slf4j
 @Component
-class OrderingFacade {
-    private val eventStore: EventStore? = null
-    private val publisher: MessagePublisher? = null
-    private val clock: Clock? = null
+class OrderingFacade (
+    val eventStore: EventStore,
+    val publisher: MessagePublisher,
+    val clock: Clock? = null
+){
 
     fun handle(createOrder: CreateOrder) {
         process(
@@ -76,7 +75,7 @@ class OrderingFacade {
     }
 
     private fun foodInPreparation(foodInPreparation: FoodInPreparation) {
-        logger.info("Setting '{}' order to IN_PROGRESS state", foodInPreparation.orderId())
+        logger.info { "Setting '${foodInPreparation.orderId()}' order to IN_PROGRESS state" }
 
         val order = findOrder(foodInPreparation.orderId())
         order.setInProgress()
@@ -131,7 +130,7 @@ class OrderingFacade {
     private fun publishingFailureEvent(id: UUID, message: String, ex: Throwable) {
         logger.error(ex) { "$message Publishing OrderProcessingError event" }
         val event = resultingEvent(id, OrderProcessingError(id, -1, message, ex.localizedMessage))
-        publisher!!.send(event)
+        publisher.send(event)
     }
 
     private fun resultingEvent(orderId: UUID, eventBody: IntegrationMessageBody): IntegrationMessage {
@@ -143,7 +142,7 @@ class OrderingFacade {
     }
 
     private fun findOrder(orderId: UUID): Order {
-        val storedEvents = eventStore!!.loadEvents(ORDERS_CHANNEL, orderId)
+        val storedEvents = eventStore.loadEvents(ORDERS_CHANNEL, orderId)
         if (storedEvents.isEmpty()) {
             throw OrderingException(String.format("There is no order with an orderId '%s'.", orderId))
         }
@@ -159,13 +158,13 @@ class OrderingFacade {
     private fun storeUncommittedEvents(order: Order): List<EventEntity> {
         val domainEvents: List<DomainEvent> = order.uncommittedChanges()
         val eventEntities = EventEntity.newEventEntities(domainEvents, ORDERS_CHANNEL, clock)
-        eventStore!!.store(eventEntities)
+        eventStore.store(eventEntities)
         return eventEntities
     }
 
     private fun prepareAndPublishIntegrationEvents(eventEntities: List<EventEntity>) {
         val integrationEvents = IntegrationMessage.integrationEvents(eventEntities, Mappers.getMapper(OrderingEventMapper::class.java))
-        publisher!!.send(integrationEvents)
+        publisher.send(integrationEvents)
     }
 
     companion object {

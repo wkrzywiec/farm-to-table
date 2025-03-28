@@ -6,6 +6,8 @@ import io.wkrzywiec.fooddelivery.commons.infra.messaging.IntegrationMessage
 import io.wkrzywiec.fooddelivery.commons.infra.store.EventStore
 import io.wkrzywiec.fooddelivery.commons.infra.store.postgres.PostgresEventStore
 import io.wkrzywiec.fooddelivery.ordering.IntegrationTest
+import io.wkrzywiec.fooddelivery.ordering.domain.ItemTestData
+import io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingEvent
 import io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade
 import io.wkrzywiec.fooddelivery.ordering.infra.stream.RedisOrdersChannelConsumer
@@ -17,7 +19,6 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 import static io.wkrzywiec.fooddelivery.ordering.domain.OrderingFacade.ORDERS_CHANNEL
-import static io.wkrzywiec.fooddelivery.ordering.domain.OrderTestData.anOrder
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await
 
 @ActiveProfiles(["redis-stream", "postgres-event-store"])
@@ -30,10 +31,10 @@ class DefaultProfileOrderingProcessComponentTest extends IntegrationTest {
     def "Message is consumed and processed correctly"() {
         given: "CreateOrder command"
         Faker faker = new Faker()
-        var order = anOrder()
+        var order = OrderTestData.anOrder()
                 .withItems(
-                        anItem().withName(faker.food().dish()).withPricePerItem(2.5),
-                        anItem().withName(faker.food().dish()).withPricePerItem(3.0)
+                        ItemTestData.anItem().withName(faker.food().dish()).withPricePerItem(2.5),
+                        ItemTestData.anItem().withName(faker.food().dish()).withPricePerItem(3.0)
                 )
                 .withAddress(faker.address().fullAddress())
 
@@ -48,7 +49,7 @@ class DefaultProfileOrderingProcessComponentTest extends IntegrationTest {
         await().atMost(5, TimeUnit.SECONDS)
                 .until {
                     def event = redisStreamsClient.getLatestMessageFromStreamAsJson("orders")
-                    event.get("header").get("streamId").asText() == order.id
+                    event.get("header").get("streamId").asText() == order.id.toString()
                     event.get("header").get("type").asText() == "OrderCreated"
                 }
 

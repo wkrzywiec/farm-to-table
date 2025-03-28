@@ -46,14 +46,15 @@ data class OrderTestData private constructor(
         }
         val order = constructor.callBy(mapOf(
             params[0] to id,
-            params[1] to customerId,
-            params[2] to farmId,
-            params[3] to status,
-            params[4] to address,
-            params[5] to items.stream().map { obj: ItemTestData -> obj.entity() }.toList(),
-            params[6] to deliveryCharge,
-            params[7] to tip,
-            params[8] to metadata,
+            params[1] to version,
+            params[2] to customerId,
+            params[3] to farmId,
+            params[4] to status,
+            params[5] to address,
+            params[6] to items.stream().map { obj: ItemTestData -> obj.entity() }.toList(),
+            params[7] to deliveryCharge,
+            params[8] to tip,
+            params[9] to metadata,
         )
         )
 
@@ -97,6 +98,11 @@ data class OrderTestData private constructor(
                 .toList(),
             deliveryCharge,
             entity.total)
+    }
+
+    fun total(): BigDecimal {
+        val entity = entity()
+        return entity.total
     }
 
     fun withId(id: UUID): OrderTestData {

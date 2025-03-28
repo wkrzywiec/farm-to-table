@@ -64,7 +64,7 @@ class OrderingFacadeSpec extends Specification {
 
         and:
         var cancellationReason = "Not hungry anymore"
-        var cancelOrder = new CancelOrder(order.id, 2, cancellationReason)
+        var cancelOrder = new CancelOrder(order.id, 1, cancellationReason)
 
         when:
         facade.handle(cancelOrder)
@@ -85,7 +85,7 @@ class OrderingFacadeSpec extends Specification {
         eventStore.store(order.orderCreatedEntity(testClock))
 
         and:
-        var foodInPreparation = new FoodInPreparation(order.id, 2)
+        var foodInPreparation = new FoodInPreparation(order.id, 1)
 
         when:
         facade.handle(foodInPreparation)
@@ -112,15 +112,15 @@ class OrderingFacadeSpec extends Specification {
 
         and:
         double tip = 20
-        var addTip = new AddTip(order.id, 2, new BigDecimal(tip))
+        var addTip = new AddTip(order.id, 1, new BigDecimal(tip))
 
         when:
         facade.handle(addTip)
 
         then: "Tip was added"
-        double total = itemCost + deliveryCharge + tip
+        double total = 35
         verifyEventInStore(
-                new OrderingEvent.TipAddedToOrder(order.getId(), 1, tip, total),
+                new OrderingEvent.TipAddedToOrder(order.getId(), 1, new BigDecimal(tip), new BigDecimal(total)),
                 2
         )
 

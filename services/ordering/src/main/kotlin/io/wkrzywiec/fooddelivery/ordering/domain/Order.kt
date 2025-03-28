@@ -2,17 +2,16 @@ package io.wkrzywiec.fooddelivery.ordering.domain
 
 import io.wkrzywiec.fooddelivery.commons.infra.store.DomainEvent
 import io.wkrzywiec.fooddelivery.commons.model.CreateOrder
-import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.*
 import java.math.BigDecimal
 import java.util.*
 
 
 class Order private constructor(
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
     version: Int,
     val customerId: String,
     val farmId: String,
-    status: OrderStatus,
+    status: OrderStatus = OrderStatus.CREATED,
     val address: String,
     val items: List<Item>,
     val deliveryCharge: BigDecimal,
@@ -29,70 +28,68 @@ class Order private constructor(
     var total: BigDecimal = BigDecimal(0)
         private set
 
-    private val changes: List<DomainEvent> = mutableListOf()
+    private val changes: MutableList<DomainEvent> = mutableListOf()
 
     init {
-        this.calculateTotal()
+        total = calculateTotal()
+    }
+
+    private fun calculateTotal(): BigDecimal {
+        return items.sumOf { it.pricePerItem.multiply(BigDecimal(it.amount)) }
+            .add(deliveryCharge)
+            .add(tip)
     }
 
     fun uncommittedChanges(): List<DomainEvent> {
         return changes
     }
 
-    fun calculateTotal() {
-        total = items.sumOf { it.pricePerItem.multiply(BigDecimal(it.amount)) }
-            .add(deliveryCharge)
-            .add(tip)
-    }
-
-    fun cancelOrder(reason: String?) {
+    fun cancelOrder(reason: String) {
         if (status != OrderStatus.CREATED) {
-            throw OrderingException(
-                String.format(
-                    "Failed to cancel an %s order. It's not possible to cancel an order with '%s' status",
-                    id,
-                    status
-                )
-            )
+            throw OrderingException("Failed to cancel an $id order. It's not possible to cancel an order with '$status' status")
         }
-        this.status = OrderStatus.CANCELED
+        status = OrderStatus.CANCELED
 
-        if (reason != null) {
-            metadata["cancellationReason"] = reason
-        }
+        increaseVersion()
+        changes.add(OrderingEvent.OrderCanceled(id, version, reason))
     }
 
     fun setInProgress() {
         if (status == OrderStatus.CREATED) {
-            this.status = OrderStatus.IN_PROGRESS
+            status = OrderStatus.IN_PROGRESS
+
+            increaseVersion()
+            changes.add(OrderingEvent.OrderInProgress(id, version))
             return
         }
         throw OrderingException(
-            String.format(
-                "Failed to set an '%s' order to IN_PROGRESS. It's not allowed to do it for an order with '%s' status",
-                id,
-                status
-            )
+            "Failed to set an '$id' order to IN_PROGRESS. It's not allowed to do it for an order with '$status' status"
         )
     }
 
     fun addTip(tip: BigDecimal) {
         this.tip = tip
-        this.calculateTotal()
+        total = calculateTotal()
+
+        increaseVersion()
+        changes.add(OrderingEvent.TipAddedToOrder(id, version, tip, total))
     }
 
     fun complete() {
         if (status == OrderStatus.IN_PROGRESS) {
-            this.status = OrderStatus.COMPLETED
+            status = OrderStatus.COMPLETED
+
+            increaseVersion()
+            changes.add(OrderingEvent.OrderCompleted(id, version))
             return
         }
         throw OrderingException(
-            String.format(
-                "Failed to set an '%s' order to COMPLETED. It's not allowed to do it for an order with '%s' status",
-                id,
-                status
-            )
+            "Failed to set an '$id' order to COMPLETED. It's not allowed to do it for an order with $status' status"
         )
+    }
+
+    private fun increaseVersion() {
+        version += 1
     }
 
     companion object {
@@ -111,6 +108,12 @@ class Order private constructor(
                 tip = BigDecimal.ZERO,
                 metadata = mutableMapOf()
             )
+            order.changes.add(OrderingEvent.OrderCreated(
+                order.id, 0,
+                order.customerId, order.farmId,
+                order.address, order.items,
+                order.deliveryCharge, order.total
+            ))
             return order
         }
 

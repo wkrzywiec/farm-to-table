@@ -48,11 +48,11 @@ class RedisOrdersChannelConsumer(
             val header = map(messageAsJson["header"], Header::class.java)
 
             when (header.type) {
-                "CreateOrder" -> facade!!.handle(mapMessageBody(messageAsJson, CreateOrder::class.java))
-                "CancelOrder" -> facade!!.handle(mapMessageBody(messageAsJson, CancelOrder::class.java))
-                "FoodInPreparation" -> facade!!.handle(mapMessageBody(messageAsJson, FoodInPreparation::class.java))
-                "AddTip" -> facade!!.handle(mapMessageBody(messageAsJson, AddTip::class.java))
-                "FoodDelivered" -> facade!!.handle(mapMessageBody(messageAsJson, FoodDelivered::class.java))
+                "CreateOrder" -> facade.handle(mapMessageBody(messageAsJson, CreateOrder::class.java))
+                "CancelOrder" -> facade.handle(mapMessageBody(messageAsJson, CancelOrder::class.java))
+                "FoodInPreparation" -> facade.handle(mapMessageBody(messageAsJson, FoodInPreparation::class.java))
+                "AddTip" -> facade.handle(mapMessageBody(messageAsJson, AddTip::class.java))
+                "FoodDelivered" -> facade.handle(mapMessageBody(messageAsJson, FoodDelivered::class.java))
                 else -> logger.info { "There is no logic for handling ${header.type} message" }
             }
         } catch (e: JsonProcessingException) {

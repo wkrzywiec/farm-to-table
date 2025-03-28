@@ -1,6 +1,8 @@
 plugins {
 	id 'org.jetbrains.kotlin.jvm' version '2.1.10'
 	id 'org.jetbrains.kotlin.plugin.spring' version '2.1.10'
+
+	id 'org.jetbrains.kotlin.kapt' version '2.1.10'
 }
 description = 'farm-to-table ordering domain'
 
@@ -37,6 +39,7 @@ dependencies {
 	implementation 'io.github.oshai:kotlin-logging-jvm:7.0.3'
 
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	kapt "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	implementation 'io.vavr:vavr:0.10.4'
 	implementation 'org.apache.commons:commons-lang3:3.14.0'
 	implementation 'com.google.code.gson:gson:2.10.1'
@@ -85,6 +88,18 @@ sourceSets {
 		kotlin {
 			srcDirs = ['src/test/kotlin']
 		}
+	}
+}
+
+compileKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict', '-Xjvm-default=all'] // For better null-safety with Spring
+	}
+}
+
+compileTestKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict', '-Xjvm-default=all']
 	}
 }
 
