@@ -52,6 +52,7 @@ dependencies {
 	testImplementation "org.testcontainers:spock:${testcontainersVersion}"
 	testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
 
+	testImplementation("org.assertj:assertj-core:3.27.3")
 	testImplementation 'org.awaitility:awaitility:4.2.0'
 	testImplementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
 	testImplementation 'org.yaml:snakeyaml:2.2'
