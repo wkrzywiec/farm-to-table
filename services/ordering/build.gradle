@@ -11,7 +11,6 @@ def activeDevProfiles = 'dev'
 dependencies {
 
 	def lombokVersion = '1.18.32'
-	def spockVersion = '2.4-M4-groovy-4.0'
 	def testcontainersVersion = '1.19.7'
 	def mapstructVersion = '1.5.5.Final'
 
@@ -45,11 +44,7 @@ dependencies {
 	implementation 'com.google.code.gson:gson:2.10.1'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.apache.groovy:groovy-all:4.0.21'
-	testImplementation "org.spockframework:spock-core:${spockVersion}"
-	testImplementation "org.spockframework:spock-spring:${spockVersion}"
 	testImplementation 'io.rest-assured:spring-mock-mvc:5.4.0'
-	testImplementation "org.testcontainers:spock:${testcontainersVersion}"
 	testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
 	testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
 
@@ -57,21 +52,6 @@ dependencies {
 	testImplementation 'org.awaitility:awaitility:4.2.0'
 	testImplementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
 	testImplementation 'org.yaml:snakeyaml:2.2'
-
-	//this part is needed, because io.rest-assured:spring-mock-mvc depends on old lib for groovy - org.codehaus.groovy:groovy
-	modules {
-		module("org.codehaus.groovy:groovy") {
-			replacedBy("org.apache.groovy:groovy", "conflicts in current rest-assured version")
-		}
-
-		module("org.codehaus.groovy:groovy-xml") {
-			replacedBy("org.apache.groovy:groovy-xml", "conflicts in current rest-assured version")
-		}
-
-		module("org.codehaus.groovy:groovy-json") {
-			replacedBy("org.apache.groovy:groovy-json", "conflicts in current rest-assured version")
-		}
-	}
 }
 
 sourceSets {
