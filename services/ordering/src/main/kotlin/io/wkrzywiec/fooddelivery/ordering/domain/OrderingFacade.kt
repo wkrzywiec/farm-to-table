@@ -16,8 +16,6 @@ import io.wkrzywiec.fooddelivery.commons.model.CreateOrder
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodDelivered
 import io.wkrzywiec.fooddelivery.ordering.domain.incoming.FoodInPreparation
 import io.wkrzywiec.fooddelivery.ordering.domain.outgoing.OrderProcessingError
-import lombok.RequiredArgsConstructor
-import lombok.extern.slf4j.Slf4j
 import org.mapstruct.factory.Mappers
 import org.springframework.stereotype.Component
 import java.time.Clock
@@ -29,7 +27,7 @@ private val logger = KotlinLogging.logger {}
 class OrderingFacade (
     val eventStore: EventStore,
     val publisher: MessagePublisher,
-    val clock: Clock? = null
+    val clock: Clock
 ){
 
     fun handle(createOrder: CreateOrder) {
@@ -138,7 +136,7 @@ class OrderingFacade (
     }
 
     private fun eventHeader(orderId: UUID, type: String, version: Int): Header {
-        return Header(UUID.randomUUID(), version, ORDERS_CHANNEL, type, orderId, clock!!.instant())
+        return Header(UUID.randomUUID(), version, ORDERS_CHANNEL, type, orderId, clock.instant())
     }
 
     private fun findOrder(orderId: UUID): Order {

@@ -15,8 +15,7 @@ class Order private constructor(
     val address: String,
     val items: List<Item>,
     val deliveryCharge: BigDecimal,
-    tip: BigDecimal,
-    val metadata: MutableMap<String, String>
+    tip: BigDecimal
 ) {
 
     var version: Int = version
@@ -105,8 +104,7 @@ class Order private constructor(
                 address = createOrder.address,
                 items = mapItems(createOrder.items),
                 deliveryCharge = createOrder.deliveryCharge,
-                tip = BigDecimal.ZERO,
-                metadata = mutableMapOf()
+                tip = BigDecimal.ZERO
             )
             order.changes.add(OrderingEvent.OrderCreated(
                 order.id, 0,
@@ -140,8 +138,7 @@ class Order private constructor(
                             address = event.address,
                             items = event.items,
                             deliveryCharge = event.deliveryCharge,
-                            tip = BigDecimal.ZERO,
-                            metadata = mutableMapOf()
+                            tip = BigDecimal.ZERO
                         )
                     }
 

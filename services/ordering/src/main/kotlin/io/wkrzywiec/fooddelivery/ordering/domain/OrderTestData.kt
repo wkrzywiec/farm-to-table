@@ -35,8 +35,8 @@ data class OrderTestData private constructor(
     }
 
     fun entity(): Order {
-        var constructor: KFunction<Order>
-        var params: List<KParameter>
+        val constructor: KFunction<Order>
+        val params: List<KParameter>
         try {
             constructor = Order::class.primaryConstructor ?: throw RuntimeException()
             constructor.isAccessible = true

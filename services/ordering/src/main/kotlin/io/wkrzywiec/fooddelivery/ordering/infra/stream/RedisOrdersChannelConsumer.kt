@@ -44,7 +44,7 @@ class RedisOrdersChannelConsumer(
         val payloadMessage = message.value["payload"]
 
         try {
-            val messageAsJson = objectMapper!!.readTree(payloadMessage)
+            val messageAsJson = objectMapper.readTree(payloadMessage)
             val header = map(messageAsJson["header"], Header::class.java)
 
             when (header.type) {
@@ -62,11 +62,11 @@ class RedisOrdersChannelConsumer(
 
     @Throws(JsonProcessingException::class)
     private fun <T> mapMessageBody(fullMessage: JsonNode, valueType: Class<T>): T {
-        return objectMapper!!.treeToValue(fullMessage["body"], valueType)
+        return objectMapper.treeToValue(fullMessage["body"], valueType)
     }
 
     @Throws(JsonProcessingException::class)
     private fun <T> map(fullMessage: JsonNode, valueType: Class<T>): T {
-        return objectMapper!!.treeToValue(fullMessage, valueType)
+        return objectMapper.treeToValue(fullMessage, valueType)
     }
 }
