@@ -53,8 +53,7 @@ data class OrderTestData private constructor(
             params[5] to address,
             params[6] to items.stream().map { obj: ItemTestData -> obj.entity() }.toList(),
             params[7] to deliveryCharge,
-            params[8] to tip,
-            params[9] to metadata,
+            params[8] to tip
         )
         )
 
